@@ -4,7 +4,16 @@
 ******************************************************************************/
 #ifndef _SW_PROXY_H
 #define _SW_PROXY_H
-
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <netdb.h>
+#include <ifaddrs.h>
 
 
 

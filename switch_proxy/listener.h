@@ -10,12 +10,12 @@ using namespace std;
 
 class Listener{
 	public:
-		Listener(int lport, int rport, int ip){}
+		Listener(int lport, int rport, struct sockaddr_in *addr){}
 		~Listener(){}
 	private:
 		int ctl_num;
 		int port;
-		int ip;
+		struct sockaddr_in addr;
 };
 
 #endif

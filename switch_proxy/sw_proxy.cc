@@ -2,11 +2,8 @@
 * Author: Samuel Jero <sjero@purdue.edu>
 * SDN Switch-Controller Proxy
 ******************************************************************************/
-#include <cstdlib>
 #include <list>
 #include <stdarg.h>
-#include <cstdio>
-#include <cstring>
 #include "sw_proxy.h"
 #include "listener.h"
 using namespace std;
@@ -25,7 +22,7 @@ void usage();
 int main(int argc, char** argv)
 {
 	/*parse commandline options*/
-	if (argc == 0) {
+	if (argc == 1) {
 		usage();
 	}
 
@@ -43,16 +40,38 @@ int main(int argc, char** argv)
 			int lport = 0;
 			int rport = 0;
 			char *sip = NULL;
-			sscanf(argv[i], "%i:%ms:%i",&lport, &sip, &rport);
+			sscanf(argv[i], "%i:%m[^:]:%i",&lport, &sip, &rport);
 			if (!lport || !rport || !sip){
 				dbgprintf(0,"Error parsing controller description: %s\n", argv[i]);
 				usage();
 			}
-			int ip;
+
 			/* Parse IP */
+			struct sockaddr_in addr;
+			struct addrinfo hints;
+			struct addrinfo *results, *p;
+			int found;
+			int ret;
+			memset(&hints, 0, sizeof(struct addrinfo));
+			hints.ai_family = AF_INET;
+			if ((ret = getaddrinfo(sip, NULL, &hints, &results)) < 0) {
+				dbgprintf(0, "Error parsing controller description: %s\n", gai_strerror(ret));
+				usage();
+			}
+			found = 0;
+			for (p = results; p!=NULL; p = p->ai_next) {
+				memcpy(&addr, p->ai_addr, sizeof(struct sockaddr_in));
+				found = 1;
+				break;
+			}
+			if (found == 0) {
+				dbgprintf(0, "Error parsing controller description: No IP addresses found\n");
+				usage();
+			}
+			addr.sin_port = htons(rport);
 
 			/* Create Listener */
-			Listener* l = new Listener(lport,rport,ip);
+			Listener* l = new Listener(lport,rport,&addr);
 			listeners.push_front(l);
 		}else{
 			usage();
