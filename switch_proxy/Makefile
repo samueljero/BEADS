@@ -5,7 +5,7 @@ CPP=g++
 CPPFLAGS=-O2 -Wall -Werror -g
 
 BINARIES=sw_proxy
-SRC=sw_proxy.cc
+SRC=sw_proxy.cc listener.cc connection.cc half_conn.cc
 
 .PHONY: clean
 

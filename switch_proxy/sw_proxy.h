@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <unistd.h>
+#include <signal.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -14,8 +16,13 @@
 #include <errno.h>
 #include <netdb.h>
 #include <ifaddrs.h>
+#include <pthread.h>
 
-
+class Message{
+	public:
+		char *buff;
+		int len;
+};
 
 /*debug printf
  * Levels:

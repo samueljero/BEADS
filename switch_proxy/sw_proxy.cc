@@ -73,9 +73,14 @@ int main(int argc, char** argv)
 			/* Create Listener */
 			Listener* l = new Listener(lport,rport,&addr);
 			listeners.push_front(l);
+			l->start();
 		}else{
 			usage();
 		}
+	}
+
+	for (list<Listener*>::iterator it=listeners.begin(); it!=listeners.end(); it++) {
+		(*it)->join();
 	}
 }
 

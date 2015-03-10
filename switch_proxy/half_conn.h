@@ -2,33 +2,29 @@
 * Author: Samuel Jero <sjero@purdue.edu>
 * SDN Switch-Controller Proxy
 ******************************************************************************/
-#ifndef _LISTENER_H
-#define _LISTENER_H
+#ifndef _HALF_CONN_H
+#define _HALF_CONN_H
 #include "sw_proxy.h"
-#include "connection.h"
 #include <string>
-#include <list>
 using namespace std;
 
-class Listener{
+class HalfConn{
 	public:
-		Listener(int lport, int rport, struct sockaddr_in *addr);
-		int start();
-		int getLport(){return lport;}
-		~Listener();
-		void join();
-
+		HalfConn(){}
+		HalfConn(int fsock, HalfConn *other);
+		HalfConn(struct sockaddr_in *raddr, int rport, HalfConn *other);
+		~HalfConn(){}
+		bool sendm(Message m);
+		bool start();
 	private:
-		static void* listen_thread_run(void *arg);
+		static void* thread_run(void* arg);
 		void run();
 
-		int ctl_num;
-		int lport;
+		HalfConn *other;
 		int rport;
 		int sock;
 		struct sockaddr_in addr;
-		pthread_t listen_thread;
-		list<Connection*> connections;
+		pthread_t rcv_thread;
 };
 
 #endif
