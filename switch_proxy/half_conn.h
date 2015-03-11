@@ -19,6 +19,7 @@ class HalfConn{
 	private:
 		static void* thread_run(void* arg);
 		void run();
+		Message recvMsg();
 
 		HalfConn *other;
 		int rport;

@@ -75,7 +75,9 @@ void Listener::run(){
 		dbgprintf(1, "New Connection on port: %i\n", lport);
 		conn = new Connection(new_sock, rport, &addr);
 		connections.push_front(conn);
-		conn->start();
+		if (!conn->start()) {
+			dbgprintf(0, "Error starting connection!\n");
+		}
 	}
 }
 

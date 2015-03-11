@@ -80,40 +80,12 @@ struct ofp_header{
 
 void HalfConn::run()
 {
-	char *buff;
-	int blen;
-	int len;
-	int mlen;
 	Message m;
-	struct ofp_header *hdr;
 
 	while (true) {
-		mlen = blen = 65535;
-		m.len = 0;
-		buff = m.buff = (char*)malloc(blen);
-		if (!buff) {
-			dbgprintf(0, "Error: Cannot allocate Memory!\n");
-			close(sock);
-			sock = 0;
-			return;
-		}
-		
-		/* Receive Message */
-		while (mlen > m.len) {
-			if ((len = recv(sock,buff,blen,0)) < 0) {
-				dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
-				close(sock);
-				sock = 0;
-				return;
-			}
-
-			if (m.len < 4 && len >= 4) { /* find the length in the OpenFlow header */
-				hdr = (struct ofp_header*)m.buff;
-				blen = mlen = ntohs(hdr->length);
-			}
-			buff += len;
-			m.len += len;
-			blen -= len;
+		m = recvMsg();
+		if (m.buff == NULL){
+			break;
 		}
 
 		dbgprintf(1, "Received OpenFlow message\n");
@@ -122,4 +94,59 @@ void HalfConn::run()
 		other->sendm(m);
 		free(m.buff);
 	}
+}
+
+
+Message HalfConn::recvMsg()
+{
+	char hdrbuff[32];
+	char *buff;
+	int blen;
+	int len;
+	Message m;
+	struct ofp_header *hdr;
+
+	/* Peak at header */
+	len = 0;
+	while (len < 4) {
+		if ((len = recv(sock,hdrbuff,32,MSG_PEEK)) < 0) {
+			dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
+			close(sock);
+			sock = 0;
+			m.buff = NULL;
+			return m;
+		}
+	}
+
+	/* Determine message length */
+	hdr = (struct ofp_header*)m.buff;
+	blen = ntohs(hdr->length);
+	m.len = 0;
+
+	buff = m.buff = (char*)malloc(blen);
+	if (!buff) {
+		dbgprintf(0, "Error: Cannot allocate Memory!\n");
+		close(sock);
+		sock = 0;
+		m.buff = NULL;
+		return m;
+	}
+	
+	/* Receive Message */
+	while (blen > 0) {
+		if ((len = recv(sock,buff,blen,0)) < 0) {
+			dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
+			close(sock);
+			sock = 0;
+			free(m.buff);
+			m.buff = NULL;
+			return m;
+		}
+
+		buff += len;
+		m.len += len;
+		blen -= len;
+	}
+
+	return m;
 }

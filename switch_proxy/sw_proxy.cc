@@ -73,7 +73,10 @@ int main(int argc, char** argv)
 			/* Create Listener */
 			Listener* l = new Listener(lport,rport,&addr);
 			listeners.push_front(l);
-			l->start();
+			if (!l->start()) {
+				dbgprintf(0, "Error starting Listeners!\n");
+				exit(1);
+			}
 		}else{
 			usage();
 		}
