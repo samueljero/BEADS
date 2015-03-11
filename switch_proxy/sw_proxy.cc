@@ -12,7 +12,7 @@ using namespace std;
 #define SWPROXY_VERSION 0.1
 #define COPYRIGHT_YEAR 2015
 
-int debug = 0;
+int debug = 1;
 list<Listener*> listeners;
 
 void version();

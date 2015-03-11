@@ -28,27 +28,30 @@ HalfConn::HalfConn(struct sockaddr_in *raddr, int rport, HalfConn *other)
 {
 	this->other = other;
 	this->rport = rport;
+	this->sock = 0;
 	memcpy(&this->addr, raddr, sizeof(struct sockaddr_in));
-	
-	sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock < 0) {
-		dbgprintf(0, "Connection Failed: Could not create socket: %s\n", strerror(errno));
-		sock = 0;
-		return;
-	}
-
-	if (connect(sock, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0) {
-		dbgprintf(0, "Connection Failed: %s\n", strerror(errno));
-		close(sock);
-		sock = 0;
-		return;
-	}
 }
 
 bool HalfConn::start()
 {
-	if (sock <= 0 && other == NULL) {
+	if (other == NULL) {
 		return false;
+	}
+
+	if (sock == 0) {
+		sock = socket(AF_INET, SOCK_STREAM, 0);
+		if (sock < 0) {
+			dbgprintf(0, "Connection Failed: Could not create socket: %s\n", strerror(errno));
+			sock = 0;
+			return false;
+		}
+
+		if (connect(sock, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0) {
+			dbgprintf(0, "Connection Failed: %s\n", strerror(errno));
+			close(sock);
+			sock = 0;
+			return false;
+		}
 	}
 
 	if (pthread_create(&rcv_thread, NULL, thread_run, this) < 0) {
@@ -106,12 +109,14 @@ void HalfConn::run()
 
 			if (m.len < 4 && len >= 4) { /* find the length in the OpenFlow header */
 				hdr = (struct ofp_header*)m.buff;
-				mlen = ntohs(hdr->length);
+				blen = mlen = ntohs(hdr->length);
 			}
 			buff += len;
 			m.len += len;
 			blen -= len;
 		}
+
+		dbgprintf(1, "Received OpenFlow message\n");
 
 		/* Send message */
 		other->sendm(m);
