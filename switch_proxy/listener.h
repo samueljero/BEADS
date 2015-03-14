@@ -13,7 +13,7 @@ using namespace std;
 class Listener{
 	public:
 		Listener(int lport, int rport, struct sockaddr_in *addr);
-		int start();
+		bool start();
 		int getLport(){return lport;}
 		~Listener();
 		void join();

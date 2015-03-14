@@ -6,12 +6,15 @@
 
 bool HalfConn::sendm(Message m)
 {
+	int len;
 	if (sock <= 0) {
 		return false;
 	}
 	
-	if (send(sock, m.buff, m.len, 0) < 0) {
+	if ((len = send(sock, m.buff, m.len, MSG_NOSIGNAL)) < 0) {
 		dbgprintf(0, "Send Failed: %s\n", strerror(errno));
+		close(sock);
+		sock = 0;
 		return false;
 	}
 
@@ -91,7 +94,12 @@ void HalfConn::run()
 		dbgprintf(1, "Received OpenFlow message\n");
 
 		/* Send message */
-		other->sendm(m);
+		if(!other->sendm(m)) {
+			close(sock);
+			sock = 0;
+			free(m.buff);
+			break;
+		}
 		free(m.buff);
 	}
 }
@@ -119,7 +127,7 @@ Message HalfConn::recvMsg()
 	}
 
 	/* Determine message length */
-	hdr = (struct ofp_header*)m.buff;
+	hdr = (struct ofp_header*)hdrbuff;
 	blen = ntohs(hdr->length);
 	m.len = 0;
 

@@ -13,20 +13,20 @@ Listener::Listener(int lport, int rport, struct sockaddr_in *addr)
 	memcpy(&this->addr, addr, sizeof(struct sockaddr_in));
 }
 
-int Listener::start()
+bool Listener::start()
 {
 	struct sockaddr_in sin;
 
 	if (sock) {
 		/*Already running*/
-		return 0;
+		return false;
 	}
 
 	/* Setup Socket */
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock < 0) {
 		dbgprintf(0, "Error: Can't create listen_socket: %s\n",strerror(errno));
-		return -1;
+		return false;
 	}
 
 	memset(&sin, 0, sizeof(sin));
@@ -35,22 +35,22 @@ int Listener::start()
 	sin.sin_port = htons(lport);
 	if (bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0 ) {
 		dbgprintf(0, "Error: Can't bind listen_socket to port %i: %s\n",lport, strerror(errno));
-		return -1;
+		return false;
 	}
 
 	if (listen(sock, 5) < 0) {
 		dbgprintf(0, "Error: Can't listen on listen_socket: %s\n",strerror(errno));
-		return -1;
+		return false;
 	}
 
 	if (pthread_create(&listen_thread, NULL, listen_thread_run, this) < 0) {
 		dbgprintf(0, "Error: Failed to start listen thread!: %s\n", strerror(errno));
 		close(sock);
 		sock = 0;
-		return -1;
+		return false;
 	}
 
-	return 0;
+	return true;
 }
 
 /* stupid pthreads/C++ glue */
