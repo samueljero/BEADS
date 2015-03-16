@@ -3,6 +3,14 @@
 * SDN Switch-Controller Proxy
 ******************************************************************************/
 #include "half_conn.h"
+extern "C" {
+#include <loci/loci.h>
+#include <loci/of_object.h>
+#include <loci/loci_obj_dump.h>
+}
+#include <stdarg.h>
+
+pthread_mutex_t ofo_print_serialization_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 bool HalfConn::sendm(Message m)
 {
@@ -101,10 +109,18 @@ struct ofp_header{
 	uint16_t length;
 };
 
+int writer(void *cookie, const char *fmt, ...)
+{
+    va_list args;
+	va_start(args, fmt);
+	int ret = vfprintf(stderr, fmt, args);
+	va_end(args);
+	return ret;
+}
+
 void HalfConn::run()
 {
 	Message m;
-	int i = 0;
 
 	while (running) {
 		m = recvMsg();
@@ -116,18 +132,25 @@ void HalfConn::run()
 			break;
 		}
 
-		if (i%100 == 0) {
-		dbgprintf(1, "Received OpenFlow message\n");
+		
+		of_message_t msg = OF_BUFFER_TO_MESSAGE(m.buff);
+		of_object_t *ofo = of_object_new_from_message(msg, m.len);
+		if (debug > 0) {
+			pthread_mutex_lock(&ofo_print_serialization_mutex);
+			dbgprintf(0,"##################\nGot Message\n");
+			of_object_dump((loci_writer_f)&writer,NULL,ofo);
+			dbgprintf(0,"##################\n");
+			pthread_mutex_unlock(&ofo_print_serialization_mutex);
 		}
-		i++;
+		
 
 		/* Send message */
 		if(!other->sendm(m)) {
 			stop();
-			free(m.buff);
+			of_object_delete(ofo);
 			break;
 		}
-		free(m.buff);
+		of_object_delete(ofo);
 	}
 }
 
