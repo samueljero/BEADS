@@ -17,10 +17,13 @@ list<Listener*> listeners;
 
 void version();
 void usage();
+void control_loop(int port);
 
 
 int main(int argc, char** argv)
 {
+	int ctlport = 3333;
+
 	/*parse commandline options*/
 	if (argc == 1) {
 		usage();
@@ -34,6 +37,13 @@ int main(int argc, char** argv)
 			usage();
 		} else if (strcmp(argv[i], "-v") == 0) { /*-v*/
 			debug++;
+		} else if (strcmp(argv[i], "-p") == 0) { /*-p*/
+			i++;
+			ctlport = atoi(argv[i]);
+			if ( ctlport <= 0 || ctlport > 65535) {
+				dbgprintf(0, "Error parsing control port: %s\n", argv[i]);
+				usage();
+			}
 		} else if (argv[i][0] == '-' && argv[i][1] == 'c'){ /*-c*/
 			i++;
 			/* Parse Line */
@@ -82,8 +92,44 @@ int main(int argc, char** argv)
 		}
 	}
 
-	for (list<Listener*>::iterator it=listeners.begin(); it!=listeners.end(); it++) {
-		(*it)->join();
+	control_loop(ctlport);
+}
+
+void control_loop(int port)
+{
+	struct sockaddr_in sin;
+	int sock;
+	int new_sock;
+
+	/* Setup Socket */
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock < 0) {
+		dbgprintf(0, "Error: Can't create control_socket: %s\n",strerror(errno));
+		return;
+	}
+
+	memset(&sin, 0, sizeof(sin));
+	sin.sin_family = AF_INET;
+	sin.sin_addr.s_addr = INADDR_ANY;
+	sin.sin_port = htons(port);
+	if (bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0 ) {
+		dbgprintf(0, "Error: Can't bind control_socket to port %i: %s\n",port, strerror(errno));
+		return;
+	}
+
+	if (listen(sock, 5) < 0) {
+		dbgprintf(0, "Error: Can't listen on control_socket: %s\n",strerror(errno));
+		return;
+	}
+
+	while(true){
+		new_sock = accept(sock, NULL, NULL);
+		if (new_sock < 0) {
+			dbgprintf(0, "Error: Accept() failed!: %s\n", strerror(errno));
+			break;
+		}
+
+		dbgprintf(1, "New Control Connection\n");
 	}
 }
 
@@ -100,7 +146,7 @@ void version()
 /*Usage information for program*/
 void usage()
 {
-	dbgprintf(0,"Usage: sw_proxy [-v] [-V] [-h] [-c local_port:remote_ip:remote_port]\n");
+	dbgprintf(0,"Usage: sw_proxy [-v] [-V] [-h] [-c local_port:remote_ip:remote_port] [-p control_port]\n");
 	dbgprintf(0, "          -v   verbose. May be repeated for additional verbosity.\n");
 	dbgprintf(0, "          -V   Version information\n");
 	dbgprintf(0, "          -h   Help\n");
