@@ -24,7 +24,7 @@ class Queue{
 class Connection{
 	public:
 		Connection(int fsock, int rport, struct sockaddr_in *raddr);
-		~Connection();
+		~Connection(){}
 		HalfConn* getBH(){return &bh;}
 		HalfConn* getTH(){return &th;}
 		bool start();

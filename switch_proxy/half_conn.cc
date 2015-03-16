@@ -13,8 +13,7 @@ bool HalfConn::sendm(Message m)
 	
 	if ((len = send(sock, m.buff, m.len, MSG_NOSIGNAL)) < 0) {
 		dbgprintf(0, "Send Failed: %s\n", strerror(errno));
-		close(sock);
-		sock = 0;
+		stop();
 		return false;
 	}
 
@@ -56,15 +55,36 @@ bool HalfConn::start()
 			return false;
 		}
 	}
-
+	
+	running = true;
 	if (pthread_create(&rcv_thread, NULL, thread_run, this) < 0) {
 		dbgprintf(0, "Error: Failed to start receive thread!: %s\n", strerror(errno));
 		close(sock);
 		sock = 0;
+		running = false;
 		return false;
+	}
+
+	if (pthread_detach(rcv_thread) < 0) {
+		dbgprintf(0, "Error: Failed to detach receive thread!: %s\n", strerror(errno));
 	}
 	
 	return true;
+}
+
+bool HalfConn::stop()
+{
+	if (running && sock > 0) {
+		running = false;
+		close(sock);
+		sock = 0;
+	}
+	return true;
+}
+
+bool HalfConn::isRunning()
+{
+	return running;
 }
 
 /* stupid pthreads/C++ glue */
@@ -84,19 +104,26 @@ struct ofp_header{
 void HalfConn::run()
 {
 	Message m;
+	int i = 0;
 
-	while (true) {
+	while (running) {
 		m = recvMsg();
 		if (m.buff == NULL){
+			running = false;
+			if (other->isRunning()) {
+				other->stop();
+			}
 			break;
 		}
 
+		if (i%100 == 0) {
 		dbgprintf(1, "Received OpenFlow message\n");
+		}
+		i++;
 
 		/* Send message */
 		if(!other->sendm(m)) {
-			close(sock);
-			sock = 0;
+			stop();
 			free(m.buff);
 			break;
 		}
@@ -118,9 +145,15 @@ Message HalfConn::recvMsg()
 	len = 0;
 	while (len < 4) {
 		if ((len = recv(sock,hdrbuff,32,MSG_PEEK)) < 0) {
-			dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
-			close(sock);
-			sock = 0;
+			if (running) {
+				dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
+				stop();
+			}
+			m.buff = NULL;
+			return m;
+		}
+		if (len == 0) {
+			stop();
 			m.buff = NULL;
 			return m;
 		}
@@ -134,8 +167,7 @@ Message HalfConn::recvMsg()
 	buff = m.buff = (char*)malloc(blen);
 	if (!buff) {
 		dbgprintf(0, "Error: Cannot allocate Memory!\n");
-		close(sock);
-		sock = 0;
+		stop();
 		m.buff = NULL;
 		return m;
 	}
@@ -143,9 +175,16 @@ Message HalfConn::recvMsg()
 	/* Receive Message */
 	while (blen > 0) {
 		if ((len = recv(sock,buff,blen,0)) < 0) {
-			dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
-			close(sock);
-			sock = 0;
+			if (running) {
+				dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
+				stop();
+			}
+			free(m.buff);
+			m.buff = NULL;
+			return m;
+		}
+		if (len == 0) {
+			stop();
 			free(m.buff);
 			m.buff = NULL;
 			return m;

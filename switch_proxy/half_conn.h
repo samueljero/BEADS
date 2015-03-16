@@ -16,6 +16,9 @@ class HalfConn{
 		~HalfConn(){}
 		bool sendm(Message m);
 		bool start();
+		bool stop();
+		bool isRunning();
+
 	private:
 		static void* thread_run(void* arg);
 		void run();
@@ -24,6 +27,8 @@ class HalfConn{
 		HalfConn *other;
 		int rport;
 		int sock;
+		bool running;
+		bool joined;
 		struct sockaddr_in addr;
 		pthread_t rcv_thread;
 };

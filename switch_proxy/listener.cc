@@ -74,9 +74,24 @@ void Listener::run(){
 
 		dbgprintf(1, "New Connection on port: %i\n", lport);
 		conn = new Connection(new_sock, rport, &addr);
-		connections.push_front(conn);
 		if (!conn->start()) {
 			dbgprintf(0, "Error starting connection!\n");
+			delete conn;
+			continue;
+		}
+		connections.push_front(conn);
+
+		cleanupConnections();
+	}
+}
+
+void Listener::cleanupConnections()
+{
+	list<Connection*>::iterator tmp;
+	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
+		if( !(*it)->getBH()->isRunning() && !(*it)->getTH()->isRunning()) {
+			connections.erase(it);
+			it = connections.begin();
 		}
 	}
 }

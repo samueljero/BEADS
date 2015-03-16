@@ -21,6 +21,7 @@ class Listener{
 	private:
 		static void* listen_thread_run(void *arg);
 		void run();
+		void cleanupConnections();
 
 		int ctl_num;
 		int lport;
