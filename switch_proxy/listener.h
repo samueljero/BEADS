@@ -17,6 +17,7 @@ class Listener{
 		int getLport(){return lport;}
 		~Listener();
 		void join();
+		bool cmd(uint64_t dpid, Message m);
 
 	private:
 		static void* listen_thread_run(void *arg);
@@ -30,6 +31,7 @@ class Listener{
 		struct sockaddr_in addr;
 		pthread_t listen_thread;
 		list<Connection*> connections;
+		pthread_mutex_t mutex;
 };
 
 #endif

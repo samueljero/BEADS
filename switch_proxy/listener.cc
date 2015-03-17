@@ -11,6 +11,7 @@ Listener::Listener(int lport, int rport, struct sockaddr_in *addr)
 	this->lport = lport;
 	this->rport = rport;
 	memcpy(&this->addr, addr, sizeof(struct sockaddr_in));
+	pthread_mutex_init(&mutex, NULL);
 }
 
 bool Listener::start()
@@ -79,7 +80,9 @@ void Listener::run(){
 			delete conn;
 			continue;
 		}
+		pthread_mutex_lock(&mutex);
 		connections.push_front(conn);
+		pthread_mutex_unlock(&mutex);
 
 		cleanupConnections();
 	}
@@ -87,13 +90,40 @@ void Listener::run(){
 
 void Listener::cleanupConnections()
 {
-	list<Connection*>::iterator tmp;
+	pthread_mutex_lock(&mutex);
 	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
 		if( !(*it)->getBH()->isRunning() && !(*it)->getTH()->isRunning()) {
+			delete *it;
 			connections.erase(it);
 			it = connections.begin();
 		}
 	}
+	pthread_mutex_unlock(&mutex);
+}
+
+bool Listener::cmd(uint64_t dpid, Message m)
+{
+	bool ret = false;
+	pthread_mutex_lock(&mutex);
+	if (dpid == DPID_MAX) {
+		for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
+				(*it)->getBH()->cmd(m);
+				(*it)->getTH()->cmd(m);
+				ret = true;
+		}
+	} else {
+		for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
+			if((*it)->getBH()->getDPID() == dpid) {
+				ret = (*it)->getBH()->cmd(m);
+				if (ret) {
+					(*it)->getTH()->cmd(m);
+				}
+				break;
+			}
+		}
+	}
+	pthread_mutex_unlock(&mutex);
+	return ret;
 }
 
 Listener::~Listener()

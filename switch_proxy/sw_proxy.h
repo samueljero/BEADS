@@ -18,6 +18,8 @@
 #include <ifaddrs.h>
 #include <pthread.h>
 
+#define DPID_MAX 0xFFFFFFFFFFFFFFFF
+
 class Message{
 	public:
 		char *buff;
@@ -30,7 +32,7 @@ class Message{
  *  1) Errors and warnings... Don't overload the screen with too much output
  *  2) Notes and per-packet processing info... as verbose as needed
  */
-extern int debug;
+extern int sw_proxy_debug;
 void dbgprintf(int level, const char *fmt, ...);
 
 #endif

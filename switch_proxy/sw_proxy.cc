@@ -6,23 +6,29 @@
 #include <stdarg.h>
 #include "sw_proxy.h"
 #include "listener.h"
+#include "control.h"
 using namespace std;
 
 
 #define SWPROXY_VERSION 0.1
 #define COPYRIGHT_YEAR 2015
 
-int debug = 1;
+int sw_proxy_debug = 1;
+
 list<Listener*> listeners;
+pthread_mutex_t listeners_mutex  = PTHREAD_MUTEX_INITIALIZER;
+list<Control*> controls;
 
 void version();
 void usage();
 void control_loop(int port);
+void cleanupControls();
 
 
 int main(int argc, char** argv)
 {
 	int ctlport = 3333;
+	pthread_mutex_init(&listeners_mutex, NULL);
 
 	/*parse commandline options*/
 	if (argc == 1) {
@@ -36,7 +42,7 @@ int main(int argc, char** argv)
 		} else if (strcmp(argv[i], "-h") == 0) { /*-h*/
 			usage();
 		} else if (strcmp(argv[i], "-v") == 0) { /*-v*/
-			debug++;
+			sw_proxy_debug++;
 		} else if (strcmp(argv[i], "-p") == 0) { /*-p*/
 			i++;
 			ctlport = atoi(argv[i]);
@@ -82,7 +88,9 @@ int main(int argc, char** argv)
 
 			/* Create Listener */
 			Listener* l = new Listener(lport,rport,&addr);
+			pthread_mutex_lock(&listeners_mutex);
 			listeners.push_front(l);
+			pthread_mutex_unlock(&listeners_mutex);
 			if (!l->start()) {
 				dbgprintf(0, "Error starting Listeners!\n");
 				exit(1);
@@ -100,6 +108,7 @@ void control_loop(int port)
 	struct sockaddr_in sin;
 	int sock;
 	int new_sock;
+	Control *ctl;
 
 	/* Setup Socket */
 	sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -130,6 +139,23 @@ void control_loop(int port)
 		}
 
 		dbgprintf(1, "New Control Connection\n");
+		
+		ctl = new Control(new_sock, &listeners, &listeners_mutex);
+		ctl->start();
+		controls.push_front(ctl);
+
+		cleanupControls();
+	}
+}
+
+void cleanupControls()
+{
+	for (list<Control*>::iterator it = controls.begin(); it != controls.end(); it++) {
+		if( !(*it)->isRunning()) {
+			delete *it;
+			controls.erase(it);
+			it = controls.begin();
+		}
 	}
 }
 
@@ -157,7 +183,7 @@ void usage()
 void dbgprintf(int level, const char *fmt, ...)
 {
     va_list args;
-    if (debug >= level) {
+    if (sw_proxy_debug >= level) {
     	va_start(args, fmt);
     	vfprintf(stderr, fmt, args);
     	va_end(args);

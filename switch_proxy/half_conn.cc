@@ -9,7 +9,6 @@ extern "C" {
 #include <loci/loci_obj_dump.h>
 }
 #include <stdarg.h>
-#define DPID_MAX 0xFFFFFFFFFFFFFFFF
 
 pthread_mutex_t ofo_print_serialization_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -36,6 +35,8 @@ HalfConn::HalfConn(int fsock, int cid, HalfConn *other)
 	this->dpid = DPID_MAX;
 	this->dir = STOC;
 	this->cid = cid;
+	this->print_messages = false;
+	pthread_mutex_init(&mutex, NULL);
 }
 
 HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *other)
@@ -46,7 +47,9 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 	this->dpid = DPID_MAX;
 	this->dir = CTOS;
 	this->cid = cid;
+	this->print_messages = false;
 	memcpy(&this->addr, raddr, sizeof(struct sockaddr_in));
+	pthread_mutex_init(&mutex, NULL);
 }
 
 bool HalfConn::start()
@@ -134,13 +137,14 @@ void HalfConn::run()
 			break;
 		}
 
-		
+		pthread_mutex_lock(&mutex);
+
 		of_message_t msg = OF_BUFFER_TO_MESSAGE(m.buff);
 		of_object_t *ofo = of_object_new_from_message(msg, m.len);
 		if (dpid == DPID_MAX && ofo->object_id == OF_FEATURES_REPLY) {
 			of_features_reply_datapath_id_get(ofo, &dpid);
 		}
-		if (debug > 0) {
+		if (sw_proxy_debug > 2 || print_messages) {
 			pthread_mutex_lock(&ofo_print_serialization_mutex);
 			if (dir == STOC) {
 				dbgprintf(0,"##################\nGot Message (s %llu -> c %i)\n", dpid, other->getCID());
@@ -151,7 +155,8 @@ void HalfConn::run()
 			dbgprintf(0,"##################\n");
 			pthread_mutex_unlock(&ofo_print_serialization_mutex);
 		}
-		
+
+		pthread_mutex_unlock(&mutex);
 
 		/* Send message */
 		if(!other->sendm(m)) {
@@ -228,4 +233,18 @@ Message HalfConn::recvMsg()
 	}
 
 	return m;
+}
+
+bool HalfConn::cmd(Message m)
+{
+	pthread_mutex_lock(&mutex);
+	if (strcmp(m.buff, "print,on")==0) {
+		print_messages = true;
+	} else if (strcmp(m.buff, "print,off")==0) {
+		print_messages = false;
+	} else {
+		dbgprintf(0, "Warning: unknown command: %s\n", m.buff);
+	}
+	pthread_mutex_unlock(&mutex);
+	return true;
 }

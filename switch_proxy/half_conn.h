@@ -22,6 +22,7 @@ class HalfConn{
 		bool sendm(Message m);
 		bool start();
 		bool stop();
+		bool cmd(Message m);
 		bool isRunning() {return running;}
 		uint64_t getDPID() {return dpid;}
 		int getCID() {return cid;}
@@ -38,10 +39,12 @@ class HalfConn{
 		int cid;
 		bool running;
 		bool joined;
+		bool print_messages;
 		enum direction dir;
 		uint64_t dpid;
 		struct sockaddr_in addr;
 		pthread_t rcv_thread;
+		pthread_mutex_t mutex;
 };
 
 #endif
