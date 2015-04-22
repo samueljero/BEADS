@@ -75,8 +75,13 @@ void Listener::run(){
 
 		dbgprintf(1, "New Connection on port: %i\n", lport);
 		conn = new Connection(new_sock, lport, rport, &addr);
+		if (!conn) {
+			dbgprintf(0, "Error: Cannot allocate new connection!\n");
+			break;
+		}
 		if (!conn->start()) {
 			dbgprintf(0, "Error starting connection!\n");
+			conn->stop();
 			delete conn;
 			continue;
 		}

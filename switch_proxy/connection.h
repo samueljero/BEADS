@@ -28,6 +28,7 @@ class Connection{
 		HalfConn* getBH(){return &bh;}
 		HalfConn* getTH(){return &th;}
 		bool start();
+		void stop();
 	private:
 		HalfConn bh;
 		HalfConn th;

@@ -92,8 +92,26 @@ bool HalfConn::start()
 
 bool HalfConn::stop()
 {
-	if (running && sock > 0) {
+	if (running) {
+			running = false;
+	}
+	if (sock > 0) {
+		close(sock);
+		sock = 0;
+	}
+	if (running) {
 		running = false;
+		pthread_join(rcv_thread,NULL);
+	}	
+	return true;
+}
+
+bool HalfConn::_stop()
+{
+	if (running) {
+			running = false;
+	}
+	if (sock > 0) {
 		close(sock);
 		sock = 0;
 	}
@@ -160,7 +178,7 @@ void HalfConn::run()
 
 		/* Send message */
 		if(!other->sendm(m)) {
-			stop();
+			_stop();
 			of_object_delete(ofo);
 			break;
 		}
@@ -204,7 +222,7 @@ Message HalfConn::recvMsg()
 	buff = m.buff = (char*)malloc(blen);
 	if (!buff) {
 		dbgprintf(0, "Error: Cannot allocate Memory!\n");
-		stop();
+		_stop();
 		m.buff = NULL;
 		return m;
 	}
@@ -221,7 +239,7 @@ Message HalfConn::recvMsg()
 			return m;
 		}
 		if (len == 0) {
-			stop();
+			_stop();
 			free(m.buff);
 			m.buff = NULL;
 			return m;

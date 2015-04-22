@@ -12,5 +12,12 @@ Connection::Connection(int fsock, int lport, int rport, struct sockaddr_in *radd
 
 bool Connection::start()
 {
-	return bh.start() && th.start();
+	return th.start() && bh.start();
+}
+
+void Connection::stop()
+{
+	bh.stop();
+	th.stop();
+	return;
 }
