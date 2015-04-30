@@ -10,6 +10,7 @@ Listener::Listener(int lport, int rport, struct sockaddr_in *addr)
 {
 	this->lport = lport;
 	this->rport = rport;
+	this->sock = 0;
 	memcpy(&this->addr, addr, sizeof(struct sockaddr_in));
 	pthread_mutex_init(&mutex, NULL);
 }
@@ -29,6 +30,12 @@ bool Listener::start()
 		dbgprintf(0, "Error: Can't create listen_socket: %s\n",strerror(errno));
 		return false;
 	}
+
+	//int so_reuseaddr = 1;
+	//if (setsockopt(sock, SOL_SOCKET,SO_REUSEADDR, &so_reuseaddr, sizeof(so_reuseaddr))< 0){
+	//	dbgprintf(0, "Error: Can't create listen_socket: %s\n",strerror(errno));
+	//	return false;
+	//}
 
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
@@ -85,11 +92,12 @@ void Listener::run(){
 			delete conn;
 			continue;
 		}
-		pthread_mutex_lock(&mutex);
-		connections.push_front(conn);
-		pthread_mutex_unlock(&mutex);
 
 		cleanupConnections();
+
+		pthread_mutex_lock(&mutex);
+		connections.push_back(conn);
+		pthread_mutex_unlock(&mutex);
 	}
 }
 
@@ -98,9 +106,12 @@ void Listener::cleanupConnections()
 	pthread_mutex_lock(&mutex);
 	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
 		if( !(*it)->getBH()->isRunning() && !(*it)->getTH()->isRunning()) {
-			delete *it;
-			connections.erase(it);
-			it = connections.begin();
+			(*it)->stop();
+			if(!(*it)->getBH()->isThread() && (*it)->getTH()->isThread()) {
+				delete *it;
+				connections.erase(it);
+				it = connections.begin();
+			}
 		}
 	}
 	pthread_mutex_unlock(&mutex);
@@ -134,7 +145,6 @@ bool Listener::cmd(uint64_t dpid, Message m)
 Listener::~Listener()
 {
 	close(sock);
-	pthread_kill(listen_thread,SIGINT);
 }
 
 void Listener::join()

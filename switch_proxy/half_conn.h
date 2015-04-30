@@ -6,6 +6,9 @@
 #define _HALF_CONN_H
 #include "sw_proxy.h"
 #include <string>
+extern "C" {
+#include <loci/loci.h>
+}
 using namespace std;
 
 enum direction {
@@ -24,6 +27,7 @@ class HalfConn{
 		bool stop();
 		bool cmd(Message m);
 		bool isRunning() {return running;}
+		bool isThread()	 {return thread;}
 		uint64_t getDPID() {return dpid;}
 		int getCID() {return cid;}
 		enum direction getDIR() {return dir;}
@@ -32,6 +36,7 @@ class HalfConn{
 		static void* thread_run(void* arg);
 		void run();
 		bool _stop();
+		of_object_t* doAttack(of_object_t* ofo);
 		Message recvMsg();
 
 		HalfConn *other;
@@ -39,7 +44,7 @@ class HalfConn{
 		int sock;
 		int cid;
 		bool running;
-		bool joined;
+		bool thread;
 		bool print_messages;
 		enum direction dir;
 		uint64_t dpid;

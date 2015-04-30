@@ -36,6 +36,8 @@ HalfConn::HalfConn(int fsock, int cid, HalfConn *other)
 	this->dir = STOC;
 	this->cid = cid;
 	this->print_messages = false;
+	this->thread = false;
+	this->running = false;
 	pthread_mutex_init(&mutex, NULL);
 }
 
@@ -48,6 +50,8 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 	this->dir = CTOS;
 	this->cid = cid;
 	this->print_messages = false;
+	this->thread = false;
+	this->running = false;
 	memcpy(&this->addr, raddr, sizeof(struct sockaddr_in));
 	pthread_mutex_init(&mutex, NULL);
 }
@@ -82,11 +86,7 @@ bool HalfConn::start()
 		running = false;
 		return false;
 	}
-
-	if (pthread_detach(rcv_thread) < 0) {
-		dbgprintf(0, "Error: Failed to detach receive thread!: %s\n", strerror(errno));
-	}
-	
+	thread = true;
 	return true;
 }
 
@@ -99,8 +99,7 @@ bool HalfConn::stop()
 		close(sock);
 		sock = 0;
 	}
-	if (running) {
-		running = false;
+	if (thread) {
 		pthread_join(rcv_thread,NULL);
 	}	
 	return true;
@@ -123,6 +122,7 @@ void* HalfConn::thread_run(void* arg)
 {
 	HalfConn *t = (HalfConn*)arg;
 	t->run();
+	t->thread = false;
 	return NULL;
 }
 
@@ -155,25 +155,30 @@ void HalfConn::run()
 			break;
 		}
 
+		/* Avoid changes during packet processing */
 		pthread_mutex_lock(&mutex);
 
+		/* Buffer to of_object */
 		of_message_t msg = OF_BUFFER_TO_MESSAGE(m.buff);
 		of_object_t *ofo = of_object_new_from_message(msg, m.len);
 		if (dpid == DPID_MAX && ofo->object_id == OF_FEATURES_REPLY) {
 			of_features_reply_datapath_id_get(ofo, &dpid);
 		}
-		if (sw_proxy_debug > 2 || print_messages) {
-			pthread_mutex_lock(&ofo_print_serialization_mutex);
-			if (dir == STOC) {
-				dbgprintf(0,"##################\nGot Message (s %llu -> c %i)\n", dpid, other->getCID());
-			}else {
-				dbgprintf(0,"##################\nGot Message (c %i -> s %llu)\n", cid, other->getDPID());
-			}
-			of_object_dump((loci_writer_f)&writer,NULL,ofo);
-			dbgprintf(0,"##################\n");
-			pthread_mutex_unlock(&ofo_print_serialization_mutex);
+
+		ofo = doAttack(ofo);
+
+		if (ofo == NULL) {
+			/* No message to send */
+			pthread_mutex_unlock(&mutex);
+			continue;
 		}
 
+		/* of_object to buffer */
+		msg = OF_OBJECT_TO_MESSAGE(ofo);
+		m.buff = (char*)OF_MESSAGE_TO_BUFFER(msg);
+		m.len = of_message_length_get(msg);
+
+		/* Avoid changes during packet processing */
 		pthread_mutex_unlock(&mutex);
 
 		/* Send message */
@@ -265,4 +270,22 @@ bool HalfConn::cmd(Message m)
 	}
 	pthread_mutex_unlock(&mutex);
 	return true;
+}
+
+
+of_object_t* HalfConn::doAttack(of_object_t* ofo)
+{
+	if (sw_proxy_debug > 2 || print_messages) {
+		pthread_mutex_lock(&ofo_print_serialization_mutex);
+		if (dir == STOC) {
+			dbgprintf(0,"##################\nGot Message (s %llu -> c %i)\n", dpid, other->getCID());
+		}else {
+			dbgprintf(0,"##################\nGot Message (c %i -> s %llu)\n", cid, other->getDPID());
+		}
+		of_object_dump((loci_writer_f)&writer,NULL,ofo);
+		dbgprintf(0,"##################\n");
+		pthread_mutex_unlock(&ofo_print_serialization_mutex);
+	}
+
+	return ofo;
 }
