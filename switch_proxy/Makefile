@@ -7,7 +7,8 @@ CPPFLAGS=-O2 -Wall -Werror -g -I loci/inc
 CFLAGS=-O2 -Wall -Werror -g -I loci/inc
 
 BINARIES=sw_proxy sndcmd
-PROXY_SRC=sw_proxy.cc listener.cc connection.cc half_conn.cc control.cc
+PROXY_HEADERS=sw_proxy.h listener.h connection.h half_conn.h control.h csv.h args.h attacks.h
+PROXY_SRC=sw_proxy.cc listener.cc connection.cc half_conn.cc control.cc args.cc csv.cc attacks.cc
 LOCI_SRC=loci/src/*.c
 SNDCMD_SRC=sndcmd.cc
 
@@ -20,7 +21,7 @@ all:
 clean:
 	rm -f $(BINARIES) *.o *~
         
-sw_proxy: $(PROXY_SRC) libloci.so
+sw_proxy: $(PROXY_HEADERS) $(PROXY_SRC) libloci.so
 	$(CPP) $(CPPFLAGS) $(PROXY_SRC) -o sw_proxy -lpthread -Wl,-rpath,. -L. -lloci
 
 sndcmd: $(SNDCMD_SRC)
