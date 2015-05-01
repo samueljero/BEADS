@@ -6,13 +6,12 @@
 #include <string>
 #include "control.h"
 #include "listener.h"
+#include "attacker.h"
 using namespace std;
 
-Control::Control(int sock, list<Listener*> *listeners, pthread_mutex_t *listener_mutex)
+Control::Control(int sock)
 {
 	this->sock = sock;
-	this->listeners = listeners;
-	this->listener_mutex = listener_mutex;
 	this->running = false;
 }
 
@@ -68,42 +67,10 @@ void Control::run()
 		memmove(&m.buff[0], &m.buff[1], m.len - 1);
 		m.buff[m.len-1] = 0;
 
-		processCmd(m);
+		Attacker::get().addCommand(m);
+
 		free(m.buff);
 	}
-}
-
-void Control::processCmd(Message m)
-{
-		Message nm;
-		int controller = 0;
-		uint64_t dpid = 0;
-		int len = 0;
-
-		dbgprintf(2, "Received Command: %s\n", m.buff);
-
-		if (sscanf(m.buff,"%i,%lu,%n", &controller, &dpid, &len) < 0) {
-			dbgprintf(0, "Warning: Invalid command: %s\n", m.buff);
-			return;
-		}
-
-		if (controller ==0 || dpid == 0 || len == 0) {
-			dbgprintf(0, "Warning: Invalid command: %s\n", m.buff);
-			return;
-		}
-
-		nm.buff = &m.buff[len];
-		nm.len = m.len - len;
-		dbgprintf(2, "controller: %i, dpid: %lu, cmd:%s\n", controller, dpid, nm.buff);
-
-		pthread_mutex_lock(listener_mutex);
-		for	(list<Listener*>::iterator l = listeners->begin(); l != listeners->end(); l++) {
-			if ((*l)->getLport() == controller) {
-				(*l)->cmd(dpid, nm);
-				break;
-			}
-		}
-		pthread_mutex_unlock(listener_mutex);
 }
 
 /*First byte indicates length*/

@@ -27,6 +27,7 @@ class Connection{
 		~Connection(){}
 		HalfConn* getBH(){return &bh;}
 		HalfConn* getTH(){return &th;}
+		bool isRunning();
 		bool start();
 		void stop();
 	private:

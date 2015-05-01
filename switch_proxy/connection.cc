@@ -15,6 +15,10 @@ bool Connection::start()
 	return th.start() && bh.start();
 }
 
+bool Connection::isRunning() {
+	return bh.isRunning() || th.isRunning();
+}
+
 void Connection::stop()
 {
 	bh.stop();

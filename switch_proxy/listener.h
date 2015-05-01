@@ -17,7 +17,6 @@ class Listener{
 		int getLport(){return lport;}
 		~Listener();
 		void join();
-		bool cmd(uint64_t dpid, Message m);
 
 	private:
 		static void* listen_thread_run(void *arg);

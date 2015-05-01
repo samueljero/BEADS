@@ -18,25 +18,23 @@ enum direction {
 
 class HalfConn{
 	public:
-		HalfConn(){}
+		HalfConn();
 		HalfConn(int fsock, int cid, HalfConn *other);
 		HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *other);
 		~HalfConn(){}
 		bool sendm(Message m);
 		bool start();
 		bool stop();
-		bool cmd(Message m);
-		bool isRunning() {return running;}
-		bool isThread()	 {return thread;}
+		bool isRunning() {return running || thread;}
 		uint64_t getDPID() {return dpid;}
 		int getCID() {return cid;}
 		enum direction getDIR() {return dir;}
+		HalfConn*	getOther() {return other;}
 
 	private:
 		static void* thread_run(void* arg);
 		void run();
 		bool _stop();
-		of_object_t* doAttack(of_object_t* ofo);
 		Message recvMsg();
 
 		HalfConn *other;
@@ -50,7 +48,16 @@ class HalfConn{
 		uint64_t dpid;
 		struct sockaddr_in addr;
 		pthread_t rcv_thread;
-		pthread_mutex_t mutex;
+};
+
+class pkt_info {
+	public:
+		of_object_t* ofo;
+		int	cid;
+		uint64_t dpid;
+		enum direction dir;
+		HalfConn *rcv;
+		HalfConn *snd;
 };
 
 #endif

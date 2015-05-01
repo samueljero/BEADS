@@ -140,7 +140,7 @@ void control_loop(int port)
 
 		dbgprintf(1, "New Control Connection\n");
 		
-		ctl = new Control(new_sock, &listeners, &listeners_mutex);
+		ctl = new Control(new_sock);
 		ctl->start();
 		controls.push_front(ctl);
 

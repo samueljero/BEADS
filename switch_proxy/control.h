@@ -11,7 +11,7 @@ using namespace std;
 
 class Control {
 	public:
-		Control(int sock, list<Listener*> *listeners, pthread_mutex_t *listener_mutex);
+		Control(int sock);
 		~Control(){}
 		bool start();
 		bool isRunning() {return running;}
@@ -20,12 +20,9 @@ class Control {
 		static void* thread_run(void* arg);
 		void run();
 		Message recvMsg();
-		void processCmd(Message m);
 
 		int sock;
 		bool running;
-		list<Listener*> *listeners;
-		pthread_mutex_t *listener_mutex;
 		pthread_t ctl_thread;
 };
 

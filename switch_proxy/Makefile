@@ -7,8 +7,8 @@ CPPFLAGS=-O2 -Wall -Werror -g -I loci/inc
 CFLAGS=-O2 -Wall -Werror -g -I loci/inc
 
 BINARIES=sw_proxy sndcmd
-PROXY_HEADERS=sw_proxy.h listener.h connection.h half_conn.h control.h csv.h args.h attacks.h
-PROXY_SRC=sw_proxy.cc listener.cc connection.cc half_conn.cc control.cc args.cc csv.cc attacks.cc
+PROXY_HEADERS=sw_proxy.h listener.h connection.h half_conn.h control.h csv.h args.h attacker.h
+PROXY_SRC=sw_proxy.cc listener.cc connection.cc half_conn.cc control.cc args.cc csv.cc attacker.cc
 LOCI_SRC=loci/src/*.c
 SNDCMD_SRC=sndcmd.cc
 

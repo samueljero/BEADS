@@ -3,14 +3,13 @@
 * SDN Switch-Controller Proxy
 ******************************************************************************/
 #include "half_conn.h"
+#include "attacker.h"
 extern "C" {
 #include <loci/loci.h>
 #include <loci/of_object.h>
-#include <loci/loci_obj_dump.h>
 }
-#include <stdarg.h>
 
-pthread_mutex_t ofo_print_serialization_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 
 bool HalfConn::sendm(Message m)
 {
@@ -28,6 +27,18 @@ bool HalfConn::sendm(Message m)
 	return true;
 }
 
+HalfConn::HalfConn() {
+	this->sock = 0;
+	this->other = NULL;
+	this->dpid = DPID_MAX;
+	this->dir = STOC;
+	this->cid = 0;
+	this->print_messages = false;
+	this->thread = false;
+	this->running = false;
+	this->rport = 0;
+}
+
 HalfConn::HalfConn(int fsock, int cid, HalfConn *other)
 {
 	this->sock = fsock;
@@ -38,7 +49,7 @@ HalfConn::HalfConn(int fsock, int cid, HalfConn *other)
 	this->print_messages = false;
 	this->thread = false;
 	this->running = false;
-	pthread_mutex_init(&mutex, NULL);
+	this->rport = 0;
 }
 
 HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *other)
@@ -53,7 +64,6 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 	this->thread = false;
 	this->running = false;
 	memcpy(&this->addr, raddr, sizeof(struct sockaddr_in));
-	pthread_mutex_init(&mutex, NULL);
 }
 
 bool HalfConn::start()
@@ -100,7 +110,7 @@ bool HalfConn::stop()
 		sock = 0;
 	}
 	if (thread) {
-		pthread_join(rcv_thread,NULL);
+		pthread_join(rcv_thread, NULL);
 	}	
 	return true;
 }
@@ -132,18 +142,10 @@ struct ofp_header{
 	uint16_t length;
 };
 
-int writer(void *cookie, const char *fmt, ...)
-{
-    va_list args;
-	va_start(args, fmt);
-	int ret = vfprintf(stderr, fmt, args);
-	va_end(args);
-	return ret;
-}
-
 void HalfConn::run()
 {
 	Message m;
+	pkt_info pk;
 
 	while (running) {
 		m = recvMsg();
@@ -155,21 +157,25 @@ void HalfConn::run()
 			break;
 		}
 
-		/* Avoid changes during packet processing */
-		pthread_mutex_lock(&mutex);
-
 		/* Buffer to of_object */
 		of_message_t msg = OF_BUFFER_TO_MESSAGE(m.buff);
 		of_object_t *ofo = of_object_new_from_message(msg, m.len);
 		if (dpid == DPID_MAX && ofo->object_id == OF_FEATURES_REPLY) {
 			of_features_reply_datapath_id_get(ofo, &dpid);
+			other->dpid = dpid;
 		}
 
-		ofo = doAttack(ofo);
+		pk.ofo = ofo;
+		pk.dir = this->dir;
+		pk.cid = cid;
+		pk.dpid = dpid;
+		pk.rcv = this;
+		pk.snd = this->other;
+		pk = Attacker::get().doAttack(pk);
+		ofo = pk.ofo;
 
 		if (ofo == NULL) {
 			/* No message to send */
-			pthread_mutex_unlock(&mutex);
 			continue;
 		}
 
@@ -177,9 +183,6 @@ void HalfConn::run()
 		msg = OF_OBJECT_TO_MESSAGE(ofo);
 		m.buff = (char*)OF_MESSAGE_TO_BUFFER(msg);
 		m.len = of_message_length_get(msg);
-
-		/* Avoid changes during packet processing */
-		pthread_mutex_unlock(&mutex);
 
 		/* Send message */
 		if(!other->sendm(m)) {
@@ -256,36 +259,4 @@ Message HalfConn::recvMsg()
 	}
 
 	return m;
-}
-
-bool HalfConn::cmd(Message m)
-{
-	pthread_mutex_lock(&mutex);
-	if (strcmp(m.buff, "print,on")==0) {
-		print_messages = true;
-	} else if (strcmp(m.buff, "print,off")==0) {
-		print_messages = false;
-	} else {
-		dbgprintf(0, "Warning: unknown command: %s\n", m.buff);
-	}
-	pthread_mutex_unlock(&mutex);
-	return true;
-}
-
-
-of_object_t* HalfConn::doAttack(of_object_t* ofo)
-{
-	if (sw_proxy_debug > 2 || print_messages) {
-		pthread_mutex_lock(&ofo_print_serialization_mutex);
-		if (dir == STOC) {
-			dbgprintf(0,"##################\nGot Message (s %llu -> c %i)\n", dpid, other->getCID());
-		}else {
-			dbgprintf(0,"##################\nGot Message (c %i -> s %llu)\n", cid, other->getDPID());
-		}
-		of_object_dump((loci_writer_f)&writer,NULL,ofo);
-		dbgprintf(0,"##################\n");
-		pthread_mutex_unlock(&ofo_print_serialization_mutex);
-	}
-
-	return ofo;
 }

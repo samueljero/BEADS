@@ -105,41 +105,13 @@ void Listener::cleanupConnections()
 {
 	pthread_mutex_lock(&mutex);
 	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
-		if( !(*it)->getBH()->isRunning() && !(*it)->getTH()->isRunning()) {
-			(*it)->stop();
-			if(!(*it)->getBH()->isThread() && (*it)->getTH()->isThread()) {
-				delete *it;
-				connections.erase(it);
-				it = connections.begin();
-			}
+		if( !(*it)->isRunning()) {
+			delete *it;
+			connections.erase(it);
+			it = connections.begin();
 		}
 	}
 	pthread_mutex_unlock(&mutex);
-}
-
-bool Listener::cmd(uint64_t dpid, Message m)
-{
-	bool ret = false;
-	pthread_mutex_lock(&mutex);
-	if (dpid == DPID_MAX) {
-		for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
-				(*it)->getBH()->cmd(m);
-				(*it)->getTH()->cmd(m);
-				ret = true;
-		}
-	} else {
-		for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
-			if((*it)->getBH()->getDPID() == dpid) {
-				ret = (*it)->getBH()->cmd(m);
-				if (ret) {
-					(*it)->getTH()->cmd(m);
-				}
-				break;
-			}
-		}
-	}
-	pthread_mutex_unlock(&mutex);
-	return ret;
 }
 
 Listener::~Listener()
