@@ -6,6 +6,7 @@
 #define _ATTACKER_H
 #include "sw_proxy.h"
 #include "half_conn.h"
+#include "args.h"
 #include <map>
 #include <list>
 
@@ -16,7 +17,8 @@
 #define ACTION_ID_DUP			2
 #define ACTION_ID_LIE			3
 #define ACTION_ID_PRINT			4
-#define ACTION_ID_MAX			4
+#define ACTION_ID_CLEAR			5
+#define ACTION_ID_MAX			5
 
 
 typedef std::map<int, int> amap_t;
@@ -41,6 +43,10 @@ class Attacker{
 		int normalize_action_type(char *s);
 		int normalize_cid(char *s);
 		uint64_t normalize_dpid(char *s);
+		bool loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args);
+		bool removeCommand(amap_t::iterator it5, aamap_t::iterator it4, aaamap_t::iterator it3,
+				aaaamap_t::iterator it2, aaaaamap_t::iterator it1);
+		void print(pkt_info pk);
 
 		pthread_rwlock_t lock;
 		// <cid, <dpid, <of_version, <pkt_type, <action, ID> > > >

@@ -15,7 +15,7 @@ extern "C" {
 #include <list>
 using namespace std;
 
-#define ATTACKER_ROW_NUM_FIELDS		8
+#define ATTACKER_ROW_NUM_FIELDS		7
 #define ATTACKER_ARGS_DELIM		'&'
 
 #define CID_ERROR				(-2)
@@ -30,6 +30,7 @@ using namespace std;
 #define ACTION_ALIAS_DUP		"DUP"
 #define ACTION_ALIAS_LIE		"LIE"
 #define ACTION_ALIAS_PRINT		"PRINT"
+#define ACTION_ALIAS_CLEAR		"CLEAR"
 
 #define OFP_MSG_TYPE_ERR		(-2)
 #define OFP_MSG_TYPE_ALL		(-1)
@@ -62,12 +63,7 @@ bool Attacker::addCommand(Message m)
 	int cid;
 	int dpid;
 	char **fields;
-	//arg_node_t *args, *targ;
-	aaaaamap_t::iterator it1;
-	aaaamap_t::iterator it2;
-	aaamap_t::iterator it3;
-	aamap_t::iterator it4;
-	amap_t::iterator it5;
+	arg_node_t *args;
 
 	/* Parse CSV */
 	fields = csv_parse(m.buff, m.len, &num_fields);
@@ -82,24 +78,24 @@ bool Attacker::addCommand(Message m)
 		goto out;
 	}
 
-	if ((cid = normalize_cid(fields[1])) == CID_ERROR) {
+	if ((cid = normalize_cid(fields[0])) == CID_ERROR) {
 		dbgprintf(0,"Adding Command: unrecognized CID\"%s\".\n", fields[1]);
 		ret = false;
 		goto out;
 	}
 
-	if ((dpid = normalize_cid(fields[2])) == DPID_ERROR) {
+	if ((dpid = normalize_dpid(fields[1])) == DPID_ERROR) {
 		dbgprintf(0,"Adding Command: unrecognized DPID \"%s\".\n", fields[2]);
 		ret = false;
 		goto out;
 	}
 
-	if ((ofp_ver = normalize_ofp_ver_str(fields[3])) == OF_VERSION_UNKNOWN) {
+	if ((ofp_ver = normalize_ofp_ver_str(fields[2])) == OF_VERSION_UNKNOWN) {
 		dbgprintf(0,"Adding Command: unrecognized OFP version field \"%s\".\n", fields[3]);
 		ret = false;
 		goto out;
 	}
-	if ((msg_type = normalize_ofp_msg_type(ofp_ver, fields[4])) == OFP_MSG_TYPE_ERR) {
+	if ((msg_type = normalize_ofp_msg_type(ofp_ver, fields[3])) == OFP_MSG_TYPE_ERR) {
 		dbgprintf(0,"Adding Command: unrecognized message type \"%s\" for OFP version %d.\n", fields[4], ofp_ver);
 		ret = false;
 		goto out;
@@ -107,11 +103,35 @@ bool Attacker::addCommand(Message m)
 
 	// TODO: parse field column
 
-	if ((action_type = normalize_action_type(fields[6])) == ACTION_ID_ERR) {
+	if ((action_type = normalize_action_type(fields[5])) == ACTION_ID_ERR) {
 		dbgprintf(0,"Adding Command: unsupported malicious action \"%s\".\n", fields[6]);
 		ret = false;
 		goto out;
 	}
+
+	args = args_parse(fields[6],ATTACKER_ARGS_DELIM);
+	if (!args) {
+		dbgprintf(0,"Adding Command: failed to parse arguments \"%s\"\n", fields[7]);
+		ret = false;
+		goto out;
+	}
+
+	ret = loadmap(cid, dpid, ofp_ver, msg_type, action_type, args);
+	args_free(args);
+out:
+	csv_free(fields);
+	return ret;
+}
+
+bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args)
+{
+	bool ret = true;
+	arg_node_t *targ;
+	aaaaamap_t::iterator it1;
+	aaaamap_t::iterator it2;
+	aaamap_t::iterator it3;
+	aamap_t::iterator it4;
+	amap_t::iterator it5;
 
 	/* Add command */
 	pthread_rwlock_wrlock(&lock);
@@ -147,17 +167,65 @@ bool Attacker::addCommand(Message m)
 	/* Action */
 	it5 = it4->second.find(action_type);
 	if (it5 == it4->second.end()) {
-		it4->second[action_type] = 1;
+		it4->second[action_type] = -3;
 		it5 = it4->second.find(action_type);
-	} else {
-		it5->second = 1;
+	}
+	switch(action_type){
+		case ACTION_ID_PRINT:
+			targ = args_find(args, "on");
+			if (targ && targ->type == ARG_VALUE_TYPE_INT) {
+				it5->second = targ->value.i;
+				if (targ->value.i == 0) {
+					removeCommand(it5, it4, it3, it2, it1);
+				}
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			break;
+		case ACTION_ID_DROP:
+			targ = args_find(args, "p");
+			if (targ && targ->type == ARG_VALUE_TYPE_INT) {
+				it5->second = targ->value.i;
+				if (targ->value.i == 0) {
+					removeCommand(it5, it4, it3, it2, it1);
+				}
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			break;
 	}
 
-	pthread_rwlock_unlock(&lock);
+	dbgprintf(1, "New Rule Installed: cid=%i, dpid=%llu, version=%i, msg_type=%i, action_type=%i\n",
+				cid,dpid, ofp_ver, msg_type,action_type);
 
 out:
-	csv_free(fields);
+	pthread_rwlock_unlock(&lock);
 	return ret;
+}
+
+bool Attacker::removeCommand(amap_t::iterator it5, aamap_t::iterator it4, aaamap_t::iterator it3,
+		aaaamap_t::iterator it2, aaaaamap_t::iterator it1)
+{
+	it4->second.erase(it5);
+	if (it4->second.size() == 0) {
+		it3->second.erase(it4);
+		if (it3->second.size() == 0) {
+			it2->second.erase(it3);
+			if (it2->second.size() == 0) {
+				it1->second.erase(it2);
+				if (it1->second.size() == 0) {
+					actions_map.erase(it1);
+				}
+			}
+		}
+	}
+	return true;
 }
 
 int Attacker::normalize_ofp_ver_str(char *v)
@@ -262,13 +330,13 @@ int writer(void *cookie, const char *fmt, ...)
 
 pkt_info Attacker::doAttack(pkt_info pk)
 {
-	of_object_t* ofo = pk.ofo;
+	bool did_print = false;
 	aaaaamap_t::iterator it1;
 	aaaamap_t::iterator it2;
 	aaamap_t::iterator it3;
 	aamap_t::iterator it4;
 	amap_t::iterator it5;
-	//int param;
+	int param;
 
 
 	pthread_rwlock_rdlock(&lock);
@@ -292,41 +360,62 @@ pkt_info Attacker::doAttack(pkt_info pk)
 	}
 
 	/* Check OpenFlow Version */
-	it3 = it2->second.find(pk.ofo->version);
+	it3 = it2->second.find(OF_VERSION_ALL);
 	if (it3 == it2->second.end()) {
-		goto out;
+		it3 = it2->second.find(pk.ofo->version);
+		if (it3 == it2->second.end()) {
+			goto out;
+		}
 	}
 
 	/* Check Packet Type */
-	it4 = it3->second.find(pk.ofo->object_id);
+	it4 = it3->second.find(OFP_MSG_TYPE_ALL);
 	if (it4 == it3->second.end()) {
-		goto out;
+		it4 = it3->second.find(pk.ofo->object_id);
+		if (it4 == it3->second.end()) {
+			goto out;
+		}
 	}
 
 	/* Drop */
 	it5 = it4->second.find(ACTION_ID_DROP);
 	if (it5 != it4->second.end()) {
-		//param = it4->second[ACTION_ID_DROP];
-		of_object_delete(pk.ofo);
-		pk.ofo = NULL;
-		goto out;
+		param = it5->second;
+		if (rand() % 100 < param) {
+			dbgprintf(1, "Dropping packet!\n");
+			of_object_delete(pk.ofo);
+			pk.ofo = NULL;
+			goto out;
+		}
 	}
 
 	/* Debug Printing */
 	it5 = it4->second.find(ACTION_ID_PRINT);
-	if (it5 != it4->second.end() || sw_proxy_debug > 2) {
-		pthread_mutex_lock(&ofo_print_serialization_mutex);
-		if (pk.dir == STOC) {
-			dbgprintf(0,"##################\nGot Message (s %llu -> c %i)\n", pk.dpid, pk.cid);
-		}else {
-			dbgprintf(0,"##################\nGot Message (c %i -> s %llu)\n", pk.cid, pk.dpid);
+	if (it5 != it4->second.end()) {
+		if (it5->second == 1) {
+			did_print = true;
+			print(pk);
 		}
-		of_object_dump((loci_writer_f)&writer,NULL,ofo);
-		dbgprintf(0,"##################\n");
-		pthread_mutex_unlock(&ofo_print_serialization_mutex);
+	}
+
+	if (sw_proxy_debug > 2 && !did_print) {
+		print(pk);
 	}
 
 out:
 	pthread_rwlock_unlock(&lock);
 	return pk;
+}
+
+void Attacker::print(pkt_info pk)
+{
+	pthread_mutex_lock(&ofo_print_serialization_mutex);
+	if (pk.dir == STOC) {
+		dbgprintf(0,"##################\nGot Message (s %llu -> c %i)\n", pk.dpid, pk.cid);
+	}else {
+		dbgprintf(0,"##################\nGot Message (c %i -> s %llu)\n", pk.cid, pk.dpid);
+	}
+	of_object_dump((loci_writer_f)&writer,NULL,pk.ofo);
+	dbgprintf(0,"##################\n");
+	pthread_mutex_unlock(&ofo_print_serialization_mutex);
 }
