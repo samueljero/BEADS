@@ -136,6 +136,11 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 	/* Add command */
 	pthread_rwlock_wrlock(&lock);
 
+	/* Clear action is special */
+	if (action_type == ACTION_ID_CLEAR) {
+		return clearRules(cid, dpid, ofp_ver, msg_type);
+	}
+
 	/* CID */
 	it1 = actions_map.find(cid);
 	if (it1 == actions_map.end()) {
@@ -226,6 +231,63 @@ bool Attacker::removeCommand(amap_t::iterator it5, aamap_t::iterator it4, aaamap
 		}
 	}
 	return true;
+}
+
+bool Attacker::clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type)
+{
+	aaaaamap_t::iterator it1;
+	aaaamap_t::iterator it2;
+	aaamap_t::iterator it3;
+	aamap_t::iterator it4;
+
+	if (cid == CID_ALL) {
+		if (dpid == (uint64_t)DPID_ALL) {
+			if (ofp_ver == OF_VERSION_ALL) {
+				if (msg_type == OFP_MSG_TYPE_ALL) {
+					actions_map.clear();
+					return true;
+				} else {
+					for (it1 = actions_map.begin(); it1 != actions_map.end(); it1++) {
+						for (it2 = it1->second.begin(); it2 != it1->second.end(); it2++) {
+							for(it3 = it2->second.begin(); it3 != it2->second.end(); it3++) {
+								for (it4 = it3->second.begin(); it4 != it3->second.end(); it4++) {
+									if (it4->first == msg_type) {
+										it4->second.clear();
+									}
+								}
+							}
+						}
+					}
+					return true;
+				}
+			} else {
+				for (it1 = actions_map.begin(); it1 != actions_map.end(); it1++) {
+					for (it2 = it1->second.begin(); it2 != it1->second.end(); it2++) {
+						for(it3 = it2->second.begin(); it3 != it2->second.end(); it3++) {
+							if (it3->first == ofp_ver) {
+								if (msg_type == OFP_MSG_TYPE_ALL) {
+									it3->second.clear();
+								} else {
+									for (it4 = it3->second.begin(); it4 != it3->second.end(); it4++) {
+										if (it4->first == msg_type) {
+											it4->second.clear();
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				return true;
+			}
+		} else {
+			dbgprintf(0, "Command Failed: Partial CLEAR command not supported\n");
+		}
+	} else {
+		dbgprintf(0, "Command Failed: Partial CLEAR command not supported\n");
+	}
+
+	return false;
 }
 
 int Attacker::normalize_ofp_ver_str(char *v)
@@ -342,36 +404,36 @@ pkt_info Attacker::doAttack(pkt_info pk)
 	pthread_rwlock_rdlock(&lock);
 
 	/* Check cid */
-	it1 = actions_map.find(CID_ALL);
+	it1 = actions_map.find(pk.cid);
 	if (it1 == actions_map.end()) {
-		it1 = actions_map.find(pk.cid);
+		it1 = actions_map.find(CID_ALL);
 		if (it1 == actions_map.end()) {
 			goto out;
 		}
 	}
 
 	/* Check dpid */
-	it2 = it1->second.find(DPID_ALL);
+	it2 = it1->second.find(pk.dpid);
 	if (it2 == it1->second.end()) {
-		it2 = it1->second.find(pk.dpid);
+		it2 = it1->second.find(DPID_ALL);
 		if (it2 == it1->second.end()) {
 			goto out;
 		}
 	}
 
 	/* Check OpenFlow Version */
-	it3 = it2->second.find(OF_VERSION_ALL);
+	it3 = it2->second.find(pk.ofo->version);
 	if (it3 == it2->second.end()) {
-		it3 = it2->second.find(pk.ofo->version);
+		it3 = it2->second.find(OF_VERSION_ALL);
 		if (it3 == it2->second.end()) {
 			goto out;
 		}
 	}
 
 	/* Check Packet Type */
-	it4 = it3->second.find(OFP_MSG_TYPE_ALL);
+	it4 = it3->second.find(pk.ofo->object_id);
 	if (it4 == it3->second.end()) {
-		it4 = it3->second.find(pk.ofo->object_id);
+		it4 = it3->second.find(OFP_MSG_TYPE_ALL);
 		if (it4 == it3->second.end()) {
 			goto out;
 		}

@@ -46,6 +46,7 @@ class Attacker{
 		bool loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args);
 		bool removeCommand(amap_t::iterator it5, aamap_t::iterator it4, aaamap_t::iterator it3,
 				aaaamap_t::iterator it2, aaaaamap_t::iterator it1);
+		bool clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type);
 		void print(pkt_info pk);
 
 		pthread_rwlock_t lock;
