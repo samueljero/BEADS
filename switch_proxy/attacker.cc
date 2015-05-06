@@ -138,7 +138,8 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 
 	/* Clear action is special */
 	if (action_type == ACTION_ID_CLEAR) {
-		return clearRules(cid, dpid, ofp_ver, msg_type);
+		ret = clearRules(cid, dpid, ofp_ver, msg_type);
+		goto out;
 	}
 
 	/* CID */
@@ -204,6 +205,34 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 				goto out;
 			}
 			break;
+		case ACTION_ID_DELAY:
+			targ = args_find(args, "ms");
+			if (targ && targ->type == ARG_VALUE_TYPE_INT) {
+				it5->second = targ->value.i;
+				if (targ->value.i == 0) {
+					removeCommand(it5, it4, it3, it2, it1);
+				}
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			break;
+		case ACTION_ID_DUP:
+			targ = args_find(args, "t");
+			if (targ && targ->type == ARG_VALUE_TYPE_INT) {
+				it5->second = targ->value.i;
+				if (targ->value.i == 0) {
+					removeCommand(it5, it4, it3, it2, it1);
+				}
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			break;
 	}
 
 	dbgprintf(1, "New Rule Installed: cid=%i, dpid=%llu, version=%i, msg_type=%i, action_type=%i\n",
@@ -245,6 +274,7 @@ bool Attacker::clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type)
 			if (ofp_ver == OF_VERSION_ALL) {
 				if (msg_type == OFP_MSG_TYPE_ALL) {
 					actions_map.clear();
+					params.clear();
 					return true;
 				} else {
 					for (it1 = actions_map.begin(); it1 != actions_map.end(); it1++) {
@@ -392,21 +422,33 @@ int writer(void *cookie, const char *fmt, ...)
 
 pkt_info Attacker::doAttack(pkt_info pk)
 {
-	bool did_print = false;
+	/* THERE HAS GOT TO BE A CLEANER WAY TO WRITE THIS... */
 	aaaaamap_t::iterator it1;
 	aaaamap_t::iterator it2;
 	aaamap_t::iterator it3;
 	aamap_t::iterator it4;
 	amap_t::iterator it5;
-	int param;
-
+	bool star_cid = false;
+	bool star_dpid = false;
+	bool star_ver = false;
+	bool star_msg = false;
 
 	pthread_rwlock_rdlock(&lock);
+
+	if (sw_proxy_debug > 2) {
+		print(pk);
+	}
 
 	/* Check cid */
 	it1 = actions_map.find(pk.cid);
 	if (it1 == actions_map.end()) {
+cid_all:
+		if (star_cid) goto out;
 		it1 = actions_map.find(CID_ALL);
+		star_cid = true;
+		star_dpid = false;
+		star_ver = false;
+		star_msg = false;
 		if (it1 == actions_map.end()) {
 			goto out;
 		}
@@ -415,27 +457,59 @@ pkt_info Attacker::doAttack(pkt_info pk)
 	/* Check dpid */
 	it2 = it1->second.find(pk.dpid);
 	if (it2 == it1->second.end()) {
+dpid_all:
+		if (star_dpid) goto out;
 		it2 = it1->second.find(DPID_ALL);
+		star_dpid = true;
+		star_ver = false;
+		star_msg = false;
 		if (it2 == it1->second.end()) {
-			goto out;
+			goto cid_all;
 		}
 	}
 
 	/* Check OpenFlow Version */
 	it3 = it2->second.find(pk.ofo->version);
 	if (it3 == it2->second.end()) {
+of_all:
+		if (star_ver) goto out;
 		it3 = it2->second.find(OF_VERSION_ALL);
+		star_ver = true;
+		star_msg = false;
 		if (it3 == it2->second.end()) {
-			goto out;
+			goto dpid_all;
 		}
 	}
 
 	/* Check Packet Type */
 	it4 = it3->second.find(pk.ofo->object_id);
 	if (it4 == it3->second.end()) {
+		if (star_msg) goto out;
 		it4 = it3->second.find(OFP_MSG_TYPE_ALL);
+		star_msg = true;
 		if (it4 == it3->second.end()) {
-			goto out;
+			goto of_all;
+		}
+	}
+
+	pk = applyActions(pk, it4);
+
+out:
+	pthread_rwlock_unlock(&lock);
+	return pk;
+}
+
+pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
+{
+	amap_t::iterator it5;
+	int param;
+	int dups = 1;
+
+	/* Debug Printing */
+	it5 = it4->second.find(ACTION_ID_PRINT);
+	if (it5 != it4->second.end()) {
+		if (it5->second == 1 && sw_proxy_debug <= 2) {
+			print(pk);
 		}
 	}
 
@@ -451,21 +525,27 @@ pkt_info Attacker::doAttack(pkt_info pk)
 		}
 	}
 
-	/* Debug Printing */
-	it5 = it4->second.find(ACTION_ID_PRINT);
+	/* Modify */
+
+	/* Divert */
+
+	/* Duplicate */
+	it5 = it4->second.find(ACTION_ID_DUP);
 	if (it5 != it4->second.end()) {
-		if (it5->second == 1) {
-			did_print = true;
-			print(pk);
-		}
+		dups = it5->second;
+		dbgprintf(1, "Duplicating packet %i times!\n", dups);
 	}
 
-	if (sw_proxy_debug > 2 && !did_print) {
-		print(pk);
+	/* Delay */
+
+	/* Apply to Packet */
+	for (int i =0; i < dups; i++) {
+		pk.snd->sendm(pk.ofo);
 	}
+	of_object_delete(pk.ofo);
+	pk.ofo = NULL;
 
 out:
-	pthread_rwlock_unlock(&lock);
 	return pk;
 }
 

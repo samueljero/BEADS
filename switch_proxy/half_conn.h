@@ -23,17 +23,18 @@ class HalfConn{
 		HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *other);
 		~HalfConn(){}
 		bool sendm(Message m);
+		bool sendm(of_object_t* ofo);
 		bool start();
 		bool stop();
-		bool isRunning() {return running || thread;}
+		bool isRunning() {return running || rcv_thread_running;}
 		uint64_t getDPID() {return dpid;}
 		int getCID() {return cid;}
 		enum direction getDIR() {return dir;}
 		HalfConn*	getOther() {return other;}
 
 	private:
-		static void* thread_run(void* arg);
-		void run();
+		static void* rcv_thread_run(void* arg);
+		void rcv_run();
 		bool _stop();
 		Message recvMsg();
 
@@ -42,7 +43,7 @@ class HalfConn{
 		int sock;
 		int cid;
 		bool running;
-		bool thread;
+		bool rcv_thread_running;
 		bool print_messages;
 		enum direction dir;
 		uint64_t dpid;

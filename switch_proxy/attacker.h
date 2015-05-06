@@ -1,6 +1,15 @@
 /******************************************************************************
 * Author: Samuel Jero <sjero@purdue.edu>
 * SDN Switch-Controller Proxy
+*
+* Rule Format:
+* controller_id, switch_id, openflow_version, msg_type, field, action, parameters
+* 	controller_id is port number
+* 	switch_id is dpid
+* 	parameters are a list of "key=value" pairs separated by &
+* Wildcards are supported in all fields except action and parameters.
+* Rule search is left to right, preferring specific values over wildcards (i.e.
+* longest prefix match). Only the first set of matching actions are applied.
 ******************************************************************************/
 #ifndef _ATTACKER_H
 #define _ATTACKER_H
@@ -8,7 +17,7 @@
 #include "half_conn.h"
 #include "args.h"
 #include <map>
-#include <list>
+#include <vector>
 
 #define ACTION_ID_ERR			(-1)
 #define ACTION_ID_MIN			0
@@ -47,13 +56,14 @@ class Attacker{
 		bool removeCommand(amap_t::iterator it5, aamap_t::iterator it4, aaamap_t::iterator it3,
 				aaaamap_t::iterator it2, aaaaamap_t::iterator it1);
 		bool clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type);
+		pkt_info applyActions(pkt_info pk, aamap_t::iterator it4);
 		void print(pkt_info pk);
 
 		pthread_rwlock_t lock;
 		// <cid, <dpid, <of_version, <pkt_type, <action, ID> > > >
 		aaaaamap_t actions_map;
 		// <ID, list_of_parameters >
-		std::map<int, std::list<int> > params;
+		std::map<int, std::vector<int> > params;
 };
 
 

@@ -27,6 +27,18 @@ bool HalfConn::sendm(Message m)
 	return true;
 }
 
+bool HalfConn::sendm(of_object_t *ofo)
+{
+	of_message_t msg;
+	Message m;
+
+	msg = OF_OBJECT_TO_MESSAGE(ofo);
+	m.buff = (char*)OF_MESSAGE_TO_BUFFER(msg);
+	m.len = of_message_length_get(msg);
+
+	return sendm(m);
+}
+
 HalfConn::HalfConn() {
 	this->sock = 0;
 	this->other = NULL;
@@ -34,7 +46,7 @@ HalfConn::HalfConn() {
 	this->dir = STOC;
 	this->cid = 0;
 	this->print_messages = false;
-	this->thread = false;
+	this->rcv_thread_running = false;
 	this->running = false;
 	this->rport = 0;
 }
@@ -47,7 +59,7 @@ HalfConn::HalfConn(int fsock, int cid, HalfConn *other)
 	this->dir = STOC;
 	this->cid = cid;
 	this->print_messages = false;
-	this->thread = false;
+	this->rcv_thread_running = false;
 	this->running = false;
 	this->rport = 0;
 }
@@ -61,7 +73,7 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 	this->dir = CTOS;
 	this->cid = cid;
 	this->print_messages = false;
-	this->thread = false;
+	this->rcv_thread_running = false;
 	this->running = false;
 	memcpy(&this->addr, raddr, sizeof(struct sockaddr_in));
 }
@@ -89,14 +101,14 @@ bool HalfConn::start()
 	}
 	
 	running = true;
-	if (pthread_create(&rcv_thread, NULL, thread_run, this) < 0) {
+	if (pthread_create(&rcv_thread, NULL, rcv_thread_run, this) < 0) {
 		dbgprintf(0, "Error: Failed to start receive thread!: %s\n", strerror(errno));
 		close(sock);
 		sock = 0;
 		running = false;
 		return false;
 	}
-	thread = true;
+	rcv_thread_running = true;
 	return true;
 }
 
@@ -109,7 +121,7 @@ bool HalfConn::stop()
 		close(sock);
 		sock = 0;
 	}
-	if (thread) {
+	if (rcv_thread_running) {
 		pthread_join(rcv_thread, NULL);
 	}	
 	return true;
@@ -128,11 +140,11 @@ bool HalfConn::_stop()
 }
 
 /* stupid pthreads/C++ glue */
-void* HalfConn::thread_run(void* arg)
+void* HalfConn::rcv_thread_run(void* arg)
 {
 	HalfConn *t = (HalfConn*)arg;
-	t->run();
-	t->thread = false;
+	t->rcv_run();
+	t->rcv_thread_running = false;
 	return NULL;
 }
 
@@ -142,7 +154,7 @@ struct ofp_header{
 	uint16_t length;
 };
 
-void HalfConn::run()
+void HalfConn::rcv_run()
 {
 	Message m;
 	pkt_info pk;
@@ -172,25 +184,19 @@ void HalfConn::run()
 		pk.rcv = this;
 		pk.snd = this->other;
 		pk = Attacker::get().doAttack(pk);
-		ofo = pk.ofo;
 
-		if (ofo == NULL) {
+		if (pk.ofo == NULL) {
 			/* No message to send */
 			continue;
 		}
 
-		/* of_object to buffer */
-		msg = OF_OBJECT_TO_MESSAGE(ofo);
-		m.buff = (char*)OF_MESSAGE_TO_BUFFER(msg);
-		m.len = of_message_length_get(msg);
-
 		/* Send message */
-		if(!other->sendm(m)) {
+		if(!other->sendm(pk.ofo)) {
 			_stop();
-			of_object_delete(ofo);
+			of_object_delete(pk.ofo);
 			break;
 		}
-		of_object_delete(ofo);
+		of_object_delete(pk.ofo);
 	}
 }
 
