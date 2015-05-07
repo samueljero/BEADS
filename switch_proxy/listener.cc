@@ -123,3 +123,35 @@ void Listener::join()
 {
 	pthread_join(listen_thread,NULL);
 }
+
+int Listener::numConnections()
+{
+	int ret = 0;
+	pthread_mutex_lock(&mutex);
+	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
+		if( (*it)->isRunning()) {
+			ret++;
+
+		}
+	}
+	pthread_mutex_unlock(&mutex);
+	return ret;
+}
+Connection* Listener::getConnection(int i)
+{
+	Connection *ret = NULL;
+	int j = 0;
+	pthread_mutex_lock(&mutex);
+	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
+		if( (*it)->isRunning()) {
+			if (j == i) {
+				ret = (*it);
+				break;
+			}
+			j++;
+
+		}
+	}
+	pthread_mutex_unlock(&mutex);
+	return ret;
+}

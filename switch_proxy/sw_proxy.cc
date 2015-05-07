@@ -7,6 +7,7 @@
 #include "sw_proxy.h"
 #include "listener.h"
 #include "control.h"
+#include "attacker.h"
 using namespace std;
 
 
@@ -100,6 +101,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+	Attacker::get().loadListeners(&listeners, &listeners_mutex);
 	control_loop(ctlport);
 }
 

@@ -15,6 +15,8 @@ class Listener{
 		Listener(int lport, int rport, struct sockaddr_in *addr);
 		bool start();
 		int getLport(){return lport;}
+		int numConnections();
+		Connection* getConnection(int i);
 		~Listener();
 		void join();
 
