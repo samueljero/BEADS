@@ -15,8 +15,10 @@
 #define _ATTACKER_H
 #include "sw_proxy.h"
 #include "half_conn.h"
+#include "listener.h"
 #include "args.h"
 #include <map>
+#include <list>
 #include <vector>
 
 #define ACTION_ID_ERR			(-1)
@@ -27,7 +29,8 @@
 #define ACTION_ID_LIE			3
 #define ACTION_ID_PRINT			4
 #define ACTION_ID_CLEAR			5
-#define ACTION_ID_MAX			5
+#define ACTION_ID_DIVERT		6
+#define ACTION_ID_MAX			6
 
 
 typedef std::map<int, int> amap_t;
@@ -43,6 +46,7 @@ class Attacker{
 	public:
 		~Attacker();
 		static Attacker& get();
+		bool loadListeners(std::list<Listener*> *listeners, pthread_mutex_t *listeners_mutex);
 		bool addCommand(Message m);
 		pkt_info doAttack(pkt_info pk);
 
@@ -64,6 +68,9 @@ class Attacker{
 		aaaaamap_t actions_map;
 		// <ID, list_of_parameters >
 		std::map<int, std::vector<int> > params;
+		std::list<Listener*> *listeners;
+		pthread_mutex_t *listeners_mutex;
+
 };
 
 

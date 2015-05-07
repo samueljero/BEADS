@@ -49,6 +49,8 @@ HalfConn::HalfConn() {
 	this->rcv_thread_running = false;
 	this->running = false;
 	this->rport = 0;
+	pthread_mutex_init(&this->q_mutex, NULL);
+	pthread_mutex_init(&this->timeout_mutex, NULL);
 }
 
 HalfConn::HalfConn(int fsock, int cid, HalfConn *other)
@@ -62,6 +64,8 @@ HalfConn::HalfConn(int fsock, int cid, HalfConn *other)
 	this->rcv_thread_running = false;
 	this->running = false;
 	this->rport = 0;
+	pthread_mutex_init(&this->q_mutex, NULL);
+	pthread_mutex_init(&this->timeout_mutex, NULL);
 }
 
 HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *other)
@@ -76,6 +80,14 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 	this->rcv_thread_running = false;
 	this->running = false;
 	memcpy(&this->addr, raddr, sizeof(struct sockaddr_in));
+	pthread_mutex_init(&this->q_mutex, NULL);
+	pthread_mutex_init(&this->timeout_mutex, NULL);
+}
+
+HalfConn::~HalfConn()
+{
+	pthread_mutex_destroy(&this->q_mutex);
+	pthread_mutex_destroy(&this->timeout_mutex);
 }
 
 bool HalfConn::start()
@@ -109,6 +121,16 @@ bool HalfConn::start()
 		return false;
 	}
 	rcv_thread_running = true;
+
+	if (pthread_create(&q_thread, NULL, queue_thread_run, this) < 0) {
+		dbgprintf(0, "Error: Failed to start queue thread!: %s\n", strerror(errno));
+		close(sock);
+		sock = 0;
+		running = false;
+		return false;
+	}
+	q_thread_running = true;
+
 	return true;
 }
 
@@ -121,9 +143,22 @@ bool HalfConn::stop()
 		close(sock);
 		sock = 0;
 	}
+
+	/* Unlocking an unlocked mutex is undefined.
+	 * Do this instead. */
+	if (pthread_mutex_trylock(&timeout_mutex)) {
+		pthread_mutex_unlock(&timeout_mutex);
+	} else {
+		pthread_mutex_unlock(&timeout_mutex);
+	}
+
 	if (rcv_thread_running) {
 		pthread_join(rcv_thread, NULL);
-	}	
+	}
+
+	if (q_thread_running) {
+		pthread_join(q_thread, NULL);
+	}
 	return true;
 }
 
@@ -136,6 +171,15 @@ bool HalfConn::_stop()
 		close(sock);
 		sock = 0;
 	}
+
+	/* Unlocking an unlocked mutex is undefined.
+	 * Do this instead. */
+	if (pthread_mutex_trylock(&timeout_mutex)) {
+		pthread_mutex_unlock(&timeout_mutex);
+	} else {
+		pthread_mutex_unlock(&timeout_mutex);
+	}
+
 	return true;
 }
 
@@ -265,4 +309,81 @@ Message HalfConn::recvMsg()
 	}
 
 	return m;
+}
+
+/* stupid pthreads/C++ glue */
+void* HalfConn::queue_thread_run(void *arg)
+{
+	HalfConn *t = (HalfConn*)arg;
+	t->queue_run();
+	t->q_thread_running = false;
+	return NULL;
+}
+
+void HalfConn::queue_run()
+{
+	pkt_info pk;
+	int val;
+
+	/* Mutex used only to sleep on */
+	pthread_mutex_lock(&timeout_mutex);
+
+	while (running) {
+		/* Look at next packet */
+		pthread_mutex_lock(&q_mutex);
+		if (q.empty()) {
+			pthread_mutex_unlock(&q_mutex);
+			pthread_mutex_lock(&timeout_mutex); /* Sleep until packets available */
+			continue;
+		}
+		pk = q.top();
+		pthread_mutex_unlock(&q_mutex);
+
+		/* Sleep */
+		val = pthread_mutex_timedlock(&timeout_mutex, &pk.del);
+		if (val != ETIMEDOUT) {
+			continue;
+		}
+
+		/* Send next packet */
+		pthread_mutex_lock(&q_mutex);
+		if (pk != q.top()) {
+			/* Packet changed! */
+			pthread_mutex_unlock(&q_mutex);
+			continue;
+		}
+		q.pop();
+		for(int i=0; i < pk.dups; i++) {
+			sendm(pk.ofo);
+		}
+		of_object_delete(pk.ofo);
+		pthread_mutex_unlock(&q_mutex);
+	}
+}
+
+
+bool HalfConn::sendat(of_object_t *ofo, struct timespec *time, int num)
+{
+	pkt_info pk;
+
+	pk.ofo = ofo;
+	memcpy(&pk.del, time, sizeof(struct timespec));
+	pk.cid = cid;
+	pk.dpid = dpid;
+	pk.rcv = other;
+	pk.snd = this;
+	pk.dups = num;
+
+	pthread_mutex_lock(&q_mutex);
+	q.push(pk);
+	/* Unlocking an unlocked mutex is undefined.
+	 * Do this instead. */
+	if (pthread_mutex_trylock(&timeout_mutex)) {
+		pthread_mutex_unlock(&timeout_mutex);
+	} else {
+		pthread_mutex_unlock(&timeout_mutex);
+	}
+	pthread_mutex_unlock(&q_mutex);
+
+	return true;
 }

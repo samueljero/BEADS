@@ -11,6 +11,8 @@ extern "C" {
 #include <loci/loci_obj_dump.h>
 }
 #include <stdarg.h>
+#include <time.h>
+#include <sys/time.h>
 #include <map>
 #include <list>
 using namespace std;
@@ -31,6 +33,7 @@ using namespace std;
 #define ACTION_ALIAS_LIE		"LIE"
 #define ACTION_ALIAS_PRINT		"PRINT"
 #define ACTION_ALIAS_CLEAR		"CLEAR"
+#define ACTION_ALIAS_DIVERT		"DIVERT"
 
 #define OFP_MSG_TYPE_ERR		(-2)
 #define OFP_MSG_TYPE_ALL		(-1)
@@ -41,6 +44,8 @@ pthread_mutex_t ofo_print_serialization_mutex = PTHREAD_MUTEX_INITIALIZER;
 Attacker::Attacker()
 {
 	pthread_rwlock_init(&lock, NULL);
+	listeners = NULL;
+	listeners_mutex = NULL;
 }
 Attacker::~Attacker()
 {
@@ -51,6 +56,15 @@ Attacker& Attacker::get()
 {
 	static Attacker me;
 	return me;
+}
+
+bool Attacker::loadListeners(std::list<Listener*> *listeners, pthread_mutex_t *listeners_mutex)
+{
+	pthread_rwlock_wrlock(&lock);
+	this->listeners = listeners;
+	this->listeners_mutex = listeners_mutex;
+	pthread_rwlock_unlock(&lock);
+	return true;
 }
 
 bool Attacker::addCommand(Message m)
@@ -233,6 +247,22 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 				goto out;
 			}
 			break;
+		case ACTION_ID_DIVERT:
+			targ = args_find(args, "p");
+			if (targ && targ->type == ARG_VALUE_TYPE_INT) {
+				it5->second = targ->value.i;
+				if (targ->value.i == 0) {
+					removeCommand(it5, it4, it3, it2, it1);
+				}
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			break;
+		case ACTION_ID_LIE:
+			break;
 	}
 
 	dbgprintf(1, "New Rule Installed: cid=%i, dpid=%llu, version=%i, msg_type=%i, action_type=%i\n",
@@ -380,6 +410,7 @@ int Attacker::normalize_action_type(char *s)
 	if (!strcmp(ACTION_ALIAS_DUP, s)) return ACTION_ID_DUP;
 	if (!strcmp(ACTION_ALIAS_LIE, s)) return ACTION_ID_LIE;
 	if (!strcmp(ACTION_ALIAS_PRINT, s)) return ACTION_ID_PRINT;
+	if (!strcmp(ACTION_ALIAS_DIVERT, s)) return ACTION_ID_DIVERT;
 	return ACTION_ID_ERR;
 }
 
@@ -502,7 +533,11 @@ out:
 pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 {
 	amap_t::iterator it5;
+	struct timespec time;
+	struct timeval tm;
 	int param;
+	int sec;
+	int nsec;
 	int dups = 1;
 
 	/* Debug Printing */
@@ -526,8 +561,16 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 	}
 
 	/* Modify */
+	it5 = it4->second.find(ACTION_ID_LIE);
+	if (it5 != it4->second.end()) {
+		//TODO: Implement
+	}
 
 	/* Divert */
+	it5 = it4->second.find(ACTION_ID_DIVERT);
+	if (it5 != it4->second.end()) {
+		//TODO: Implement
+	}
 
 	/* Duplicate */
 	it5 = it4->second.find(ACTION_ID_DUP);
@@ -537,6 +580,28 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 	}
 
 	/* Delay */
+	it5 = it4->second.find(ACTION_ID_DELAY);
+	if (it5 != it4->second.end()) {
+		param = it5->second;
+		dbgprintf(1, "Delaying packet %i ms!\n", param);
+
+		/* Compute time to send */
+		sec = param / 1000;
+		nsec = (param % 1000)*1000000;
+		gettimeofday(&tm, NULL);
+		time.tv_sec = 0;
+		time.tv_nsec = tm.tv_usec*1000 + nsec;
+		if (time.tv_nsec > 1000000000) {
+			time.tv_sec += time.tv_nsec/1000000000;
+			time.tv_nsec = time.tv_nsec%1000000000;
+		}
+		time.tv_sec += (tm.tv_sec + sec);
+
+		/* Send packet */
+		pk.snd->sendat(pk.ofo, &time, dups);
+		pk.ofo = NULL;
+		goto out;
+	}
 
 	/* Apply to Packet */
 	for (int i =0; i < dups; i++) {

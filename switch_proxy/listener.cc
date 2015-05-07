@@ -31,11 +31,11 @@ bool Listener::start()
 		return false;
 	}
 
-	//int so_reuseaddr = 1;
-	//if (setsockopt(sock, SOL_SOCKET,SO_REUSEADDR, &so_reuseaddr, sizeof(so_reuseaddr))< 0){
-	//	dbgprintf(0, "Error: Can't create listen_socket: %s\n",strerror(errno));
-	//	return false;
-	//}
+	int so_reuseaddr = 1;
+	if (setsockopt(sock, SOL_SOCKET,SO_REUSEADDR, &so_reuseaddr, sizeof(so_reuseaddr))< 0){
+		dbgprintf(0, "Error: Can't create listen_socket: %s\n",strerror(errno));
+		return false;
+	}
 
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
