@@ -13,8 +13,10 @@ extern "C" {
 #include <stdarg.h>
 #include <time.h>
 #include <sys/time.h>
+#include <arpa/inet.h>
 #include <map>
 #include <list>
+#include <vector>
 using namespace std;
 
 #define ATTACKER_ROW_NUM_FIELDS		7
@@ -46,6 +48,7 @@ Attacker::Attacker()
 	pthread_rwlock_init(&lock, NULL);
 	listeners = NULL;
 	listeners_mutex = NULL;
+	nxt_param = 0;
 }
 Attacker::~Attacker()
 {
@@ -93,54 +96,54 @@ bool Attacker::addCommand(Message m)
 	}
 
 	if ((cid = normalize_cid(fields[0])) == CID_ERROR) {
-		dbgprintf(0,"Adding Command: unrecognized CID\"%s\".\n", fields[1]);
+		dbgprintf(0,"Adding Command: unrecognized CID\"%s\".\n", fields[0]);
 		ret = false;
 		goto out;
 	}
 
 	if ((dpid = normalize_dpid(fields[1])) == DPID_ERROR) {
-		dbgprintf(0,"Adding Command: unrecognized DPID \"%s\".\n", fields[2]);
+		dbgprintf(0,"Adding Command: unrecognized DPID \"%s\".\n", fields[1]);
 		ret = false;
 		goto out;
 	}
 
 	if ((ofp_ver = normalize_ofp_ver_str(fields[2])) == OF_VERSION_UNKNOWN) {
-		dbgprintf(0,"Adding Command: unrecognized OFP version field \"%s\".\n", fields[3]);
-		ret = false;
-		goto out;
-	}
-	if ((msg_type = normalize_ofp_msg_type(ofp_ver, fields[3])) == OFP_MSG_TYPE_ERR) {
-		dbgprintf(0,"Adding Command: unrecognized message type \"%s\" for OFP version %d.\n", fields[4], ofp_ver);
+		dbgprintf(0,"Adding Command: unrecognized OFP version field \"%s\".\n", fields[2]);
 		ret = false;
 		goto out;
 	}
 
-	// TODO: parse field column
+	if ((msg_type = normalize_ofp_msg_type(ofp_ver, fields[3])) == OFP_MSG_TYPE_ERR) {
+		dbgprintf(0,"Adding Command: unrecognized message type \"%s\" for OFP version %d.\n", fields[3], ofp_ver);
+		ret = false;
+		goto out;
+	}
 
 	if ((action_type = normalize_action_type(fields[5])) == ACTION_ID_ERR) {
-		dbgprintf(0,"Adding Command: unsupported malicious action \"%s\".\n", fields[6]);
+		dbgprintf(0,"Adding Command: unsupported malicious action \"%s\".\n", fields[5]);
 		ret = false;
 		goto out;
 	}
 
 	args = args_parse(fields[6],ATTACKER_ARGS_DELIM);
 	if (!args) {
-		dbgprintf(0,"Adding Command: failed to parse arguments \"%s\"\n", fields[7]);
+		dbgprintf(0,"Adding Command: failed to parse arguments \"%s\"\n", fields[6]);
 		ret = false;
 		goto out;
 	}
 
-	ret = loadmap(cid, dpid, ofp_ver, msg_type, action_type, args);
+	ret = loadmap(cid, dpid, ofp_ver, msg_type, action_type, args, fields[4]);
 	args_free(args);
 out:
 	csv_free(fields);
 	return ret;
 }
 
-bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args)
+bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args, char* fields)
 {
 	bool ret = true;
 	arg_node_t *targ;
+	modAttack ma;
 	aaaaamap_t::iterator it1;
 	aaaamap_t::iterator it2;
 	aaamap_t::iterator it3;
@@ -262,6 +265,52 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 			}
 			break;
 		case ACTION_ID_LIE:
+			ma.field = normalize_field(fields);
+			if (ma.field.empty()) {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+
+			targ = args_find(args, "act");
+			if (!targ || targ->type != ARG_VALUE_TYPE_STR) {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			if (strcmp(targ->value.s, "=") == 0) {
+				ma.action = MOD_SET;
+			} else if (strcmp(targ->value.s, "+") == 0) {
+				ma.action = MOD_ADD;
+			} else if (strcmp(targ->value.s, "-") == 0) {
+				ma.action = MOD_SUB;
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			targ = args_find(args, "val");
+			if (!targ || targ->type != ARG_VALUE_TYPE_INT) {
+				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			ma.value = targ->value.i;
+
+			if (it5->second == -3) {
+				/* New action set */
+				it5->second = nxt_param;
+				mod_params[nxt_param] = std::vector<modAttack>();
+				mod_params[nxt_param].push_back(ma);
+				nxt_param++;
+			} else {
+				mod_params[nxt_param].push_back(ma);
+			}
+
 			break;
 	}
 
@@ -304,7 +353,9 @@ bool Attacker::clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type)
 			if (ofp_ver == OF_VERSION_ALL) {
 				if (msg_type == OFP_MSG_TYPE_ALL) {
 					actions_map.clear();
-					params.clear();
+					mod_params.clear();
+					nxt_param = 0;
+					dbgprintf(1, "Rules Cleared\n");
 					return true;
 				} else {
 					for (it1 = actions_map.begin(); it1 != actions_map.end(); it1++) {
@@ -318,6 +369,7 @@ bool Attacker::clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type)
 							}
 						}
 					}
+					dbgprintf(1, "Rules Cleared\n");
 					return true;
 				}
 			} else {
@@ -338,6 +390,7 @@ bool Attacker::clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type)
 						}
 					}
 				}
+				dbgprintf(1, "Rules Cleared\n");
 				return true;
 			}
 		} else {
@@ -410,6 +463,7 @@ int Attacker::normalize_action_type(char *s)
 	if (!strcmp(ACTION_ALIAS_DUP, s)) return ACTION_ID_DUP;
 	if (!strcmp(ACTION_ALIAS_LIE, s)) return ACTION_ID_LIE;
 	if (!strcmp(ACTION_ALIAS_PRINT, s)) return ACTION_ID_PRINT;
+	if (!strcmp(ACTION_ALIAS_CLEAR, s)) return ACTION_ID_CLEAR;
 	if (!strcmp(ACTION_ALIAS_DIVERT, s)) return ACTION_ID_DIVERT;
 	return ACTION_ID_ERR;
 }
@@ -438,6 +492,45 @@ uint64_t Attacker::normalize_dpid(char *s)
 		return DPID_ERROR;
 	}
 	return dpid;
+}
+
+vector<int> Attacker::normalize_field(char *s)
+{
+	vector<int> lst;
+	int res;
+	char *tmp = s;
+
+	if (s[0] == '*') {
+		return lst;
+	}
+
+	while (*s != '\0') {
+		if (*s == '.') {
+			*s = '\0';
+			res = atoi(tmp);
+			if (res <= 0) {
+				lst.clear();
+				return lst;
+			}
+			lst.push_back(res);
+			tmp = s + 1;
+		}
+		if (*s < '0' || *s > '9') {
+			lst.clear();
+			return lst;
+		}
+		s++;
+	}
+
+	if (strlen(tmp) > 0) {
+		res = atoi(tmp);
+		if (res <= 0) {
+			lst.clear();
+			return lst;
+		}
+		lst.push_back(res);
+	}
+	return lst;
 }
 
 int writer(void *cookie, const char *fmt, ...)
@@ -533,6 +626,7 @@ out:
 pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 {
 	amap_t::iterator it5;
+	vector<modAttack> mod_acts;
 	struct timespec time;
 	struct timeval tm;
 	Connection *c;
@@ -565,8 +659,14 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 	/* Modify */
 	it5 = it4->second.find(ACTION_ID_LIE);
 	if (it5 != it4->second.end()) {
-
-		//TODO: Implement
+		param = it5->second;
+		mod_acts = mod_params[param];
+		for (unsigned int x = 0; x < mod_acts.size(); x++) {
+			dbgprintf(1, "Modifying Packet!\n");
+			if (!doModify(pk.ofo, mod_acts[x].field, mod_acts[x].action, mod_acts[x].value)){
+				break;
+			}
+		}
 	}
 
 	/* Divert */
@@ -607,7 +707,6 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 		} else {
 			dbgprintf(0, "Warning: DIVERT requested, but no listeners!\n");
 		}
-
 	}
 
 	/* Duplicate */
@@ -663,4 +762,307 @@ void Attacker::print(pkt_info pk)
 	of_object_dump((loci_writer_f)&writer,NULL,pk.ofo);
 	dbgprintf(0,"##################\n");
 	pthread_mutex_unlock(&ofo_print_serialization_mutex);
+}
+
+
+bool Attacker::doModify(of_object_t* ofo, vector<int> vfield, int action, int val)
+{
+	int field;
+
+	if (vfield.empty()) {
+		return false;
+	}
+	field = vfield[0];
+
+	if (field >=1 && field <= 4) {
+		/* Global fields */
+		return ModifyHEADER(ofo,vfield,action,val, 0);
+	}
+
+	switch(ofo->object_id) {
+		case OF_AGGREGATE_STATS_REPLY:
+		case OF_AGGREGATE_STATS_REQUEST:
+		case OF_ASYNC_CONFIG_FAILED_ERROR_MSG:
+		case OF_ASYNC_GET_REPLY:
+		case OF_ASYNC_GET_REQUEST:
+		case OF_ASYNC_SET:
+		case OF_BAD_ACTION_ERROR_MSG:
+		case OF_BAD_INSTRUCTION_ERROR_MSG:
+		case OF_BAD_MATCH_ERROR_MSG:
+		case OF_BAD_PROPERTY_ERROR_MSG:
+		case OF_BAD_REQUEST_ERROR_MSG:
+		case OF_BARRIER_REPLY:
+		case OF_BARRIER_REQUEST:
+		case OF_BUNDLE_ADD_MSG:
+		case OF_BUNDLE_CTRL_MSG:
+		case OF_BUNDLE_FAILED_ERROR_MSG:
+		case OF_DESC_STATS_REPLY:
+		case OF_DESC_STATS_REQUEST:
+		case OF_ECHO_REPLY:
+		case OF_ECHO_REQUEST:
+		case OF_ERROR_MSG:
+		case OF_EXPERIMENTER:
+		case OF_EXPERIMENTER_ERROR_MSG:
+		case OF_EXPERIMENTER_STATS_REPLY:
+		case OF_EXPERIMENTER_STATS_REQUEST:
+		case OF_FEATURES_REPLY:
+		case OF_FEATURES_REQUEST:
+		case OF_FLOW_ADD:
+		case OF_FLOW_DELETE:
+		case OF_FLOW_DELETE_STRICT:
+		case OF_FLOW_MOD:
+		case OF_FLOW_MOD_FAILED_ERROR_MSG:
+		case OF_FLOW_MODIFY:
+		case OF_FLOW_MODIFY_STRICT:
+		case OF_FLOW_MONITOR_FAILED_ERROR_MSG:
+		case OF_FLOW_REMOVED:
+		case OF_FLOW_STATS_REPLY:
+		case OF_FLOW_STATS_REQUEST:
+		case OF_GET_CONFIG_REPLY:
+		case OF_GET_CONFIG_REQUEST:
+		case OF_GROUP_ADD:
+		case OF_GROUP_DELETE:
+		case OF_GROUP_DESC_STATS_REPLY:
+		case OF_GROUP_DESC_STATS_REQUEST:
+		case OF_GROUP_FEATURES_STATS_REPLY:
+		case OF_GROUP_FEATURES_STATS_REQUEST:
+		case OF_GROUP_MOD:
+		case OF_GROUP_MOD_FAILED_ERROR_MSG:
+		case OF_GROUP_MODIFY:
+		case OF_GROUP_STATS_REPLY:
+		case OF_GROUP_STATS_REQUEST:
+		case OF_HEADER:
+		case OF_HELLO:
+		case OF_HELLO_FAILED_ERROR_MSG:
+		case OF_METER_CONFIG_STATS_REPLY:
+		case OF_METER_CONFIG_STATS_REQUEST:
+		case OF_METER_FEATURES_STATS_REPLY:
+		case OF_METER_FEATURES_STATS_REQUEST:
+		case OF_METER_MOD:
+		case OF_METER_MOD_FAILED_ERROR_MSG:
+		case OF_METER_STATS_REPLY:
+		case OF_METER_STATS_REQUEST:
+		case OF_NICIRA_CONTROLLER_ROLE_REPLY:
+		case OF_NICIRA_CONTROLLER_ROLE_REQUEST:
+		case OF_NICIRA_HEADER:
+			dbgprintf(0, "Modifcation for packet type %s not supported\n", of_object_id_str[ofo->object_id]);
+			return false;
+		case OF_PACKET_IN:
+			return ModifyPACKETIN(ofo, vfield, action, val, 0);
+		case OF_PACKET_OUT:
+		case OF_PORT_DESC_STATS_REPLY:
+		case OF_PORT_DESC_STATS_REQUEST:
+		case OF_PORT_MOD:
+		case OF_PORT_MOD_FAILED_ERROR_MSG:
+		case OF_PORT_STATS_REPLY:
+		case OF_PORT_STATS_REQUEST:
+		case OF_PORT_STATUS:
+		case OF_QUEUE_DESC_STATS_REPLY:
+		case OF_QUEUE_DESC_STATS_REQUEST:
+		case OF_QUEUE_GET_CONFIG_REPLY:
+		case OF_QUEUE_GET_CONFIG_REQUEST:
+		case OF_QUEUE_OP_FAILED_ERROR_MSG:
+		case OF_QUEUE_STATS_REPLY:
+		case OF_QUEUE_STATS_REQUEST:
+		case OF_REQUESTFORWARD:
+		case OF_ROLE_REPLY:
+		case OF_ROLE_REQUEST:
+		case OF_ROLE_REQUEST_FAILED_ERROR_MSG:
+		case OF_ROLE_STATUS:
+		case OF_SET_CONFIG:
+		case OF_STATS_REPLY:
+		case OF_STATS_REQUEST:
+		case OF_SWITCH_CONFIG_FAILED_ERROR_MSG:
+		case OF_TABLE_DESC_STATS_REPLY:
+		case OF_TABLE_DESC_STATS_REQUEST:
+		case OF_TABLE_FEATURES_FAILED_ERROR_MSG:
+		case OF_TABLE_FEATURES_STATS_REPLY:
+		case OF_TABLE_FEATURES_STATS_REQUEST:
+		case OF_TABLE_MOD:
+		case OF_TABLE_MOD_FAILED_ERROR_MSG:
+		case OF_TABLE_STATS_REPLY:
+		case OF_TABLE_STATS_REQUEST:
+		case OF_TABLE_STATUS:
+		default:
+			dbgprintf(0, "Modifcation for packet type %s not supported\n", of_object_id_str[ofo->object_id]);
+			return false;
+	}
+	return true;
+}
+
+bool Attacker::ModifyHEADER(of_object_t* ofo, vector<int> vfield, int action, int val, unsigned int level)
+{
+	of_message_t msg;
+	unsigned char tmp;
+	uint16_t tmp2;
+	uint32_t tmp3;
+	int field;
+
+	if (vfield.empty() || vfield.size() <= level) {
+		return false;
+	}
+
+	field = vfield[level];
+	msg = OF_OBJECT_TO_MESSAGE(ofo);
+
+	switch(field) {
+		case 1: //Version
+			if (action == MOD_SET) {
+				ofo->version = (of_version_t)val;
+				tmp = val;
+				msg[OF_MESSAGE_VERSION_OFFSET] = tmp;
+			} else if(action == MOD_ADD) {
+				ofo->version = (of_version_t) ( (int)ofo->version + val);
+				tmp = msg[OF_MESSAGE_VERSION_OFFSET];
+				tmp += val;
+				msg[OF_MESSAGE_VERSION_OFFSET] = tmp;
+			} else if(action == MOD_SUB) {
+				ofo->version = (of_version_t) ( (int)ofo->version - val);
+				tmp = msg[OF_MESSAGE_VERSION_OFFSET];
+				tmp -= val;
+				msg[OF_MESSAGE_VERSION_OFFSET] = tmp;
+			}
+			break;
+		case 2: //Type
+			if (action == MOD_SET) {
+				tmp = val;
+				msg[OF_MESSAGE_TYPE_OFFSET] = tmp;
+			} else if(action == MOD_ADD) {
+				tmp = msg[OF_MESSAGE_TYPE_OFFSET];
+				tmp += val;
+				msg[OF_MESSAGE_TYPE_OFFSET] = tmp;
+			} else if(action == MOD_SUB) {
+				tmp = msg[OF_MESSAGE_TYPE_OFFSET];
+				tmp -= val;
+				msg[OF_MESSAGE_TYPE_OFFSET] = tmp;
+			}
+			break;
+		case 3: //length
+			if (action == MOD_SET) {
+				tmp2 = val;
+				of_message_length_set(msg, tmp2);
+				ofo->length = val;
+			} else if(action == MOD_ADD) {
+				tmp2 = of_message_length_get(msg);
+				tmp2 += val;
+				of_message_length_set(msg, tmp2);
+				ofo->length += val;
+			} else if(action == MOD_SUB) {
+				tmp2 = of_message_length_get(msg);
+				tmp2 -= val;
+				of_message_length_set(msg, tmp2);
+				ofo->length -= val;
+			}
+			break;
+		case 4: //XID
+			if (action == MOD_SET) {
+				tmp3 = val;
+				msg[OF_MESSAGE_XID_OFFSET] = htonl(tmp3);
+			} else if(action == MOD_ADD) {
+				tmp3 = of_message_xid_get(msg);
+				tmp3 += val;
+				msg[OF_MESSAGE_XID_OFFSET] = htonl(tmp3);
+			} else if(action == MOD_SUB) {
+				tmp3 = of_message_xid_get(msg);
+				tmp3 -= val;
+				msg[OF_MESSAGE_XID_OFFSET] = htonl(tmp3);
+			}
+			break;
+	}
+	return true;
+}
+
+bool Attacker::ModifyPACKETIN(of_object_t* ofo, vector<int> vfield, int action, int val, unsigned int level)
+{
+	int field;
+	uint8_t tmp8;
+	uint16_t tmp16;
+	uint32_t tmp32;
+	uint64_t tmp64;
+
+	if (vfield.empty() || vfield.size() <= level) {
+		return false;
+	}
+
+	field = vfield[level];
+
+	switch(field) {
+		case 5: // Buffer ID
+			if (action == MOD_SET) {
+				tmp32 = val;
+				of_packet_in_buffer_id_set((of_packet_in_t*)ofo, tmp32);
+			} else if(action == MOD_ADD) {
+				of_packet_in_buffer_id_get((of_packet_in_t*)ofo, &tmp32);
+				tmp32 += val;
+				of_packet_in_buffer_id_set((of_packet_in_t*)ofo, tmp32);
+			} else if(action == MOD_SUB) {
+				of_packet_in_buffer_id_get((of_packet_in_t*)ofo, &tmp32);
+				tmp32 -= val;
+				of_packet_in_buffer_id_set((of_packet_in_t*)ofo, tmp32);
+			}
+			break;
+		case 6: // Total Len
+			if (action == MOD_SET) {
+				tmp16 = val;
+				of_packet_in_total_len_set((of_packet_in_t*)ofo, tmp16);
+			} else if(action == MOD_ADD) {
+				of_packet_in_total_len_get((of_packet_in_t*)ofo, &tmp16);
+				tmp16 += val;
+				of_packet_in_total_len_set((of_packet_in_t*)ofo, tmp16);
+			} else if(action == MOD_SUB) {
+				of_packet_in_total_len_get((of_packet_in_t*)ofo, &tmp16);
+				tmp16 -= val;
+				of_packet_in_total_len_set((of_packet_in_t*)ofo, tmp16);
+			}
+			break;
+		case 7: // Reason
+			if (action == MOD_SET) {
+				tmp8 = val;
+				of_packet_in_reason_set((of_packet_in_t*)ofo, tmp8);
+			} else if(action == MOD_ADD) {
+				of_packet_in_reason_get((of_packet_in_t*)ofo, &tmp8);
+				tmp8 += val;
+				of_packet_in_reason_set((of_packet_in_t*)ofo, tmp8);
+			} else if(action == MOD_SUB) {
+				of_packet_in_reason_get((of_packet_in_t*)ofo, &tmp8);
+				tmp8 -= val;
+				of_packet_in_reason_set((of_packet_in_t*)ofo, tmp8);
+			}
+			break;
+		case 8: // Table ID
+			if (action == MOD_SET) {
+				tmp8 = val;
+				of_packet_in_table_id_set((of_packet_in_t*)ofo, tmp8);
+			} else if(action == MOD_ADD) {
+				of_packet_in_table_id_get((of_packet_in_t*)ofo, &tmp8);
+				tmp8 += val;
+				of_packet_in_table_id_set((of_packet_in_t*)ofo, tmp8);
+			} else if(action == MOD_SUB) {
+				of_packet_in_table_id_get((of_packet_in_t*)ofo, &tmp8);
+				tmp8 -= val;
+				of_packet_in_table_id_set((of_packet_in_t*)ofo, tmp8);
+			}
+			break;
+		case 9: // Cookie
+			if (action == MOD_SET) {
+				tmp64 = val;
+				of_packet_in_cookie_set((of_packet_in_t*)ofo, tmp64);
+			} else if(action == MOD_ADD) {
+				of_packet_in_cookie_get((of_packet_in_t*)ofo, &tmp64);
+				tmp64 += val;
+				of_packet_in_cookie_set((of_packet_in_t*)ofo, tmp64);
+			} else if(action == MOD_SUB) {
+				of_packet_in_cookie_get((of_packet_in_t*)ofo, &tmp64);
+				tmp64 -= val;
+				of_packet_in_cookie_set((of_packet_in_t*)ofo, tmp64);
+			}
+			break;
+		case 10: // Match
+		case 11: // Data
+		default:
+			dbgprintf(0, "Warning: Trying to modify invalid/unsupported field: %i\n", field);
+			return false;
+	}
+
+	return true;
 }

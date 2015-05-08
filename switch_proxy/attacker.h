@@ -32,12 +32,23 @@
 #define ACTION_ID_DIVERT		6
 #define ACTION_ID_MAX			6
 
+#define MOD_SET 1
+#define MOD_ADD 2
+#define MOD_SUB 3
+
 
 typedef std::map<int, int> amap_t;
 typedef std::map<int, std::map<int, int> > aamap_t;
 typedef std::map<int,std::map<int, std::map<int, int> > > aaamap_t;
 typedef std::map<uint64_t, std::map<int,std::map<int, std::map<int, int> > > > aaaamap_t;
 typedef std::map<int, std::map<uint64_t, std::map<int,std::map<int, std::map<int, int> > > > > aaaaamap_t;
+
+class modAttack {
+	public:
+		std::vector<int> field;
+		int action;
+		int value;
+};
 
 class Attacker{
 	private:
@@ -56,18 +67,23 @@ class Attacker{
 		int normalize_action_type(char *s);
 		int normalize_cid(char *s);
 		uint64_t normalize_dpid(char *s);
-		bool loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args);
+		std::vector<int> normalize_field(char *s);
+		bool loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args, char *field);
 		bool removeCommand(amap_t::iterator it5, aamap_t::iterator it4, aaamap_t::iterator it3,
 				aaaamap_t::iterator it2, aaaaamap_t::iterator it1);
 		bool clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type);
 		pkt_info applyActions(pkt_info pk, aamap_t::iterator it4);
 		void print(pkt_info pk);
+		bool doModify(of_object_t* ofo, std::vector<int> vfield, int action, int val);
+		bool ModifyHEADER(of_object_t* ofo, std::vector<int> vfield, int action, int val, unsigned int level);
+		bool ModifyPACKETIN(of_object_t* ofo, std::vector<int> vfield, int action, int val, unsigned int level);
 
 		pthread_rwlock_t lock;
 		// <cid, <dpid, <of_version, <pkt_type, <action, ID> > > >
 		aaaaamap_t actions_map;
-		// <ID, list_of_parameters >
-		std::map<int, std::vector<int> > params;
+		// <ID, list_of_attacks>
+		std::map<int, std::vector<modAttack> > mod_params;
+		int nxt_param;
 		std::list<Listener*> *listeners;
 		pthread_mutex_t *listeners_mutex;
 
