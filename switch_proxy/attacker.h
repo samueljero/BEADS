@@ -43,6 +43,8 @@ typedef std::map<int,std::map<int, std::map<int, int> > > aaamap_t;
 typedef std::map<uint64_t, std::map<int,std::map<int, std::map<int, int> > > > aaaamap_t;
 typedef std::map<int, std::map<uint64_t, std::map<int,std::map<int, std::map<int, int> > > > > aaaaamap_t;
 
+class OpenFlow;
+
 class modAttack {
 	public:
 		std::vector<int> field;
@@ -86,6 +88,7 @@ class Attacker{
 		int nxt_param;
 		std::list<Listener*> *listeners;
 		pthread_mutex_t *listeners_mutex;
+		OpenFlow *modifier;
 
 };
 

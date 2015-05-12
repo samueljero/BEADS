@@ -17,6 +17,7 @@ extern "C" {
 #include <map>
 #include <list>
 #include <vector>
+#include "attacks.cc"
 using namespace std;
 
 #define ATTACKER_ROW_NUM_FIELDS		7
@@ -49,10 +50,12 @@ Attacker::Attacker()
 	listeners = NULL;
 	listeners_mutex = NULL;
 	nxt_param = 0;
+	modifier = new OpenFlow();
 }
 Attacker::~Attacker()
 {
 	pthread_rwlock_destroy(&lock);
+	delete modifier;
 }
 
 Attacker& Attacker::get()
@@ -768,6 +771,8 @@ void Attacker::print(pkt_info pk)
 bool Attacker::doModify(of_object_t* ofo, vector<int> vfield, int action, int val)
 {
 	int field;
+	vector<int> modfield;
+	unsigned long int vval;
 
 	if (vfield.empty()) {
 		return false;
@@ -778,6 +783,24 @@ bool Attacker::doModify(of_object_t* ofo, vector<int> vfield, int action, int va
 		/* Global fields */
 		return ModifyHEADER(ofo,vfield,action,val, 0);
 	}
+
+	modfield = vector<int>(vfield);
+	modfield[0] = modfield[0] - 3; //different start location
+
+	if (action == MOD_SET) {
+		vval = val;
+		modifier->set_field(ofo,vval,modfield,0);
+	} else if(action == MOD_ADD) {
+		modifier->get_field(ofo,&vval, modfield,0);
+		vval += val;
+		modifier->set_field(ofo,vval,modfield,0);
+	} else if(action == MOD_SUB) {
+		modifier->get_field(ofo,&vval, modfield,0);
+		vval -= val;
+		modifier->set_field(ofo,vval,modfield,0);
+	}
+
+	return true;
 
 	switch(ofo->object_id) {
 		case OF_AGGREGATE_STATS_REPLY:
