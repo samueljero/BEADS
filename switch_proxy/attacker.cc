@@ -669,6 +669,7 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 			if (!doModify(pk.ofo, mod_acts[x].field, mod_acts[x].action, mod_acts[x].value)){
 				break;
 			}
+			//print(pk);
 		}
 	}
 
@@ -933,31 +934,31 @@ bool Attacker::ModifyHEADER(of_object_t* ofo, vector<int> vfield, int action, in
 			if (action == MOD_SET) {
 				ofo->version = (of_version_t)val;
 				tmp = val;
-				msg[OF_MESSAGE_VERSION_OFFSET] = tmp;
+				buf_u8_set(msg + OF_MESSAGE_VERSION_OFFSET, tmp);
 			} else if(action == MOD_ADD) {
 				ofo->version = (of_version_t) ( (int)ofo->version + val);
 				tmp = msg[OF_MESSAGE_VERSION_OFFSET];
 				tmp += val;
-				msg[OF_MESSAGE_VERSION_OFFSET] = tmp;
+				buf_u8_set(msg + OF_MESSAGE_VERSION_OFFSET, tmp);
 			} else if(action == MOD_SUB) {
 				ofo->version = (of_version_t) ( (int)ofo->version - val);
 				tmp = msg[OF_MESSAGE_VERSION_OFFSET];
 				tmp -= val;
-				msg[OF_MESSAGE_VERSION_OFFSET] = tmp;
+				buf_u8_set(msg + OF_MESSAGE_VERSION_OFFSET, tmp);
 			}
 			break;
 		case 2: //Type
 			if (action == MOD_SET) {
 				tmp = val;
-				msg[OF_MESSAGE_TYPE_OFFSET] = tmp;
+				buf_u8_set(msg + OF_MESSAGE_TYPE_OFFSET, tmp);
 			} else if(action == MOD_ADD) {
 				tmp = msg[OF_MESSAGE_TYPE_OFFSET];
 				tmp += val;
-				msg[OF_MESSAGE_TYPE_OFFSET] = tmp;
+				buf_u8_set(msg + OF_MESSAGE_TYPE_OFFSET, tmp);
 			} else if(action == MOD_SUB) {
 				tmp = msg[OF_MESSAGE_TYPE_OFFSET];
 				tmp -= val;
-				msg[OF_MESSAGE_TYPE_OFFSET] = tmp;
+				buf_u8_set(msg + OF_MESSAGE_TYPE_OFFSET, tmp);
 			}
 			break;
 		case 3: //length
@@ -980,15 +981,15 @@ bool Attacker::ModifyHEADER(of_object_t* ofo, vector<int> vfield, int action, in
 		case 4: //XID
 			if (action == MOD_SET) {
 				tmp3 = val;
-				msg[OF_MESSAGE_XID_OFFSET] = htonl(tmp3);
+				buf_u32_set(msg + OF_MESSAGE_XID_OFFSET, tmp3);
 			} else if(action == MOD_ADD) {
 				tmp3 = of_message_xid_get(msg);
 				tmp3 += val;
-				msg[OF_MESSAGE_XID_OFFSET] = htonl(tmp3);
+				buf_u32_set(msg + OF_MESSAGE_XID_OFFSET, tmp3);
 			} else if(action == MOD_SUB) {
 				tmp3 = of_message_xid_get(msg);
 				tmp3 -= val;
-				msg[OF_MESSAGE_XID_OFFSET] = htonl(tmp3);
+				buf_u32_set(msg + OF_MESSAGE_XID_OFFSET, tmp3);
 			}
 			break;
 	}
