@@ -1,0 +1,204 @@
+diff --git a/c_gen/c_code_gen.py b/c_gen/c_code_gen.py
+index 9add81b..51c0d2a 100644
+--- a/c_gen/c_code_gen.py
++++ b/c_gen/c_code_gen.py
+@@ -1079,6 +1079,199 @@ extern int %(cls)s_append(
+          (rv) = %(cls)s_next((list), (elt)))
+ """ % dict(u_cls=cls.upper(), cls=cls, e_type=e_type))
+ 
++#JERO
++    out.write("JERO\n")
++    out.write("""extern "C" {
++#include <loci/loci.h>
++#include <loci/of_object.h>
++#include <loci/loci_obj_dump.h>
++}
++#include <vector>
++""")
++    out.write("class OpenFlow {\n")
++    for cls in of_g.standard_class_order:
++		    if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
++		        continue
++		    for m_name in of_g.ordered_members[cls]:
++		        if m_name in of_g.skip_members:
++		            continue
++		        m_type = loxi_utils.member_base_type(cls, m_name)
++		        if m_type == "of_match_t":
++		            out.write("""void do_%(cls)s_%(m_name)s_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
++	//TODO: Support Match manipulation
++	return;
++}
++
++void do_%(cls)s_%(m_name)s_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
++	//TODO: Support Match manipulation
++	return;
++}
++
++""" % dict(cls=cls, m_name=m_name, set_type=m_type))
++		        elif loxi_utils.class_is_list(m_type):
++		            out.write("""void do_%(cls)s_%(m_name)s_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
++	%(set_type)s *tmp;
++	tmp = %(cls)s_%(m_name)s_get( (%(cls)s_t *) o);
++	if (!tmp) {
++		return;
++	}
++	l++;
++	set_field((of_object_t*)tmp, val, f, l);
++	if (%(cls)s_%(m_name)s_set( (%(cls)s_t *) o, tmp)) {
++		//nothing
++	}
++	of_object_delete((of_object_t*)tmp);
++	return;
++}
++
++void do_%(cls)s_%(m_name)s_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
++	%(set_type)s *tmp;
++	tmp = %(cls)s_%(m_name)s_get( (%(cls)s_t *) o);
++	if (!tmp) {
++		return;
++	}
++	l++;
++	get_field((of_object_t*)tmp, val, f, l);
++	of_object_delete((of_object_t*)tmp);
++	return;
++}
++
++""" % dict(cls=cls, m_name=m_name, set_type=m_type))
++		        elif not loxi_utils.type_is_scalar(m_type):
++		            out.write("""void do_%(cls)s_%(m_name)s_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
++	%(set_type)s *tmp;
++	%(cls)s_%(m_name)s_get( (%(cls)s_t *) o, tmp);
++	l++;
++	set_field((of_object_t*)tmp, val, f, l);
++	%(cls)s_%(m_name)s_set( (%(cls)s_t *) o, tmp);
++	return;
++}
++
++void do_%(cls)s_%(m_name)s_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
++	%(set_type)s *tmp;
++	%(cls)s_%(m_name)s_get( (%(cls)s_t *) o, tmp);
++	l++;
++	get_field((of_object_t*)tmp, val, f, l);
++	return;
++}
++
++""" % dict(cls=cls, m_name=m_name, set_type=m_type))
++		        else:
++		                out.write("""void do_%(cls)s_%(m_name)s_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
++	%(set_type)s tmp;
++	tmp = val;
++	%(cls)s_%(m_name)s_set( (%(cls)s_t *) o, tmp);
++	return;
++}
++
++void do_%(cls)s_%(m_name)s_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
++	%(set_type)s tmp;
++	%(cls)s_%(m_name)s_get( (%(cls)s_t *) o, &tmp);
++	*val = tmp;
++	return;
++}
++
++""" % dict(cls=cls, m_name=m_name, set_type=m_type))
++
++    for cls in of_g.standard_class_order:
++		    if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
++		        continue
++		    if loxi_utils.class_is_list(cls):
++		        out.write("""void %(cls)s_get_field(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
++	if ( l >= f.size()) {
++		return;
++	}
++	int field = f[l];
++	of_object_t *iter = NULL;
++	int rv;
++	int ct = 1;
++	%(u_cls)s_ITER((%(cls)s_t*)o, iter, rv){
++		if (ct==field){
++			l++;
++			get_field(iter,val,f,l);
++			break;
++		}
++		ct++;
++	}
++}
++
++void %(cls)s_set_field(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
++	if ( l >= f.size()) {
++		return;
++	}
++	int field = f[l];
++	of_object_t *iter = NULL;
++	int rv;
++	int ct = 1;
++	%(u_cls)s_ITER((%(cls)s_t*)o, iter, rv){
++		if (ct==field){
++			l++;
++			set_field(iter,val,f,l);
++			break;
++		}
++		ct++;
++	}
++}
++""" % dict(cls=cls, u_cls=cls.upper()) )
++		    else:
++		        out.write("""void %(cls)s_get_field(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
++	if ( l >= f.size()) {
++		return;
++	}
++	int field = f[l];
++	switch(field){
++""" % dict(cls=cls) )
++		        i=1
++		        for m_name in of_g.ordered_members[cls]:
++		             if m_name in of_g.skip_members:
++		                 continue
++		             out.write("""case %(i)i:
++	do_%(cls)s_%(m_name)s_get(o, val,f , l);
++	break;
++""" % dict(i=i,cls=cls, m_name=m_name))
++		             i = i + 1
++		        out.write("}\n}\n")
++
++		        out.write("""void %(cls)s_set_field(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
++	if ( l >= f.size()) {
++		return;
++	}
++	int field = f[l];
++	switch(field){
++""" % dict(cls=cls) )
++		        i=1
++		        for m_name in of_g.ordered_members[cls]:
++		             if m_name in of_g.skip_members:
++		                 continue
++		             out.write("""case %(i)i:
++	do_%(cls)s_%(m_name)s_set(o, val, f, l);
++	break;
++""" % dict(i=i,cls=cls, m_name=m_name))
++		             i = i + 1
++		        out.write("}\n}\n")
++
++    out.write("public:\n")
++    out.write("void set_field(of_object_t* o, unsigned long int val, std::vector<int> f, int l){\nswitch(o->object_id){\n")
++    for cls in of_g.standard_class_order:
++		    if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
++		        continue
++		    out.write("""case %(ucls)s:
++	%(cls)s_set_field(o, val, f, l);
++	break;
++""" % dict(i=i,ucls=cls.upper(), cls=cls, m_name=m_name, get_type=m_type))
++    out.write("}\n}\n")
++
++    out.write("void get_field(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){\nswitch(o->object_id){\n")
++    for cls in of_g.standard_class_order:
++		    if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
++		        continue
++		    out.write("""case %(ucls)s:
++	%(cls)s_get_field(o, val, f, l);
++	break;
++""" % dict(i=i,ucls=cls.upper(), cls=cls, m_name=m_name, get_type=m_type))
++    out.write("}\n}\n")
++    out.write("};\n")
++#JERO
+ 
+ def wire_accessor(m_type, a_type):
+     """
