@@ -78,7 +78,6 @@ class Attacker{
 		void print(pkt_info pk);
 		bool doModify(of_object_t* ofo, std::vector<int> vfield, int action, int val);
 		bool ModifyHEADER(of_object_t* ofo, std::vector<int> vfield, int action, int val, unsigned int level);
-		bool ModifyPACKETIN(of_object_t* ofo, std::vector<int> vfield, int action, int val, unsigned int level);
 
 		pthread_rwlock_t lock;
 		// <cid, <dpid, <of_version, <pkt_type, <action, ID> > > >

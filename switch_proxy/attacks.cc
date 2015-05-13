@@ -39897,13 +39897,13 @@ void of_list_action_get_field(of_object_t* o, unsigned long int *val, std::vecto
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_ACTION_ITER((of_list_action_t*)o, iter, rv){
+	OF_LIST_ACTION_ITER((of_list_action_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -39915,13 +39915,13 @@ void of_list_action_set_field(of_object_t* o, unsigned long int val, std::vector
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_ACTION_ITER((of_list_action_t*)o, iter, rv){
+	OF_LIST_ACTION_ITER((of_list_action_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -39932,13 +39932,13 @@ void of_list_action_id_get_field(of_object_t* o, unsigned long int *val, std::ve
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_ACTION_ID_ITER((of_list_action_id_t*)o, iter, rv){
+	OF_LIST_ACTION_ID_ITER((of_list_action_id_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -39950,13 +39950,13 @@ void of_list_action_id_set_field(of_object_t* o, unsigned long int val, std::vec
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_ACTION_ID_ITER((of_list_action_id_t*)o, iter, rv){
+	OF_LIST_ACTION_ID_ITER((of_list_action_id_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -39967,13 +39967,13 @@ void of_list_async_config_prop_get_field(of_object_t* o, unsigned long int *val,
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_ASYNC_CONFIG_PROP_ITER((of_list_async_config_prop_t*)o, iter, rv){
+	OF_LIST_ASYNC_CONFIG_PROP_ITER((of_list_async_config_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -39985,13 +39985,13 @@ void of_list_async_config_prop_set_field(of_object_t* o, unsigned long int val, 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_ASYNC_CONFIG_PROP_ITER((of_list_async_config_prop_t*)o, iter, rv){
+	OF_LIST_ASYNC_CONFIG_PROP_ITER((of_list_async_config_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40002,13 +40002,13 @@ void of_list_bsn_controller_connection_get_field(of_object_t* o, unsigned long i
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_CONTROLLER_CONNECTION_ITER((of_list_bsn_controller_connection_t*)o, iter, rv){
+	OF_LIST_BSN_CONTROLLER_CONNECTION_ITER((of_list_bsn_controller_connection_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40020,13 +40020,13 @@ void of_list_bsn_controller_connection_set_field(of_object_t* o, unsigned long i
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_CONTROLLER_CONNECTION_ITER((of_list_bsn_controller_connection_t*)o, iter, rv){
+	OF_LIST_BSN_CONTROLLER_CONNECTION_ITER((of_list_bsn_controller_connection_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40037,13 +40037,13 @@ void of_list_bsn_debug_counter_desc_stats_entry_get_field(of_object_t* o, unsign
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_DEBUG_COUNTER_DESC_STATS_ENTRY_ITER((of_list_bsn_debug_counter_desc_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_DEBUG_COUNTER_DESC_STATS_ENTRY_ITER((of_list_bsn_debug_counter_desc_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40055,13 +40055,13 @@ void of_list_bsn_debug_counter_desc_stats_entry_set_field(of_object_t* o, unsign
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_DEBUG_COUNTER_DESC_STATS_ENTRY_ITER((of_list_bsn_debug_counter_desc_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_DEBUG_COUNTER_DESC_STATS_ENTRY_ITER((of_list_bsn_debug_counter_desc_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40072,13 +40072,13 @@ void of_list_bsn_debug_counter_stats_entry_get_field(of_object_t* o, unsigned lo
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_DEBUG_COUNTER_STATS_ENTRY_ITER((of_list_bsn_debug_counter_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_DEBUG_COUNTER_STATS_ENTRY_ITER((of_list_bsn_debug_counter_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40090,13 +40090,13 @@ void of_list_bsn_debug_counter_stats_entry_set_field(of_object_t* o, unsigned lo
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_DEBUG_COUNTER_STATS_ENTRY_ITER((of_list_bsn_debug_counter_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_DEBUG_COUNTER_STATS_ENTRY_ITER((of_list_bsn_debug_counter_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40107,13 +40107,13 @@ void of_list_bsn_flow_checksum_bucket_stats_entry_get_field(of_object_t* o, unsi
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_FLOW_CHECKSUM_BUCKET_STATS_ENTRY_ITER((of_list_bsn_flow_checksum_bucket_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_FLOW_CHECKSUM_BUCKET_STATS_ENTRY_ITER((of_list_bsn_flow_checksum_bucket_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40125,13 +40125,13 @@ void of_list_bsn_flow_checksum_bucket_stats_entry_set_field(of_object_t* o, unsi
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_FLOW_CHECKSUM_BUCKET_STATS_ENTRY_ITER((of_list_bsn_flow_checksum_bucket_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_FLOW_CHECKSUM_BUCKET_STATS_ENTRY_ITER((of_list_bsn_flow_checksum_bucket_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40142,13 +40142,13 @@ void of_list_bsn_generic_stats_entry_get_field(of_object_t* o, unsigned long int
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENERIC_STATS_ENTRY_ITER((of_list_bsn_generic_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENERIC_STATS_ENTRY_ITER((of_list_bsn_generic_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40160,13 +40160,13 @@ void of_list_bsn_generic_stats_entry_set_field(of_object_t* o, unsigned long int
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENERIC_STATS_ENTRY_ITER((of_list_bsn_generic_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENERIC_STATS_ENTRY_ITER((of_list_bsn_generic_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40177,13 +40177,13 @@ void of_list_bsn_gentable_bucket_stats_entry_get_field(of_object_t* o, unsigned 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_BUCKET_STATS_ENTRY_ITER((of_list_bsn_gentable_bucket_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_BUCKET_STATS_ENTRY_ITER((of_list_bsn_gentable_bucket_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40195,13 +40195,13 @@ void of_list_bsn_gentable_bucket_stats_entry_set_field(of_object_t* o, unsigned 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_BUCKET_STATS_ENTRY_ITER((of_list_bsn_gentable_bucket_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_BUCKET_STATS_ENTRY_ITER((of_list_bsn_gentable_bucket_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40212,13 +40212,13 @@ void of_list_bsn_gentable_desc_stats_entry_get_field(of_object_t* o, unsigned lo
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_DESC_STATS_ENTRY_ITER((of_list_bsn_gentable_desc_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_DESC_STATS_ENTRY_ITER((of_list_bsn_gentable_desc_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40230,13 +40230,13 @@ void of_list_bsn_gentable_desc_stats_entry_set_field(of_object_t* o, unsigned lo
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_DESC_STATS_ENTRY_ITER((of_list_bsn_gentable_desc_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_DESC_STATS_ENTRY_ITER((of_list_bsn_gentable_desc_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40247,13 +40247,13 @@ void of_list_bsn_gentable_entry_desc_stats_entry_get_field(of_object_t* o, unsig
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_ENTRY_DESC_STATS_ENTRY_ITER((of_list_bsn_gentable_entry_desc_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_ENTRY_DESC_STATS_ENTRY_ITER((of_list_bsn_gentable_entry_desc_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40265,13 +40265,13 @@ void of_list_bsn_gentable_entry_desc_stats_entry_set_field(of_object_t* o, unsig
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_ENTRY_DESC_STATS_ENTRY_ITER((of_list_bsn_gentable_entry_desc_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_ENTRY_DESC_STATS_ENTRY_ITER((of_list_bsn_gentable_entry_desc_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40282,13 +40282,13 @@ void of_list_bsn_gentable_entry_stats_entry_get_field(of_object_t* o, unsigned l
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_ENTRY_STATS_ENTRY_ITER((of_list_bsn_gentable_entry_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_ENTRY_STATS_ENTRY_ITER((of_list_bsn_gentable_entry_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40300,13 +40300,13 @@ void of_list_bsn_gentable_entry_stats_entry_set_field(of_object_t* o, unsigned l
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_ENTRY_STATS_ENTRY_ITER((of_list_bsn_gentable_entry_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_ENTRY_STATS_ENTRY_ITER((of_list_bsn_gentable_entry_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40317,13 +40317,13 @@ void of_list_bsn_gentable_stats_entry_get_field(of_object_t* o, unsigned long in
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_STATS_ENTRY_ITER((of_list_bsn_gentable_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_STATS_ENTRY_ITER((of_list_bsn_gentable_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40335,13 +40335,13 @@ void of_list_bsn_gentable_stats_entry_set_field(of_object_t* o, unsigned long in
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_GENTABLE_STATS_ENTRY_ITER((of_list_bsn_gentable_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_GENTABLE_STATS_ENTRY_ITER((of_list_bsn_gentable_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40352,13 +40352,13 @@ void of_list_bsn_interface_get_field(of_object_t* o, unsigned long int *val, std
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_INTERFACE_ITER((of_list_bsn_interface_t*)o, iter, rv){
+	OF_LIST_BSN_INTERFACE_ITER((of_list_bsn_interface_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40370,13 +40370,13 @@ void of_list_bsn_interface_set_field(of_object_t* o, unsigned long int val, std:
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_INTERFACE_ITER((of_list_bsn_interface_t*)o, iter, rv){
+	OF_LIST_BSN_INTERFACE_ITER((of_list_bsn_interface_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40387,13 +40387,13 @@ void of_list_bsn_lacp_stats_entry_get_field(of_object_t* o, unsigned long int *v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_LACP_STATS_ENTRY_ITER((of_list_bsn_lacp_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_LACP_STATS_ENTRY_ITER((of_list_bsn_lacp_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40405,13 +40405,13 @@ void of_list_bsn_lacp_stats_entry_set_field(of_object_t* o, unsigned long int va
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_LACP_STATS_ENTRY_ITER((of_list_bsn_lacp_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_LACP_STATS_ENTRY_ITER((of_list_bsn_lacp_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40422,13 +40422,13 @@ void of_list_bsn_port_counter_stats_entry_get_field(of_object_t* o, unsigned lon
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_PORT_COUNTER_STATS_ENTRY_ITER((of_list_bsn_port_counter_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_PORT_COUNTER_STATS_ENTRY_ITER((of_list_bsn_port_counter_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40440,13 +40440,13 @@ void of_list_bsn_port_counter_stats_entry_set_field(of_object_t* o, unsigned lon
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_PORT_COUNTER_STATS_ENTRY_ITER((of_list_bsn_port_counter_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_PORT_COUNTER_STATS_ENTRY_ITER((of_list_bsn_port_counter_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40457,13 +40457,13 @@ void of_list_bsn_switch_pipeline_stats_entry_get_field(of_object_t* o, unsigned 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_SWITCH_PIPELINE_STATS_ENTRY_ITER((of_list_bsn_switch_pipeline_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_SWITCH_PIPELINE_STATS_ENTRY_ITER((of_list_bsn_switch_pipeline_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40475,13 +40475,13 @@ void of_list_bsn_switch_pipeline_stats_entry_set_field(of_object_t* o, unsigned 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_SWITCH_PIPELINE_STATS_ENTRY_ITER((of_list_bsn_switch_pipeline_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_SWITCH_PIPELINE_STATS_ENTRY_ITER((of_list_bsn_switch_pipeline_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40492,13 +40492,13 @@ void of_list_bsn_table_checksum_stats_entry_get_field(of_object_t* o, unsigned l
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_TABLE_CHECKSUM_STATS_ENTRY_ITER((of_list_bsn_table_checksum_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_TABLE_CHECKSUM_STATS_ENTRY_ITER((of_list_bsn_table_checksum_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40510,13 +40510,13 @@ void of_list_bsn_table_checksum_stats_entry_set_field(of_object_t* o, unsigned l
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_TABLE_CHECKSUM_STATS_ENTRY_ITER((of_list_bsn_table_checksum_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_TABLE_CHECKSUM_STATS_ENTRY_ITER((of_list_bsn_table_checksum_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40527,13 +40527,13 @@ void of_list_bsn_tlv_get_field(of_object_t* o, unsigned long int *val, std::vect
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_TLV_ITER((of_list_bsn_tlv_t*)o, iter, rv){
+	OF_LIST_BSN_TLV_ITER((of_list_bsn_tlv_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40545,13 +40545,13 @@ void of_list_bsn_tlv_set_field(of_object_t* o, unsigned long int val, std::vecto
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_TLV_ITER((of_list_bsn_tlv_t*)o, iter, rv){
+	OF_LIST_BSN_TLV_ITER((of_list_bsn_tlv_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40562,13 +40562,13 @@ void of_list_bsn_vlan_counter_stats_entry_get_field(of_object_t* o, unsigned lon
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_VLAN_COUNTER_STATS_ENTRY_ITER((of_list_bsn_vlan_counter_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_VLAN_COUNTER_STATS_ENTRY_ITER((of_list_bsn_vlan_counter_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40580,13 +40580,13 @@ void of_list_bsn_vlan_counter_stats_entry_set_field(of_object_t* o, unsigned lon
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_VLAN_COUNTER_STATS_ENTRY_ITER((of_list_bsn_vlan_counter_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_VLAN_COUNTER_STATS_ENTRY_ITER((of_list_bsn_vlan_counter_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40597,13 +40597,13 @@ void of_list_bsn_vrf_counter_stats_entry_get_field(of_object_t* o, unsigned long
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_VRF_COUNTER_STATS_ENTRY_ITER((of_list_bsn_vrf_counter_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_VRF_COUNTER_STATS_ENTRY_ITER((of_list_bsn_vrf_counter_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40615,13 +40615,13 @@ void of_list_bsn_vrf_counter_stats_entry_set_field(of_object_t* o, unsigned long
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BSN_VRF_COUNTER_STATS_ENTRY_ITER((of_list_bsn_vrf_counter_stats_entry_t*)o, iter, rv){
+	OF_LIST_BSN_VRF_COUNTER_STATS_ENTRY_ITER((of_list_bsn_vrf_counter_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40632,13 +40632,13 @@ void of_list_bucket_get_field(of_object_t* o, unsigned long int *val, std::vecto
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BUCKET_ITER((of_list_bucket_t*)o, iter, rv){
+	OF_LIST_BUCKET_ITER((of_list_bucket_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40650,13 +40650,13 @@ void of_list_bucket_set_field(of_object_t* o, unsigned long int val, std::vector
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BUCKET_ITER((of_list_bucket_t*)o, iter, rv){
+	OF_LIST_BUCKET_ITER((of_list_bucket_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40667,13 +40667,13 @@ void of_list_bucket_counter_get_field(of_object_t* o, unsigned long int *val, st
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BUCKET_COUNTER_ITER((of_list_bucket_counter_t*)o, iter, rv){
+	OF_LIST_BUCKET_COUNTER_ITER((of_list_bucket_counter_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40685,13 +40685,13 @@ void of_list_bucket_counter_set_field(of_object_t* o, unsigned long int val, std
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BUCKET_COUNTER_ITER((of_list_bucket_counter_t*)o, iter, rv){
+	OF_LIST_BUCKET_COUNTER_ITER((of_list_bucket_counter_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40702,13 +40702,13 @@ void of_list_bundle_prop_get_field(of_object_t* o, unsigned long int *val, std::
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BUNDLE_PROP_ITER((of_list_bundle_prop_t*)o, iter, rv){
+	OF_LIST_BUNDLE_PROP_ITER((of_list_bundle_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40720,13 +40720,13 @@ void of_list_bundle_prop_set_field(of_object_t* o, unsigned long int val, std::v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_BUNDLE_PROP_ITER((of_list_bundle_prop_t*)o, iter, rv){
+	OF_LIST_BUNDLE_PROP_ITER((of_list_bundle_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40737,13 +40737,13 @@ void of_list_flow_stats_entry_get_field(of_object_t* o, unsigned long int *val, 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_FLOW_STATS_ENTRY_ITER((of_list_flow_stats_entry_t*)o, iter, rv){
+	OF_LIST_FLOW_STATS_ENTRY_ITER((of_list_flow_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40755,13 +40755,13 @@ void of_list_flow_stats_entry_set_field(of_object_t* o, unsigned long int val, s
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_FLOW_STATS_ENTRY_ITER((of_list_flow_stats_entry_t*)o, iter, rv){
+	OF_LIST_FLOW_STATS_ENTRY_ITER((of_list_flow_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40772,13 +40772,13 @@ void of_list_group_desc_stats_entry_get_field(of_object_t* o, unsigned long int 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_GROUP_DESC_STATS_ENTRY_ITER((of_list_group_desc_stats_entry_t*)o, iter, rv){
+	OF_LIST_GROUP_DESC_STATS_ENTRY_ITER((of_list_group_desc_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40790,13 +40790,13 @@ void of_list_group_desc_stats_entry_set_field(of_object_t* o, unsigned long int 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_GROUP_DESC_STATS_ENTRY_ITER((of_list_group_desc_stats_entry_t*)o, iter, rv){
+	OF_LIST_GROUP_DESC_STATS_ENTRY_ITER((of_list_group_desc_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40807,13 +40807,13 @@ void of_list_group_stats_entry_get_field(of_object_t* o, unsigned long int *val,
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_GROUP_STATS_ENTRY_ITER((of_list_group_stats_entry_t*)o, iter, rv){
+	OF_LIST_GROUP_STATS_ENTRY_ITER((of_list_group_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40825,13 +40825,13 @@ void of_list_group_stats_entry_set_field(of_object_t* o, unsigned long int val, 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_GROUP_STATS_ENTRY_ITER((of_list_group_stats_entry_t*)o, iter, rv){
+	OF_LIST_GROUP_STATS_ENTRY_ITER((of_list_group_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40842,13 +40842,13 @@ void of_list_hello_elem_get_field(of_object_t* o, unsigned long int *val, std::v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_HELLO_ELEM_ITER((of_list_hello_elem_t*)o, iter, rv){
+	OF_LIST_HELLO_ELEM_ITER((of_list_hello_elem_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40860,13 +40860,13 @@ void of_list_hello_elem_set_field(of_object_t* o, unsigned long int val, std::ve
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_HELLO_ELEM_ITER((of_list_hello_elem_t*)o, iter, rv){
+	OF_LIST_HELLO_ELEM_ITER((of_list_hello_elem_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40877,13 +40877,13 @@ void of_list_instruction_get_field(of_object_t* o, unsigned long int *val, std::
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_INSTRUCTION_ITER((of_list_instruction_t*)o, iter, rv){
+	OF_LIST_INSTRUCTION_ITER((of_list_instruction_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40895,13 +40895,13 @@ void of_list_instruction_set_field(of_object_t* o, unsigned long int val, std::v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_INSTRUCTION_ITER((of_list_instruction_t*)o, iter, rv){
+	OF_LIST_INSTRUCTION_ITER((of_list_instruction_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40912,13 +40912,13 @@ void of_list_instruction_id_get_field(of_object_t* o, unsigned long int *val, st
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_INSTRUCTION_ID_ITER((of_list_instruction_id_t*)o, iter, rv){
+	OF_LIST_INSTRUCTION_ID_ITER((of_list_instruction_id_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40930,13 +40930,13 @@ void of_list_instruction_id_set_field(of_object_t* o, unsigned long int val, std
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_INSTRUCTION_ID_ITER((of_list_instruction_id_t*)o, iter, rv){
+	OF_LIST_INSTRUCTION_ID_ITER((of_list_instruction_id_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40947,13 +40947,13 @@ void of_list_meter_band_get_field(of_object_t* o, unsigned long int *val, std::v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_METER_BAND_ITER((of_list_meter_band_t*)o, iter, rv){
+	OF_LIST_METER_BAND_ITER((of_list_meter_band_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40965,13 +40965,13 @@ void of_list_meter_band_set_field(of_object_t* o, unsigned long int val, std::ve
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_METER_BAND_ITER((of_list_meter_band_t*)o, iter, rv){
+	OF_LIST_METER_BAND_ITER((of_list_meter_band_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -40982,13 +40982,13 @@ void of_list_meter_band_stats_get_field(of_object_t* o, unsigned long int *val, 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_METER_BAND_STATS_ITER((of_list_meter_band_stats_t*)o, iter, rv){
+	OF_LIST_METER_BAND_STATS_ITER((of_list_meter_band_stats_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41000,13 +41000,13 @@ void of_list_meter_band_stats_set_field(of_object_t* o, unsigned long int val, s
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_METER_BAND_STATS_ITER((of_list_meter_band_stats_t*)o, iter, rv){
+	OF_LIST_METER_BAND_STATS_ITER((of_list_meter_band_stats_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41017,13 +41017,13 @@ void of_list_meter_stats_get_field(of_object_t* o, unsigned long int *val, std::
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_METER_STATS_ITER((of_list_meter_stats_t*)o, iter, rv){
+	OF_LIST_METER_STATS_ITER((of_list_meter_stats_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41035,13 +41035,13 @@ void of_list_meter_stats_set_field(of_object_t* o, unsigned long int val, std::v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_METER_STATS_ITER((of_list_meter_stats_t*)o, iter, rv){
+	OF_LIST_METER_STATS_ITER((of_list_meter_stats_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41052,13 +41052,13 @@ void of_list_oxm_get_field(of_object_t* o, unsigned long int *val, std::vector<i
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_OXM_ITER((of_list_oxm_t*)o, iter, rv){
+	OF_LIST_OXM_ITER((of_list_oxm_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41070,13 +41070,13 @@ void of_list_oxm_set_field(of_object_t* o, unsigned long int val, std::vector<in
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_OXM_ITER((of_list_oxm_t*)o, iter, rv){
+	OF_LIST_OXM_ITER((of_list_oxm_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41087,13 +41087,13 @@ void of_list_packet_queue_get_field(of_object_t* o, unsigned long int *val, std:
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PACKET_QUEUE_ITER((of_list_packet_queue_t*)o, iter, rv){
+	OF_LIST_PACKET_QUEUE_ITER((of_list_packet_queue_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41105,13 +41105,13 @@ void of_list_packet_queue_set_field(of_object_t* o, unsigned long int val, std::
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PACKET_QUEUE_ITER((of_list_packet_queue_t*)o, iter, rv){
+	OF_LIST_PACKET_QUEUE_ITER((of_list_packet_queue_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41122,13 +41122,13 @@ void of_list_port_desc_get_field(of_object_t* o, unsigned long int *val, std::ve
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_DESC_ITER((of_list_port_desc_t*)o, iter, rv){
+	OF_LIST_PORT_DESC_ITER((of_list_port_desc_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41140,13 +41140,13 @@ void of_list_port_desc_set_field(of_object_t* o, unsigned long int val, std::vec
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_DESC_ITER((of_list_port_desc_t*)o, iter, rv){
+	OF_LIST_PORT_DESC_ITER((of_list_port_desc_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41157,13 +41157,13 @@ void of_list_port_desc_prop_get_field(of_object_t* o, unsigned long int *val, st
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_DESC_PROP_ITER((of_list_port_desc_prop_t*)o, iter, rv){
+	OF_LIST_PORT_DESC_PROP_ITER((of_list_port_desc_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41175,13 +41175,13 @@ void of_list_port_desc_prop_set_field(of_object_t* o, unsigned long int val, std
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_DESC_PROP_ITER((of_list_port_desc_prop_t*)o, iter, rv){
+	OF_LIST_PORT_DESC_PROP_ITER((of_list_port_desc_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41192,13 +41192,13 @@ void of_list_port_mod_prop_get_field(of_object_t* o, unsigned long int *val, std
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_MOD_PROP_ITER((of_list_port_mod_prop_t*)o, iter, rv){
+	OF_LIST_PORT_MOD_PROP_ITER((of_list_port_mod_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41210,13 +41210,13 @@ void of_list_port_mod_prop_set_field(of_object_t* o, unsigned long int val, std:
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_MOD_PROP_ITER((of_list_port_mod_prop_t*)o, iter, rv){
+	OF_LIST_PORT_MOD_PROP_ITER((of_list_port_mod_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41227,13 +41227,13 @@ void of_list_port_stats_entry_get_field(of_object_t* o, unsigned long int *val, 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_STATS_ENTRY_ITER((of_list_port_stats_entry_t*)o, iter, rv){
+	OF_LIST_PORT_STATS_ENTRY_ITER((of_list_port_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41245,13 +41245,13 @@ void of_list_port_stats_entry_set_field(of_object_t* o, unsigned long int val, s
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_STATS_ENTRY_ITER((of_list_port_stats_entry_t*)o, iter, rv){
+	OF_LIST_PORT_STATS_ENTRY_ITER((of_list_port_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41262,13 +41262,13 @@ void of_list_port_stats_prop_get_field(of_object_t* o, unsigned long int *val, s
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_STATS_PROP_ITER((of_list_port_stats_prop_t*)o, iter, rv){
+	OF_LIST_PORT_STATS_PROP_ITER((of_list_port_stats_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41280,13 +41280,13 @@ void of_list_port_stats_prop_set_field(of_object_t* o, unsigned long int val, st
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_PORT_STATS_PROP_ITER((of_list_port_stats_prop_t*)o, iter, rv){
+	OF_LIST_PORT_STATS_PROP_ITER((of_list_port_stats_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41297,13 +41297,13 @@ void of_list_queue_desc_get_field(of_object_t* o, unsigned long int *val, std::v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_DESC_ITER((of_list_queue_desc_t*)o, iter, rv){
+	OF_LIST_QUEUE_DESC_ITER((of_list_queue_desc_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41315,13 +41315,13 @@ void of_list_queue_desc_set_field(of_object_t* o, unsigned long int val, std::ve
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_DESC_ITER((of_list_queue_desc_t*)o, iter, rv){
+	OF_LIST_QUEUE_DESC_ITER((of_list_queue_desc_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41332,13 +41332,13 @@ void of_list_queue_desc_prop_get_field(of_object_t* o, unsigned long int *val, s
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_DESC_PROP_ITER((of_list_queue_desc_prop_t*)o, iter, rv){
+	OF_LIST_QUEUE_DESC_PROP_ITER((of_list_queue_desc_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41350,13 +41350,13 @@ void of_list_queue_desc_prop_set_field(of_object_t* o, unsigned long int val, st
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_DESC_PROP_ITER((of_list_queue_desc_prop_t*)o, iter, rv){
+	OF_LIST_QUEUE_DESC_PROP_ITER((of_list_queue_desc_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41367,13 +41367,13 @@ void of_list_queue_prop_get_field(of_object_t* o, unsigned long int *val, std::v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_PROP_ITER((of_list_queue_prop_t*)o, iter, rv){
+	OF_LIST_QUEUE_PROP_ITER((of_list_queue_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41385,13 +41385,13 @@ void of_list_queue_prop_set_field(of_object_t* o, unsigned long int val, std::ve
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_PROP_ITER((of_list_queue_prop_t*)o, iter, rv){
+	OF_LIST_QUEUE_PROP_ITER((of_list_queue_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41402,13 +41402,13 @@ void of_list_queue_stats_entry_get_field(of_object_t* o, unsigned long int *val,
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_STATS_ENTRY_ITER((of_list_queue_stats_entry_t*)o, iter, rv){
+	OF_LIST_QUEUE_STATS_ENTRY_ITER((of_list_queue_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41420,13 +41420,13 @@ void of_list_queue_stats_entry_set_field(of_object_t* o, unsigned long int val, 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_STATS_ENTRY_ITER((of_list_queue_stats_entry_t*)o, iter, rv){
+	OF_LIST_QUEUE_STATS_ENTRY_ITER((of_list_queue_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41437,13 +41437,13 @@ void of_list_queue_stats_prop_get_field(of_object_t* o, unsigned long int *val, 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_STATS_PROP_ITER((of_list_queue_stats_prop_t*)o, iter, rv){
+	OF_LIST_QUEUE_STATS_PROP_ITER((of_list_queue_stats_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41455,13 +41455,13 @@ void of_list_queue_stats_prop_set_field(of_object_t* o, unsigned long int val, s
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_QUEUE_STATS_PROP_ITER((of_list_queue_stats_prop_t*)o, iter, rv){
+	OF_LIST_QUEUE_STATS_PROP_ITER((of_list_queue_stats_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41472,13 +41472,13 @@ void of_list_role_prop_get_field(of_object_t* o, unsigned long int *val, std::ve
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_ROLE_PROP_ITER((of_list_role_prop_t*)o, iter, rv){
+	OF_LIST_ROLE_PROP_ITER((of_list_role_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41490,13 +41490,13 @@ void of_list_role_prop_set_field(of_object_t* o, unsigned long int val, std::vec
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_ROLE_PROP_ITER((of_list_role_prop_t*)o, iter, rv){
+	OF_LIST_ROLE_PROP_ITER((of_list_role_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41507,13 +41507,13 @@ void of_list_table_desc_get_field(of_object_t* o, unsigned long int *val, std::v
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_DESC_ITER((of_list_table_desc_t*)o, iter, rv){
+	OF_LIST_TABLE_DESC_ITER((of_list_table_desc_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41525,13 +41525,13 @@ void of_list_table_desc_set_field(of_object_t* o, unsigned long int val, std::ve
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_DESC_ITER((of_list_table_desc_t*)o, iter, rv){
+	OF_LIST_TABLE_DESC_ITER((of_list_table_desc_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41542,13 +41542,13 @@ void of_list_table_feature_prop_get_field(of_object_t* o, unsigned long int *val
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_FEATURE_PROP_ITER((of_list_table_feature_prop_t*)o, iter, rv){
+	OF_LIST_TABLE_FEATURE_PROP_ITER((of_list_table_feature_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41560,13 +41560,13 @@ void of_list_table_feature_prop_set_field(of_object_t* o, unsigned long int val,
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_FEATURE_PROP_ITER((of_list_table_feature_prop_t*)o, iter, rv){
+	OF_LIST_TABLE_FEATURE_PROP_ITER((of_list_table_feature_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41577,13 +41577,13 @@ void of_list_table_features_get_field(of_object_t* o, unsigned long int *val, st
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_FEATURES_ITER((of_list_table_features_t*)o, iter, rv){
+	OF_LIST_TABLE_FEATURES_ITER((of_list_table_features_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41595,13 +41595,13 @@ void of_list_table_features_set_field(of_object_t* o, unsigned long int val, std
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_FEATURES_ITER((of_list_table_features_t*)o, iter, rv){
+	OF_LIST_TABLE_FEATURES_ITER((of_list_table_features_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41612,13 +41612,13 @@ void of_list_table_mod_prop_get_field(of_object_t* o, unsigned long int *val, st
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_MOD_PROP_ITER((of_list_table_mod_prop_t*)o, iter, rv){
+	OF_LIST_TABLE_MOD_PROP_ITER((of_list_table_mod_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41630,13 +41630,13 @@ void of_list_table_mod_prop_set_field(of_object_t* o, unsigned long int val, std
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_MOD_PROP_ITER((of_list_table_mod_prop_t*)o, iter, rv){
+	OF_LIST_TABLE_MOD_PROP_ITER((of_list_table_mod_prop_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41647,13 +41647,13 @@ void of_list_table_stats_entry_get_field(of_object_t* o, unsigned long int *val,
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_STATS_ENTRY_ITER((of_list_table_stats_entry_t*)o, iter, rv){
+	OF_LIST_TABLE_STATS_ENTRY_ITER((of_list_table_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41665,13 +41665,13 @@ void of_list_table_stats_entry_set_field(of_object_t* o, unsigned long int val, 
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_TABLE_STATS_ENTRY_ITER((of_list_table_stats_entry_t*)o, iter, rv){
+	OF_LIST_TABLE_STATS_ENTRY_ITER((of_list_table_stats_entry_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41682,13 +41682,13 @@ void of_list_uint32_get_field(of_object_t* o, unsigned long int *val, std::vecto
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_UINT32_ITER((of_list_uint32_t*)o, iter, rv){
+	OF_LIST_UINT32_ITER((of_list_uint32_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41700,13 +41700,13 @@ void of_list_uint32_set_field(of_object_t* o, unsigned long int val, std::vector
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_UINT32_ITER((of_list_uint32_t*)o, iter, rv){
+	OF_LIST_UINT32_ITER((of_list_uint32_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41717,13 +41717,13 @@ void of_list_uint64_get_field(of_object_t* o, unsigned long int *val, std::vecto
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_UINT64_ITER((of_list_uint64_t*)o, iter, rv){
+	OF_LIST_UINT64_ITER((of_list_uint64_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41735,13 +41735,13 @@ void of_list_uint64_set_field(of_object_t* o, unsigned long int val, std::vector
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_UINT64_ITER((of_list_uint64_t*)o, iter, rv){
+	OF_LIST_UINT64_ITER((of_list_uint64_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41752,13 +41752,13 @@ void of_list_uint8_get_field(of_object_t* o, unsigned long int *val, std::vector
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_UINT8_ITER((of_list_uint8_t*)o, iter, rv){
+	OF_LIST_UINT8_ITER((of_list_uint8_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			get_field(iter,val,f,l);
+			get_field(&iter,val,f,l);
 			break;
 		}
 		ct++;
@@ -41770,13 +41770,13 @@ void of_list_uint8_set_field(of_object_t* o, unsigned long int val, std::vector<
 		return;
 	}
 	int field = f[l];
-	of_object_t *iter = NULL;
+	of_object_t iter;
 	int rv;
 	int ct = 1;
-	OF_LIST_UINT8_ITER((of_list_uint8_t*)o, iter, rv){
+	OF_LIST_UINT8_ITER((of_list_uint8_t*)o, &iter, rv){
 		if (ct==field){
 			l++;
-			set_field(iter,val,f,l);
+			set_field(&iter,val,f,l);
 			break;
 		}
 		ct++;

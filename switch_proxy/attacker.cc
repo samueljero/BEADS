@@ -311,7 +311,8 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 				mod_params[nxt_param].push_back(ma);
 				nxt_param++;
 			} else {
-				mod_params[nxt_param].push_back(ma);
+				/* Existing action set */
+				mod_params[it5->second].push_back(ma);
 			}
 
 			break;
@@ -510,13 +511,14 @@ vector<int> Attacker::normalize_field(char *s)
 	while (*s != '\0') {
 		if (*s == '.') {
 			*s = '\0';
+			s++;
 			res = atoi(tmp);
 			if (res <= 0) {
 				lst.clear();
 				return lst;
 			}
 			lst.push_back(res);
-			tmp = s + 1;
+			tmp = s;
 		}
 		if (*s < '0' || *s > '9') {
 			lst.clear();
@@ -664,13 +666,13 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 	if (it5 != it4->second.end()) {
 		param = it5->second;
 		mod_acts = mod_params[param];
+		dbgprintf(1, "Modifying packet!\n");
 		for (unsigned int x = 0; x < mod_acts.size(); x++) {
-			dbgprintf(1, "Modifying Packet!\n");
 			if (!doModify(pk.ofo, mod_acts[x].field, mod_acts[x].action, mod_acts[x].value)){
 				break;
 			}
-			//print(pk);
 		}
+		//print(pk);
 	}
 
 	/* Divert */
@@ -802,116 +804,6 @@ bool Attacker::doModify(of_object_t* ofo, vector<int> vfield, int action, int va
 	}
 
 	return true;
-
-	switch(ofo->object_id) {
-		case OF_AGGREGATE_STATS_REPLY:
-		case OF_AGGREGATE_STATS_REQUEST:
-		case OF_ASYNC_CONFIG_FAILED_ERROR_MSG:
-		case OF_ASYNC_GET_REPLY:
-		case OF_ASYNC_GET_REQUEST:
-		case OF_ASYNC_SET:
-		case OF_BAD_ACTION_ERROR_MSG:
-		case OF_BAD_INSTRUCTION_ERROR_MSG:
-		case OF_BAD_MATCH_ERROR_MSG:
-		case OF_BAD_PROPERTY_ERROR_MSG:
-		case OF_BAD_REQUEST_ERROR_MSG:
-		case OF_BARRIER_REPLY:
-		case OF_BARRIER_REQUEST:
-		case OF_BUNDLE_ADD_MSG:
-		case OF_BUNDLE_CTRL_MSG:
-		case OF_BUNDLE_FAILED_ERROR_MSG:
-		case OF_DESC_STATS_REPLY:
-		case OF_DESC_STATS_REQUEST:
-		case OF_ECHO_REPLY:
-		case OF_ECHO_REQUEST:
-		case OF_ERROR_MSG:
-		case OF_EXPERIMENTER:
-		case OF_EXPERIMENTER_ERROR_MSG:
-		case OF_EXPERIMENTER_STATS_REPLY:
-		case OF_EXPERIMENTER_STATS_REQUEST:
-		case OF_FEATURES_REPLY:
-		case OF_FEATURES_REQUEST:
-		case OF_FLOW_ADD:
-		case OF_FLOW_DELETE:
-		case OF_FLOW_DELETE_STRICT:
-		case OF_FLOW_MOD:
-		case OF_FLOW_MOD_FAILED_ERROR_MSG:
-		case OF_FLOW_MODIFY:
-		case OF_FLOW_MODIFY_STRICT:
-		case OF_FLOW_MONITOR_FAILED_ERROR_MSG:
-		case OF_FLOW_REMOVED:
-		case OF_FLOW_STATS_REPLY:
-		case OF_FLOW_STATS_REQUEST:
-		case OF_GET_CONFIG_REPLY:
-		case OF_GET_CONFIG_REQUEST:
-		case OF_GROUP_ADD:
-		case OF_GROUP_DELETE:
-		case OF_GROUP_DESC_STATS_REPLY:
-		case OF_GROUP_DESC_STATS_REQUEST:
-		case OF_GROUP_FEATURES_STATS_REPLY:
-		case OF_GROUP_FEATURES_STATS_REQUEST:
-		case OF_GROUP_MOD:
-		case OF_GROUP_MOD_FAILED_ERROR_MSG:
-		case OF_GROUP_MODIFY:
-		case OF_GROUP_STATS_REPLY:
-		case OF_GROUP_STATS_REQUEST:
-		case OF_HEADER:
-		case OF_HELLO:
-		case OF_HELLO_FAILED_ERROR_MSG:
-		case OF_METER_CONFIG_STATS_REPLY:
-		case OF_METER_CONFIG_STATS_REQUEST:
-		case OF_METER_FEATURES_STATS_REPLY:
-		case OF_METER_FEATURES_STATS_REQUEST:
-		case OF_METER_MOD:
-		case OF_METER_MOD_FAILED_ERROR_MSG:
-		case OF_METER_STATS_REPLY:
-		case OF_METER_STATS_REQUEST:
-		case OF_NICIRA_CONTROLLER_ROLE_REPLY:
-		case OF_NICIRA_CONTROLLER_ROLE_REQUEST:
-		case OF_NICIRA_HEADER:
-			dbgprintf(0, "Modifcation for packet type %s not supported\n", of_object_id_str[ofo->object_id]);
-			return false;
-		case OF_PACKET_IN:
-			return ModifyPACKETIN(ofo, vfield, action, val, 0);
-		case OF_PACKET_OUT:
-		case OF_PORT_DESC_STATS_REPLY:
-		case OF_PORT_DESC_STATS_REQUEST:
-		case OF_PORT_MOD:
-		case OF_PORT_MOD_FAILED_ERROR_MSG:
-		case OF_PORT_STATS_REPLY:
-		case OF_PORT_STATS_REQUEST:
-		case OF_PORT_STATUS:
-		case OF_QUEUE_DESC_STATS_REPLY:
-		case OF_QUEUE_DESC_STATS_REQUEST:
-		case OF_QUEUE_GET_CONFIG_REPLY:
-		case OF_QUEUE_GET_CONFIG_REQUEST:
-		case OF_QUEUE_OP_FAILED_ERROR_MSG:
-		case OF_QUEUE_STATS_REPLY:
-		case OF_QUEUE_STATS_REQUEST:
-		case OF_REQUESTFORWARD:
-		case OF_ROLE_REPLY:
-		case OF_ROLE_REQUEST:
-		case OF_ROLE_REQUEST_FAILED_ERROR_MSG:
-		case OF_ROLE_STATUS:
-		case OF_SET_CONFIG:
-		case OF_STATS_REPLY:
-		case OF_STATS_REQUEST:
-		case OF_SWITCH_CONFIG_FAILED_ERROR_MSG:
-		case OF_TABLE_DESC_STATS_REPLY:
-		case OF_TABLE_DESC_STATS_REQUEST:
-		case OF_TABLE_FEATURES_FAILED_ERROR_MSG:
-		case OF_TABLE_FEATURES_STATS_REPLY:
-		case OF_TABLE_FEATURES_STATS_REQUEST:
-		case OF_TABLE_MOD:
-		case OF_TABLE_MOD_FAILED_ERROR_MSG:
-		case OF_TABLE_STATS_REPLY:
-		case OF_TABLE_STATS_REQUEST:
-		case OF_TABLE_STATUS:
-		default:
-			dbgprintf(0, "Modifcation for packet type %s not supported\n", of_object_id_str[ofo->object_id]);
-			return false;
-	}
-	return true;
 }
 
 bool Attacker::ModifyHEADER(of_object_t* ofo, vector<int> vfield, int action, int val, unsigned int level)
@@ -993,100 +885,5 @@ bool Attacker::ModifyHEADER(of_object_t* ofo, vector<int> vfield, int action, in
 			}
 			break;
 	}
-	return true;
-}
-
-bool Attacker::ModifyPACKETIN(of_object_t* ofo, vector<int> vfield, int action, int val, unsigned int level)
-{
-	int field;
-	uint8_t tmp8;
-	uint16_t tmp16;
-	uint32_t tmp32;
-	uint64_t tmp64;
-
-	if (vfield.empty() || vfield.size() <= level) {
-		return false;
-	}
-
-	field = vfield[level];
-
-	switch(field) {
-		case 5: // Buffer ID
-			if (action == MOD_SET) {
-				tmp32 = val;
-				of_packet_in_buffer_id_set((of_packet_in_t*)ofo, tmp32);
-			} else if(action == MOD_ADD) {
-				of_packet_in_buffer_id_get((of_packet_in_t*)ofo, &tmp32);
-				tmp32 += val;
-				of_packet_in_buffer_id_set((of_packet_in_t*)ofo, tmp32);
-			} else if(action == MOD_SUB) {
-				of_packet_in_buffer_id_get((of_packet_in_t*)ofo, &tmp32);
-				tmp32 -= val;
-				of_packet_in_buffer_id_set((of_packet_in_t*)ofo, tmp32);
-			}
-			break;
-		case 6: // Total Len
-			if (action == MOD_SET) {
-				tmp16 = val;
-				of_packet_in_total_len_set((of_packet_in_t*)ofo, tmp16);
-			} else if(action == MOD_ADD) {
-				of_packet_in_total_len_get((of_packet_in_t*)ofo, &tmp16);
-				tmp16 += val;
-				of_packet_in_total_len_set((of_packet_in_t*)ofo, tmp16);
-			} else if(action == MOD_SUB) {
-				of_packet_in_total_len_get((of_packet_in_t*)ofo, &tmp16);
-				tmp16 -= val;
-				of_packet_in_total_len_set((of_packet_in_t*)ofo, tmp16);
-			}
-			break;
-		case 7: // Reason
-			if (action == MOD_SET) {
-				tmp8 = val;
-				of_packet_in_reason_set((of_packet_in_t*)ofo, tmp8);
-			} else if(action == MOD_ADD) {
-				of_packet_in_reason_get((of_packet_in_t*)ofo, &tmp8);
-				tmp8 += val;
-				of_packet_in_reason_set((of_packet_in_t*)ofo, tmp8);
-			} else if(action == MOD_SUB) {
-				of_packet_in_reason_get((of_packet_in_t*)ofo, &tmp8);
-				tmp8 -= val;
-				of_packet_in_reason_set((of_packet_in_t*)ofo, tmp8);
-			}
-			break;
-		case 8: // Table ID
-			if (action == MOD_SET) {
-				tmp8 = val;
-				of_packet_in_table_id_set((of_packet_in_t*)ofo, tmp8);
-			} else if(action == MOD_ADD) {
-				of_packet_in_table_id_get((of_packet_in_t*)ofo, &tmp8);
-				tmp8 += val;
-				of_packet_in_table_id_set((of_packet_in_t*)ofo, tmp8);
-			} else if(action == MOD_SUB) {
-				of_packet_in_table_id_get((of_packet_in_t*)ofo, &tmp8);
-				tmp8 -= val;
-				of_packet_in_table_id_set((of_packet_in_t*)ofo, tmp8);
-			}
-			break;
-		case 9: // Cookie
-			if (action == MOD_SET) {
-				tmp64 = val;
-				of_packet_in_cookie_set((of_packet_in_t*)ofo, tmp64);
-			} else if(action == MOD_ADD) {
-				of_packet_in_cookie_get((of_packet_in_t*)ofo, &tmp64);
-				tmp64 += val;
-				of_packet_in_cookie_set((of_packet_in_t*)ofo, tmp64);
-			} else if(action == MOD_SUB) {
-				of_packet_in_cookie_get((of_packet_in_t*)ofo, &tmp64);
-				tmp64 -= val;
-				of_packet_in_cookie_set((of_packet_in_t*)ofo, tmp64);
-			}
-			break;
-		case 10: // Match
-		case 11: // Data
-		default:
-			dbgprintf(0, "Warning: Trying to modify invalid/unsupported field: %i\n", field);
-			return false;
-	}
-
 	return true;
 }
