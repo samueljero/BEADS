@@ -149,7 +149,7 @@ of_bundle_ctrl_msg_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -187,7 +187,7 @@ of_bundle_ctrl_msg_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -227,7 +227,7 @@ of_bundle_ctrl_msg_bundle_id_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -265,7 +265,7 @@ of_bundle_ctrl_msg_bundle_id_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -305,7 +305,7 @@ of_bundle_ctrl_msg_bundle_ctrl_type_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -343,7 +343,7 @@ of_bundle_ctrl_msg_bundle_ctrl_type_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -383,7 +383,7 @@ of_bundle_ctrl_msg_flags_get(
         offset = 14;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -421,7 +421,7 @@ of_bundle_ctrl_msg_flags_set(
         offset = 14;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -468,7 +468,7 @@ of_bundle_ctrl_msg_properties_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -538,7 +538,7 @@ of_bundle_ctrl_msg_properties_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -726,7 +726,7 @@ of_bundle_failed_error_msg_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -764,7 +764,7 @@ of_bundle_failed_error_msg_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -804,7 +804,7 @@ of_bundle_failed_error_msg_code_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -842,7 +842,7 @@ of_bundle_failed_error_msg_code_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -884,7 +884,7 @@ of_bundle_failed_error_msg_data_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -928,7 +928,7 @@ of_bundle_failed_error_msg_data_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1231,7 +1231,7 @@ of_bundle_prop_experimenter_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1269,7 +1269,7 @@ of_bundle_prop_experimenter_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1309,7 +1309,7 @@ of_bundle_prop_experimenter_exp_type_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1347,7 +1347,7 @@ of_bundle_prop_experimenter_exp_type_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1510,7 +1510,7 @@ of_flow_monitor_failed_error_msg_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1548,7 +1548,7 @@ of_flow_monitor_failed_error_msg_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1588,7 +1588,7 @@ of_flow_monitor_failed_error_msg_code_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1626,7 +1626,7 @@ of_flow_monitor_failed_error_msg_code_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1668,7 +1668,7 @@ of_flow_monitor_failed_error_msg_data_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1712,7 +1712,7 @@ of_flow_monitor_failed_error_msg_data_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1882,7 +1882,7 @@ of_oxm_pbb_uca_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1920,7 +1920,7 @@ of_oxm_pbb_uca_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2080,7 +2080,7 @@ of_oxm_pbb_uca_masked_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2118,7 +2118,7 @@ of_oxm_pbb_uca_masked_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2158,7 +2158,7 @@ of_oxm_pbb_uca_masked_value_mask_get(
         offset = 5;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2196,7 +2196,7 @@ of_oxm_pbb_uca_masked_value_mask_set(
         offset = 5;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2498,7 +2498,7 @@ of_port_desc_prop_experimenter_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2536,7 +2536,7 @@ of_port_desc_prop_experimenter_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2576,7 +2576,7 @@ of_port_desc_prop_experimenter_exp_type_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2614,7 +2614,7 @@ of_port_desc_prop_experimenter_exp_type_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2782,7 +2782,7 @@ of_port_desc_prop_bsn_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2820,7 +2820,7 @@ of_port_desc_prop_bsn_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2860,7 +2860,7 @@ of_port_desc_prop_bsn_exp_type_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2898,7 +2898,7 @@ of_port_desc_prop_bsn_exp_type_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3061,7 +3061,7 @@ of_port_desc_prop_bsn_uplink_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3099,7 +3099,7 @@ of_port_desc_prop_bsn_uplink_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3139,7 +3139,7 @@ of_port_desc_prop_bsn_uplink_exp_type_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3177,7 +3177,7 @@ of_port_desc_prop_bsn_uplink_exp_type_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3338,7 +3338,7 @@ of_port_desc_prop_ethernet_curr_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3376,7 +3376,7 @@ of_port_desc_prop_ethernet_curr_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3416,7 +3416,7 @@ of_port_desc_prop_ethernet_advertised_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3454,7 +3454,7 @@ of_port_desc_prop_ethernet_advertised_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3494,7 +3494,7 @@ of_port_desc_prop_ethernet_supported_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3532,7 +3532,7 @@ of_port_desc_prop_ethernet_supported_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3572,7 +3572,7 @@ of_port_desc_prop_ethernet_peer_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3610,7 +3610,7 @@ of_port_desc_prop_ethernet_peer_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3650,7 +3650,7 @@ of_port_desc_prop_ethernet_curr_speed_get(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3688,7 +3688,7 @@ of_port_desc_prop_ethernet_curr_speed_set(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3728,7 +3728,7 @@ of_port_desc_prop_ethernet_max_speed_get(
         offset = 28;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3766,7 +3766,7 @@ of_port_desc_prop_ethernet_max_speed_set(
         offset = 28;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3927,7 +3927,7 @@ of_port_desc_prop_optical_supported_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3965,7 +3965,7 @@ of_port_desc_prop_optical_supported_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4005,7 +4005,7 @@ of_port_desc_prop_optical_tx_min_freq_lmda_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4043,7 +4043,7 @@ of_port_desc_prop_optical_tx_min_freq_lmda_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4083,7 +4083,7 @@ of_port_desc_prop_optical_tx_max_freq_lmda_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4121,7 +4121,7 @@ of_port_desc_prop_optical_tx_max_freq_lmda_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4161,7 +4161,7 @@ of_port_desc_prop_optical_tx_grid_freq_lmda_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4199,7 +4199,7 @@ of_port_desc_prop_optical_tx_grid_freq_lmda_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4239,7 +4239,7 @@ of_port_desc_prop_optical_rx_min_freq_lmda_get(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4277,7 +4277,7 @@ of_port_desc_prop_optical_rx_min_freq_lmda_set(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4317,7 +4317,7 @@ of_port_desc_prop_optical_rx_max_freq_lmda_get(
         offset = 28;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4355,7 +4355,7 @@ of_port_desc_prop_optical_rx_max_freq_lmda_set(
         offset = 28;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4395,7 +4395,7 @@ of_port_desc_prop_optical_rx_grid_freq_lmda_get(
         offset = 32;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4433,7 +4433,7 @@ of_port_desc_prop_optical_rx_grid_freq_lmda_set(
         offset = 32;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4473,7 +4473,7 @@ of_port_desc_prop_optical_tx_pwr_min_get(
         offset = 36;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4511,7 +4511,7 @@ of_port_desc_prop_optical_tx_pwr_min_set(
         offset = 36;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4551,7 +4551,7 @@ of_port_desc_prop_optical_tx_pwr_max_get(
         offset = 40;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4589,7 +4589,7 @@ of_port_desc_prop_optical_tx_pwr_max_set(
         offset = 40;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4884,7 +4884,7 @@ of_port_mod_prop_ethernet_advertise_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4922,7 +4922,7 @@ of_port_mod_prop_ethernet_advertise_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5087,7 +5087,7 @@ of_port_mod_prop_experimenter_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5125,7 +5125,7 @@ of_port_mod_prop_experimenter_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5165,7 +5165,7 @@ of_port_mod_prop_experimenter_exp_type_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5203,7 +5203,7 @@ of_port_mod_prop_experimenter_exp_type_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5364,7 +5364,7 @@ of_port_mod_prop_optical_configure_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5402,7 +5402,7 @@ of_port_mod_prop_optical_configure_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5442,7 +5442,7 @@ of_port_mod_prop_optical_freq_ldma_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5480,7 +5480,7 @@ of_port_mod_prop_optical_freq_ldma_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5520,7 +5520,7 @@ of_port_mod_prop_optical_fl_offset_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5558,7 +5558,7 @@ of_port_mod_prop_optical_fl_offset_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5598,7 +5598,7 @@ of_port_mod_prop_optical_grid_span_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5636,7 +5636,7 @@ of_port_mod_prop_optical_grid_span_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5676,7 +5676,7 @@ of_port_mod_prop_optical_tx_pwr_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5714,7 +5714,7 @@ of_port_mod_prop_optical_tx_pwr_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6009,7 +6009,7 @@ of_port_stats_prop_ethernet_rx_frame_err_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6047,7 +6047,7 @@ of_port_stats_prop_ethernet_rx_frame_err_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6087,7 +6087,7 @@ of_port_stats_prop_ethernet_rx_over_err_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6125,7 +6125,7 @@ of_port_stats_prop_ethernet_rx_over_err_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6165,7 +6165,7 @@ of_port_stats_prop_ethernet_rx_crc_err_get(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6203,7 +6203,7 @@ of_port_stats_prop_ethernet_rx_crc_err_set(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6243,7 +6243,7 @@ of_port_stats_prop_ethernet_collisions_get(
         offset = 32;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6281,7 +6281,7 @@ of_port_stats_prop_ethernet_collisions_set(
         offset = 32;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6446,7 +6446,7 @@ of_port_stats_prop_experimenter_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6484,7 +6484,7 @@ of_port_stats_prop_experimenter_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6524,7 +6524,7 @@ of_port_stats_prop_experimenter_exp_type_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6562,7 +6562,7 @@ of_port_stats_prop_experimenter_exp_type_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6604,7 +6604,7 @@ of_port_stats_prop_experimenter_experimenter_data_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6648,7 +6648,7 @@ of_port_stats_prop_experimenter_experimenter_data_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6819,7 +6819,7 @@ of_port_stats_prop_optical_flags_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6857,7 +6857,7 @@ of_port_stats_prop_optical_flags_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6897,7 +6897,7 @@ of_port_stats_prop_optical_tx_freq_lmda_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6935,7 +6935,7 @@ of_port_stats_prop_optical_tx_freq_lmda_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6975,7 +6975,7 @@ of_port_stats_prop_optical_tx_offset_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7013,7 +7013,7 @@ of_port_stats_prop_optical_tx_offset_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7053,7 +7053,7 @@ of_port_stats_prop_optical_tx_grid_span_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7091,7 +7091,7 @@ of_port_stats_prop_optical_tx_grid_span_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7131,7 +7131,7 @@ of_port_stats_prop_optical_rx_freq_lmda_get(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7169,7 +7169,7 @@ of_port_stats_prop_optical_rx_freq_lmda_set(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7209,7 +7209,7 @@ of_port_stats_prop_optical_rx_offset_get(
         offset = 28;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7247,7 +7247,7 @@ of_port_stats_prop_optical_rx_offset_set(
         offset = 28;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7287,7 +7287,7 @@ of_port_stats_prop_optical_rx_grid_span_get(
         offset = 32;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7325,7 +7325,7 @@ of_port_stats_prop_optical_rx_grid_span_set(
         offset = 32;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7365,7 +7365,7 @@ of_port_stats_prop_optical_tx_pwr_get(
         offset = 36;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7403,7 +7403,7 @@ of_port_stats_prop_optical_tx_pwr_set(
         offset = 36;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7443,7 +7443,7 @@ of_port_stats_prop_optical_rx_pwr_get(
         offset = 38;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7481,7 +7481,7 @@ of_port_stats_prop_optical_rx_pwr_set(
         offset = 38;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7521,7 +7521,7 @@ of_port_stats_prop_optical_bias_current_get(
         offset = 40;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7559,7 +7559,7 @@ of_port_stats_prop_optical_bias_current_set(
         offset = 40;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7599,7 +7599,7 @@ of_port_stats_prop_optical_temperature_get(
         offset = 42;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7637,7 +7637,7 @@ of_port_stats_prop_optical_temperature_set(
         offset = 42;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7784,7 +7784,7 @@ of_queue_desc_port_no_get(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7822,7 +7822,7 @@ of_queue_desc_port_no_set(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7862,7 +7862,7 @@ of_queue_desc_queue_id_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7900,7 +7900,7 @@ of_queue_desc_queue_id_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7947,7 +7947,7 @@ of_queue_desc_properties_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8017,7 +8017,7 @@ of_queue_desc_properties_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8341,7 +8341,7 @@ of_queue_desc_prop_experimenter_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8379,7 +8379,7 @@ of_queue_desc_prop_experimenter_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8419,7 +8419,7 @@ of_queue_desc_prop_experimenter_exp_type_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8457,7 +8457,7 @@ of_queue_desc_prop_experimenter_exp_type_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8618,7 +8618,7 @@ of_queue_desc_prop_max_rate_rate_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8656,7 +8656,7 @@ of_queue_desc_prop_max_rate_rate_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8817,7 +8817,7 @@ of_queue_desc_prop_min_rate_rate_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8855,7 +8855,7 @@ of_queue_desc_prop_min_rate_rate_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9018,7 +9018,7 @@ of_queue_desc_stats_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9056,7 +9056,7 @@ of_queue_desc_stats_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9096,7 +9096,7 @@ of_queue_desc_stats_reply_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9134,7 +9134,7 @@ of_queue_desc_stats_reply_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9181,7 +9181,7 @@ of_queue_desc_stats_reply_entries_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9251,7 +9251,7 @@ of_queue_desc_stats_reply_entries_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9439,7 +9439,7 @@ of_queue_desc_stats_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9477,7 +9477,7 @@ of_queue_desc_stats_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9517,7 +9517,7 @@ of_queue_desc_stats_request_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9555,7 +9555,7 @@ of_queue_desc_stats_request_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9848,7 +9848,7 @@ of_queue_stats_prop_experimenter_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9886,7 +9886,7 @@ of_queue_stats_prop_experimenter_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9926,7 +9926,7 @@ of_queue_stats_prop_experimenter_exp_type_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9964,7 +9964,7 @@ of_queue_stats_prop_experimenter_exp_type_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10126,7 +10126,7 @@ of_requestforward_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10164,7 +10164,7 @@ of_requestforward_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10204,7 +10204,7 @@ of_requestforward_role_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10242,7 +10242,7 @@ of_requestforward_role_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10284,7 +10284,7 @@ of_requestforward_data_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10328,7 +10328,7 @@ of_requestforward_data_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);

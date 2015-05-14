@@ -153,7 +153,7 @@ of_bsn_set_switch_pipeline_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -192,7 +192,7 @@ of_bsn_set_switch_pipeline_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -233,7 +233,7 @@ of_bsn_set_switch_pipeline_reply_experimenter_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -272,7 +272,7 @@ of_bsn_set_switch_pipeline_reply_experimenter_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -313,7 +313,7 @@ of_bsn_set_switch_pipeline_reply_subtype_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -352,7 +352,7 @@ of_bsn_set_switch_pipeline_reply_subtype_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -393,7 +393,7 @@ of_bsn_set_switch_pipeline_reply_status_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -432,7 +432,7 @@ of_bsn_set_switch_pipeline_reply_status_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -598,7 +598,7 @@ of_bsn_set_switch_pipeline_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -637,7 +637,7 @@ of_bsn_set_switch_pipeline_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -678,7 +678,7 @@ of_bsn_set_switch_pipeline_request_experimenter_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -717,7 +717,7 @@ of_bsn_set_switch_pipeline_request_experimenter_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -758,7 +758,7 @@ of_bsn_set_switch_pipeline_request_subtype_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -797,7 +797,7 @@ of_bsn_set_switch_pipeline_request_subtype_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -838,7 +838,7 @@ of_bsn_set_switch_pipeline_request_pipeline_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -877,7 +877,7 @@ of_bsn_set_switch_pipeline_request_pipeline_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1024,7 +1024,7 @@ of_bsn_switch_pipeline_stats_entry_pipeline_get(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1063,7 +1063,7 @@ of_bsn_switch_pipeline_stats_entry_pipeline_set(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1230,7 +1230,7 @@ of_bsn_switch_pipeline_stats_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1269,7 +1269,7 @@ of_bsn_switch_pipeline_stats_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1310,7 +1310,7 @@ of_bsn_switch_pipeline_stats_reply_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1349,7 +1349,7 @@ of_bsn_switch_pipeline_stats_reply_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1390,7 +1390,7 @@ of_bsn_switch_pipeline_stats_reply_experimenter_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1429,7 +1429,7 @@ of_bsn_switch_pipeline_stats_reply_experimenter_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1470,7 +1470,7 @@ of_bsn_switch_pipeline_stats_reply_subtype_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1509,7 +1509,7 @@ of_bsn_switch_pipeline_stats_reply_subtype_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1557,7 +1557,7 @@ of_bsn_switch_pipeline_stats_reply_entries_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1628,7 +1628,7 @@ of_bsn_switch_pipeline_stats_reply_entries_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1820,7 +1820,7 @@ of_bsn_switch_pipeline_stats_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1859,7 +1859,7 @@ of_bsn_switch_pipeline_stats_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1900,7 +1900,7 @@ of_bsn_switch_pipeline_stats_request_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1939,7 +1939,7 @@ of_bsn_switch_pipeline_stats_request_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1980,7 +1980,7 @@ of_bsn_switch_pipeline_stats_request_experimenter_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2019,7 +2019,7 @@ of_bsn_switch_pipeline_stats_request_experimenter_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2060,7 +2060,7 @@ of_bsn_switch_pipeline_stats_request_subtype_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2099,7 +2099,7 @@ of_bsn_switch_pipeline_stats_request_subtype_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2246,7 +2246,7 @@ of_bsn_table_checksum_stats_entry_table_id_get(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2285,7 +2285,7 @@ of_bsn_table_checksum_stats_entry_table_id_set(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2326,7 +2326,7 @@ of_bsn_table_checksum_stats_entry_checksum_get(
         offset = 1;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2365,7 +2365,7 @@ of_bsn_table_checksum_stats_entry_checksum_set(
         offset = 1;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2532,7 +2532,7 @@ of_bsn_table_checksum_stats_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2571,7 +2571,7 @@ of_bsn_table_checksum_stats_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2612,7 +2612,7 @@ of_bsn_table_checksum_stats_reply_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2651,7 +2651,7 @@ of_bsn_table_checksum_stats_reply_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2692,7 +2692,7 @@ of_bsn_table_checksum_stats_reply_experimenter_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2731,7 +2731,7 @@ of_bsn_table_checksum_stats_reply_experimenter_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2772,7 +2772,7 @@ of_bsn_table_checksum_stats_reply_subtype_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2811,7 +2811,7 @@ of_bsn_table_checksum_stats_reply_subtype_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2859,7 +2859,7 @@ of_bsn_table_checksum_stats_reply_entries_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2930,7 +2930,7 @@ of_bsn_table_checksum_stats_reply_entries_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3122,7 +3122,7 @@ of_bsn_table_checksum_stats_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3161,7 +3161,7 @@ of_bsn_table_checksum_stats_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3202,7 +3202,7 @@ of_bsn_table_checksum_stats_request_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3241,7 +3241,7 @@ of_bsn_table_checksum_stats_request_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3282,7 +3282,7 @@ of_bsn_table_checksum_stats_request_experimenter_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3321,7 +3321,7 @@ of_bsn_table_checksum_stats_request_experimenter_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3362,7 +3362,7 @@ of_bsn_table_checksum_stats_request_subtype_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3401,7 +3401,7 @@ of_bsn_table_checksum_stats_request_subtype_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3567,7 +3567,7 @@ of_bsn_table_set_buckets_size_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3606,7 +3606,7 @@ of_bsn_table_set_buckets_size_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3647,7 +3647,7 @@ of_bsn_table_set_buckets_size_experimenter_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3686,7 +3686,7 @@ of_bsn_table_set_buckets_size_experimenter_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3727,7 +3727,7 @@ of_bsn_table_set_buckets_size_subtype_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3766,7 +3766,7 @@ of_bsn_table_set_buckets_size_subtype_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3807,7 +3807,7 @@ of_bsn_table_set_buckets_size_table_id_get(
         offset = 17;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3846,7 +3846,7 @@ of_bsn_table_set_buckets_size_table_id_set(
         offset = 17;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3887,7 +3887,7 @@ of_bsn_table_set_buckets_size_buckets_size_get(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3926,7 +3926,7 @@ of_bsn_table_set_buckets_size_buckets_size_set(
         offset = 20;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4092,7 +4092,7 @@ of_bsn_time_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4131,7 +4131,7 @@ of_bsn_time_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4172,7 +4172,7 @@ of_bsn_time_reply_experimenter_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4211,7 +4211,7 @@ of_bsn_time_reply_experimenter_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4252,7 +4252,7 @@ of_bsn_time_reply_subtype_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4291,7 +4291,7 @@ of_bsn_time_reply_subtype_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4332,7 +4332,7 @@ of_bsn_time_reply_time_ms_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4371,7 +4371,7 @@ of_bsn_time_reply_time_ms_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4537,7 +4537,7 @@ of_bsn_time_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4576,7 +4576,7 @@ of_bsn_time_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4617,7 +4617,7 @@ of_bsn_time_request_experimenter_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4656,7 +4656,7 @@ of_bsn_time_request_experimenter_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4697,7 +4697,7 @@ of_bsn_time_request_subtype_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4736,7 +4736,7 @@ of_bsn_time_request_subtype_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5459,7 +5459,7 @@ of_bsn_tlv_actor_key_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5498,7 +5498,7 @@ of_bsn_tlv_actor_key_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5661,7 +5661,7 @@ of_bsn_tlv_actor_port_num_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5700,7 +5700,7 @@ of_bsn_tlv_actor_port_num_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5863,7 +5863,7 @@ of_bsn_tlv_actor_port_priority_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5902,7 +5902,7 @@ of_bsn_tlv_actor_port_priority_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6065,7 +6065,7 @@ of_bsn_tlv_actor_state_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6104,7 +6104,7 @@ of_bsn_tlv_actor_state_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6267,7 +6267,7 @@ of_bsn_tlv_actor_system_mac_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6306,7 +6306,7 @@ of_bsn_tlv_actor_system_mac_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6469,7 +6469,7 @@ of_bsn_tlv_actor_system_priority_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6508,7 +6508,7 @@ of_bsn_tlv_actor_system_priority_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6671,7 +6671,7 @@ of_bsn_tlv_broadcast_query_timeout_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6710,7 +6710,7 @@ of_bsn_tlv_broadcast_query_timeout_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6880,7 +6880,7 @@ of_bsn_tlv_bucket_value_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6951,7 +6951,7 @@ of_bsn_tlv_bucket_value_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7141,7 +7141,7 @@ of_bsn_tlv_circuit_id_value_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7186,7 +7186,7 @@ of_bsn_tlv_circuit_id_value_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7359,7 +7359,7 @@ of_bsn_tlv_convergence_status_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7398,7 +7398,7 @@ of_bsn_tlv_convergence_status_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7561,7 +7561,7 @@ of_bsn_tlv_crc_enabled_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7600,7 +7600,7 @@ of_bsn_tlv_crc_enabled_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7765,7 +7765,7 @@ of_bsn_tlv_data_value_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7810,7 +7810,7 @@ of_bsn_tlv_data_value_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7983,7 +7983,7 @@ of_bsn_tlv_eth_dst_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8022,7 +8022,7 @@ of_bsn_tlv_eth_dst_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8185,7 +8185,7 @@ of_bsn_tlv_eth_src_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8224,7 +8224,7 @@ of_bsn_tlv_eth_src_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8387,7 +8387,7 @@ of_bsn_tlv_external_gateway_ip_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8426,7 +8426,7 @@ of_bsn_tlv_external_gateway_ip_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8589,7 +8589,7 @@ of_bsn_tlv_external_gateway_mac_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8628,7 +8628,7 @@ of_bsn_tlv_external_gateway_mac_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8791,7 +8791,7 @@ of_bsn_tlv_external_ip_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8830,7 +8830,7 @@ of_bsn_tlv_external_ip_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8993,7 +8993,7 @@ of_bsn_tlv_external_mac_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9032,7 +9032,7 @@ of_bsn_tlv_external_mac_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9195,7 +9195,7 @@ of_bsn_tlv_external_netmask_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9234,7 +9234,7 @@ of_bsn_tlv_external_netmask_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9397,7 +9397,7 @@ of_bsn_tlv_header_size_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9436,7 +9436,7 @@ of_bsn_tlv_header_size_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);

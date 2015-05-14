@@ -150,7 +150,7 @@ of_meter_band_dscp_remark_rate_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -189,7 +189,7 @@ of_meter_band_dscp_remark_rate_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -230,7 +230,7 @@ of_meter_band_dscp_remark_burst_size_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -269,7 +269,7 @@ of_meter_band_dscp_remark_burst_size_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -310,7 +310,7 @@ of_meter_band_dscp_remark_prec_level_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -349,7 +349,7 @@ of_meter_band_dscp_remark_prec_level_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -512,7 +512,7 @@ of_meter_band_experimenter_rate_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -551,7 +551,7 @@ of_meter_band_experimenter_rate_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -592,7 +592,7 @@ of_meter_band_experimenter_burst_size_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -631,7 +631,7 @@ of_meter_band_experimenter_burst_size_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -672,7 +672,7 @@ of_meter_band_experimenter_experimenter_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -711,7 +711,7 @@ of_meter_band_experimenter_experimenter_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -858,7 +858,7 @@ of_meter_band_stats_packet_band_count_get(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -897,7 +897,7 @@ of_meter_band_stats_packet_band_count_set(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -938,7 +938,7 @@ of_meter_band_stats_byte_band_count_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -977,7 +977,7 @@ of_meter_band_stats_byte_band_count_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1125,7 +1125,7 @@ of_meter_config_flags_get(
         offset = 2;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1164,7 +1164,7 @@ of_meter_config_flags_set(
         offset = 2;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1205,7 +1205,7 @@ of_meter_config_meter_id_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1244,7 +1244,7 @@ of_meter_config_meter_id_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1292,7 +1292,7 @@ of_meter_config_entries_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1363,7 +1363,7 @@ of_meter_config_entries_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1553,7 +1553,7 @@ of_meter_config_stats_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1592,7 +1592,7 @@ of_meter_config_stats_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1633,7 +1633,7 @@ of_meter_config_stats_reply_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1672,7 +1672,7 @@ of_meter_config_stats_reply_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1720,7 +1720,7 @@ of_meter_config_stats_reply_entries_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1791,7 +1791,7 @@ of_meter_config_stats_reply_entries_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -1981,7 +1981,7 @@ of_meter_config_stats_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2020,7 +2020,7 @@ of_meter_config_stats_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2061,7 +2061,7 @@ of_meter_config_stats_request_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2100,7 +2100,7 @@ of_meter_config_stats_request_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2141,7 +2141,7 @@ of_meter_config_stats_request_meter_id_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2180,7 +2180,7 @@ of_meter_config_stats_request_meter_id_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2327,7 +2327,7 @@ of_meter_features_max_meter_get(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2366,7 +2366,7 @@ of_meter_features_max_meter_set(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2407,7 +2407,7 @@ of_meter_features_band_types_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2446,7 +2446,7 @@ of_meter_features_band_types_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2487,7 +2487,7 @@ of_meter_features_capabilities_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2526,7 +2526,7 @@ of_meter_features_capabilities_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2567,7 +2567,7 @@ of_meter_features_max_bands_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2606,7 +2606,7 @@ of_meter_features_max_bands_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2647,7 +2647,7 @@ of_meter_features_max_color_get(
         offset = 13;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2686,7 +2686,7 @@ of_meter_features_max_color_set(
         offset = 13;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2851,7 +2851,7 @@ of_meter_features_stats_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2890,7 +2890,7 @@ of_meter_features_stats_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2931,7 +2931,7 @@ of_meter_features_stats_reply_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -2970,7 +2970,7 @@ of_meter_features_stats_reply_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3018,7 +3018,7 @@ of_meter_features_stats_reply_features_bind(
         cur_len = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3089,7 +3089,7 @@ of_meter_features_stats_reply_features_set(
         cur_len = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3279,7 +3279,7 @@ of_meter_features_stats_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3318,7 +3318,7 @@ of_meter_features_stats_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3359,7 +3359,7 @@ of_meter_features_stats_request_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3398,7 +3398,7 @@ of_meter_features_stats_request_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3562,7 +3562,7 @@ of_meter_mod_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3601,7 +3601,7 @@ of_meter_mod_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3642,7 +3642,7 @@ of_meter_mod_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3681,7 +3681,7 @@ of_meter_mod_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3722,7 +3722,7 @@ of_meter_mod_meter_id_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3761,7 +3761,7 @@ of_meter_mod_meter_id_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3808,7 +3808,7 @@ of_meter_mod_bands_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3878,7 +3878,7 @@ of_meter_mod_bands_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -3950,7 +3950,7 @@ of_meter_mod_meters_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4020,7 +4020,7 @@ of_meter_mod_meters_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4210,7 +4210,7 @@ of_meter_mod_failed_error_msg_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4249,7 +4249,7 @@ of_meter_mod_failed_error_msg_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4290,7 +4290,7 @@ of_meter_mod_failed_error_msg_code_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4329,7 +4329,7 @@ of_meter_mod_failed_error_msg_code_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4372,7 +4372,7 @@ of_meter_mod_failed_error_msg_data_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4417,7 +4417,7 @@ of_meter_mod_failed_error_msg_data_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4575,7 +4575,7 @@ of_meter_stats_meter_id_get(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4614,7 +4614,7 @@ of_meter_stats_meter_id_set(
         offset = 0;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4655,7 +4655,7 @@ of_meter_stats_flow_count_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4694,7 +4694,7 @@ of_meter_stats_flow_count_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4735,7 +4735,7 @@ of_meter_stats_packet_in_count_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4774,7 +4774,7 @@ of_meter_stats_packet_in_count_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4815,7 +4815,7 @@ of_meter_stats_byte_in_count_get(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4854,7 +4854,7 @@ of_meter_stats_byte_in_count_set(
         offset = 24;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4895,7 +4895,7 @@ of_meter_stats_duration_sec_get(
         offset = 32;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4934,7 +4934,7 @@ of_meter_stats_duration_sec_set(
         offset = 32;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -4975,7 +4975,7 @@ of_meter_stats_duration_nsec_get(
         offset = 36;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5014,7 +5014,7 @@ of_meter_stats_duration_nsec_set(
         offset = 36;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5062,7 +5062,7 @@ of_meter_stats_band_stats_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5133,7 +5133,7 @@ of_meter_stats_band_stats_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5323,7 +5323,7 @@ of_meter_stats_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5362,7 +5362,7 @@ of_meter_stats_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5403,7 +5403,7 @@ of_meter_stats_reply_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5442,7 +5442,7 @@ of_meter_stats_reply_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5490,7 +5490,7 @@ of_meter_stats_reply_entries_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5561,7 +5561,7 @@ of_meter_stats_reply_entries_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5751,7 +5751,7 @@ of_meter_stats_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5790,7 +5790,7 @@ of_meter_stats_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5831,7 +5831,7 @@ of_meter_stats_request_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5870,7 +5870,7 @@ of_meter_stats_request_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5911,7 +5911,7 @@ of_meter_stats_request_meter_id_get(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -5950,7 +5950,7 @@ of_meter_stats_request_meter_id_set(
         offset = 16;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6112,7 +6112,7 @@ of_oxm_ipv6_exthdr_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6151,7 +6151,7 @@ of_oxm_ipv6_exthdr_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6313,7 +6313,7 @@ of_oxm_ipv6_exthdr_masked_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6352,7 +6352,7 @@ of_oxm_ipv6_exthdr_masked_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6393,7 +6393,7 @@ of_oxm_ipv6_exthdr_masked_value_mask_get(
         offset = 6;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6432,7 +6432,7 @@ of_oxm_ipv6_exthdr_masked_value_mask_set(
         offset = 6;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6594,7 +6594,7 @@ of_oxm_mpls_bos_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6633,7 +6633,7 @@ of_oxm_mpls_bos_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6795,7 +6795,7 @@ of_oxm_mpls_bos_masked_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6834,7 +6834,7 @@ of_oxm_mpls_bos_masked_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6875,7 +6875,7 @@ of_oxm_mpls_bos_masked_value_mask_get(
         offset = 5;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -6914,7 +6914,7 @@ of_oxm_mpls_bos_masked_value_mask_set(
         offset = 5;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7076,7 +7076,7 @@ of_oxm_tunnel_id_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7115,7 +7115,7 @@ of_oxm_tunnel_id_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7277,7 +7277,7 @@ of_oxm_tunnel_id_masked_value_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7316,7 +7316,7 @@ of_oxm_tunnel_id_masked_value_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7357,7 +7357,7 @@ of_oxm_tunnel_id_masked_value_mask_get(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7396,7 +7396,7 @@ of_oxm_tunnel_id_masked_value_mask_set(
         offset = 12;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7561,7 +7561,7 @@ of_port_desc_stats_reply_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7600,7 +7600,7 @@ of_port_desc_stats_reply_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7641,7 +7641,7 @@ of_port_desc_stats_reply_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7680,7 +7680,7 @@ of_port_desc_stats_reply_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7728,7 +7728,7 @@ of_port_desc_stats_reply_entries_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7799,7 +7799,7 @@ of_port_desc_stats_reply_entries_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -7989,7 +7989,7 @@ of_port_desc_stats_request_xid_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8028,7 +8028,7 @@ of_port_desc_stats_request_xid_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8069,7 +8069,7 @@ of_port_desc_stats_request_flags_get(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8108,7 +8108,7 @@ of_port_desc_stats_request_flags_set(
         offset = 10;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8511,7 +8511,7 @@ of_table_feature_prop_apply_actions_action_ids_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8582,7 +8582,7 @@ of_table_feature_prop_apply_actions_action_ids_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8777,7 +8777,7 @@ of_table_feature_prop_apply_actions_miss_action_ids_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -8848,7 +8848,7 @@ of_table_feature_prop_apply_actions_miss_action_ids_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9043,7 +9043,7 @@ of_table_feature_prop_apply_setfield_oxm_ids_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9114,7 +9114,7 @@ of_table_feature_prop_apply_setfield_oxm_ids_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9309,7 +9309,7 @@ of_table_feature_prop_apply_setfield_miss_oxm_ids_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9380,7 +9380,7 @@ of_table_feature_prop_apply_setfield_miss_oxm_ids_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9580,7 +9580,7 @@ of_table_feature_prop_experimenter_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9619,7 +9619,7 @@ of_table_feature_prop_experimenter_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9660,7 +9660,7 @@ of_table_feature_prop_experimenter_subtype_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9699,7 +9699,7 @@ of_table_feature_prop_experimenter_subtype_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9742,7 +9742,7 @@ of_table_feature_prop_experimenter_experimenter_data_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9787,7 +9787,7 @@ of_table_feature_prop_experimenter_experimenter_data_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -9972,7 +9972,7 @@ of_table_feature_prop_experimenter_miss_experimenter_get(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10011,7 +10011,7 @@ of_table_feature_prop_experimenter_miss_experimenter_set(
         offset = 4;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10052,7 +10052,7 @@ of_table_feature_prop_experimenter_miss_subtype_get(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10091,7 +10091,7 @@ of_table_feature_prop_experimenter_miss_subtype_set(
         offset = 8;
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10134,7 +10134,7 @@ of_table_feature_prop_experimenter_miss_experimenter_data_get(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10179,7 +10179,7 @@ of_table_feature_prop_experimenter_miss_experimenter_data_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10359,7 +10359,7 @@ of_table_feature_prop_instructions_instruction_ids_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10430,7 +10430,7 @@ of_table_feature_prop_instructions_instruction_ids_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10625,7 +10625,7 @@ of_table_feature_prop_instructions_miss_instruction_ids_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10696,7 +10696,7 @@ of_table_feature_prop_instructions_miss_instruction_ids_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10891,7 +10891,7 @@ of_table_feature_prop_match_oxm_ids_bind(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return ;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
@@ -10962,7 +10962,7 @@ of_table_feature_prop_match_oxm_ids_set(
         cur_len = _END_LEN(obj, offset);
         break;
     default:
-        LOCI_ASSERT(0);
+        return OF_ERROR_VERSION;
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);

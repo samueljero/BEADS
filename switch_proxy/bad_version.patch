@@ -1,0 +1,32 @@
+diff --git a/c_gen/c_code_gen.py b/c_gen/c_code_gen.py
+index 9add81b..22ec880 100644
+--- a/c_gen/c_code_gen.py
++++ b/c_gen/c_code_gen.py
+@@ -76,6 +76,12 @@ def accessor_return_success(a_type, m_type):
+     else:
+         return ""
+ 
++def accessor_return_failure(a_type, m_type):
++    if loxi_utils.accessor_returns_error(a_type, m_type):
++        return "OF_ERROR_VERSION"
++    else:
++        return ""
++
+ ################################################################
+ #
+ # Per-file generators, mapped to jump table below
+@@ -1415,12 +1421,12 @@ def gen_unified_acc_body(out, cls, m_name, ver_type_map, a_type, m_type):
+     gen_accessor_offsets(out, cls, m_name, next, a_type, m_type, prev_o)
+     out.write("""\
+     default:
+-        LOCI_ASSERT(0);
++        return %s;
+     }
+ 
+     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
+     LOCI_ASSERT(abs_offset >= 0);
+-""")
++""" % accessor_return_failure(a_type, m_type))
+     if not loxi_utils.type_is_scalar(m_type):
+         out.write("    LOCI_ASSERT(cur_len >= 0 && cur_len < 64 * 1024);\n")
+ 

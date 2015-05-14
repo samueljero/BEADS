@@ -12720,34 +12720,30 @@ void OpenFlow::do_of_action_push_vlan_ethertype_get(of_object_t* o, unsigned lon
 }
 
 void OpenFlow::do_of_action_set_dl_dst_dl_addr_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_action_set_dl_dst_dl_addr_set( (of_action_set_dl_dst_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr, &val, 6);
+	of_action_set_dl_dst_dl_addr_set( (of_action_set_dl_dst_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_action_set_dl_dst_dl_addr_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_action_set_dl_dst_dl_addr_get( (of_action_set_dl_dst_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_action_set_dl_dst_dl_addr_get( (of_action_set_dl_dst_t *) o, &tmp);
+	memcpy(val,tmp.addr,6);
 	return;
 }
 
 void OpenFlow::do_of_action_set_dl_src_dl_addr_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_action_set_dl_src_dl_addr_set( (of_action_set_dl_src_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr, &val, 6);
+	of_action_set_dl_src_dl_addr_set( (of_action_set_dl_src_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_action_set_dl_src_dl_addr_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_action_set_dl_src_dl_addr_get( (of_action_set_dl_src_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_action_set_dl_src_dl_addr_get( (of_action_set_dl_src_t *) o, &tmp);
+	memcpy(val,tmp.addr,6);
 	return;
 }
 
@@ -16097,34 +16093,30 @@ void OpenFlow::do_of_match_v1_in_port_get(of_object_t* o, unsigned long int *val
 }
 
 void OpenFlow::do_of_match_v1_eth_src_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_match_v1_eth_src_set( (of_match_v1_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_match_v1_eth_src_set( (of_match_v1_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_match_v1_eth_src_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_match_v1_eth_src_get( (of_match_v1_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_match_v1_eth_src_get( (of_match_v1_t *) o, &tmp);
+	memcpy(val,tmp.addr,6);
 	return;
 }
 
 void OpenFlow::do_of_match_v1_eth_dst_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_match_v1_eth_dst_set( (of_match_v1_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_match_v1_eth_dst_set( (of_match_v1_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_match_v1_eth_dst_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_match_v1_eth_dst_get( (of_match_v1_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_match_v1_eth_dst_get( (of_match_v1_t *) o, &tmp);
+	memcpy(val,tmp.addr,6);
 	return;
 }
 
@@ -16283,74 +16275,65 @@ void OpenFlow::do_of_match_v2_wildcards_get(of_object_t* o, unsigned long int *v
 }
 
 void OpenFlow::do_of_match_v2_eth_src_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_match_v2_eth_src_set( (of_match_v2_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_match_v2_eth_src_set( (of_match_v2_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_match_v2_eth_src_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_match_v2_eth_src_get( (of_match_v2_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_match_v2_eth_src_get( (of_match_v2_t *) o, &tmp);
+	memcpy(val, tmp.addr,6);
 	return;
 }
 
 void OpenFlow::do_of_match_v2_eth_src_mask_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_match_v2_eth_src_mask_set( (of_match_v2_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_match_v2_eth_src_mask_set( (of_match_v2_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_match_v2_eth_src_mask_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_match_v2_eth_src_mask_get( (of_match_v2_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_match_v2_eth_src_mask_get( (of_match_v2_t *) o, &tmp);
+	memcpy(val, tmp.addr,6);
 	return;
 }
 
 void OpenFlow::do_of_match_v2_eth_dst_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_match_v2_eth_dst_set( (of_match_v2_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_match_v2_eth_dst_set( (of_match_v2_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_match_v2_eth_dst_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_match_v2_eth_dst_get( (of_match_v2_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_match_v2_eth_dst_get( (of_match_v2_t *) o, &tmp);
+	memcpy(val, tmp.addr,6);
 	return;
 }
 
 void OpenFlow::do_of_match_v2_eth_dst_mask_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_match_v2_eth_dst_mask_set( (of_match_v2_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_match_v2_eth_dst_mask_set( (of_match_v2_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_match_v2_eth_dst_mask_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_match_v2_eth_dst_mask_get( (of_match_v2_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_match_v2_eth_dst_mask_get( (of_match_v2_t *) o, &tmp);
+	memcpy(val, tmp.addr,6);
 	return;
 }
 
 void OpenFlow::do_of_match_v2_vlan_vid_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//uint16_t tmp;
-	//tmp = val;
-	//of_match_v2_vlan_vid_set( (of_match_v2_t *) o, tmp);
+	uint16_t tmp;
+	tmp = val;
+	of_match_v2_vlan_vid_set( (of_match_v2_t *) o, tmp);
 	return;
 }
 
@@ -17003,50 +16986,44 @@ void OpenFlow::do_of_oxm_arp_op_masked_value_mask_get(of_object_t* o, unsigned l
 }
 
 void OpenFlow::do_of_oxm_arp_sha_value_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_oxm_arp_sha_value_set( (of_oxm_arp_sha_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_oxm_arp_sha_value_set( (of_oxm_arp_sha_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_oxm_arp_sha_value_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_oxm_arp_sha_value_get( (of_oxm_arp_sha_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_oxm_arp_sha_value_get( (of_oxm_arp_sha_t *) o, &tmp);
+	memcpy(val, tmp.addr,6);
 	return;
 }
 
 void OpenFlow::do_of_oxm_arp_sha_masked_value_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_oxm_arp_sha_masked_value_set( (of_oxm_arp_sha_masked_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_oxm_arp_sha_masked_value_set( (of_oxm_arp_sha_masked_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_oxm_arp_sha_masked_value_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_oxm_arp_sha_masked_value_get( (of_oxm_arp_sha_masked_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_oxm_arp_sha_masked_value_get( (of_oxm_arp_sha_masked_t *) o, &tmp);
+	memcpy(val, tmp.addr,6);
 	return;
 }
 
 void OpenFlow::do_of_oxm_arp_sha_masked_value_mask_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//tmp = val;
-	//of_oxm_arp_sha_masked_value_mask_set( (of_oxm_arp_sha_masked_t *) o, tmp);
+	of_mac_addr_t tmp;
+	memcpy(tmp.addr,&val,6);
+	of_oxm_arp_sha_masked_value_mask_set( (of_oxm_arp_sha_masked_t *) o, tmp);
 	return;
 }
 
 void OpenFlow::do_of_oxm_arp_sha_masked_value_mask_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO
-	//of_mac_addr_t tmp;
-	//of_oxm_arp_sha_masked_value_mask_get( (of_oxm_arp_sha_masked_t *) o, &tmp);
-	//*val = tmp;
+	of_mac_addr_t tmp;
+	of_oxm_arp_sha_masked_value_mask_get( (of_oxm_arp_sha_masked_t *) o, &tmp);
+	memcpy(val, tmp.addr,6);
 	return;
 }
 
