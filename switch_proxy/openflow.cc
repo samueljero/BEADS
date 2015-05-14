@@ -1,5 +1,452 @@
 #include "openflow.h"
 
+
+void OpenFlow::do_of_match_set(of_match_t *m, unsigned long int val, std::vector<int> f, int l){
+	if ( l >= (int)f.size()) {
+		return;
+	}
+	int field = f[l];
+
+	switch(field){
+		case 1:
+			m->version = (of_version_t)val;
+			break;
+		case 2:
+			l++;
+			do_of_match_fields_set(&m->fields, val, f, l);
+			break;
+		case 3:
+			l++;
+			do_of_match_fields_set(&m->masks, val, f, l);
+			break;
+		default:
+			return;
+	}
+	return;
+}
+
+void OpenFlow::do_of_match_get(of_match_t *m, unsigned long int *val, std::vector<int> f, int l){
+	if ( l >= (int)f.size()) {
+		return;
+	}
+	int field = f[l];
+
+	switch(field){
+		case 1:
+			*val = m->version;
+			break;
+		case 2:
+			l++;
+			do_of_match_fields_get(&m->fields, val, f, l);
+			break;
+		case 3:
+			l++;
+			do_of_match_fields_get(&m->masks, val, f, l);
+			break;
+		default:
+			return;
+	}
+	return;
+}
+
+void OpenFlow::do_of_match_fields_set(of_match_fields_t *m, unsigned long int val, std::vector<int> f, int l){
+	if ( l >= (int)f.size()) {
+		return;
+	}
+	int field = f[l];
+
+	switch(field){
+		case 1: //of_port_no_t         in_port
+			m->in_port = val;
+			break;
+		case 2: //of_port_no_t         in_phy_port
+			m->in_phy_port = val;
+			break;
+    	case 3: //uint64_t             metadata
+			m->metadata = val;
+			break;
+		case 4: //of_mac_addr_t        eth_dst
+			memcpy(m->eth_dst.addr, &val, 6);
+			break;
+		case 5: //of_mac_addr_t        eth_src
+			memcpy(m->eth_src.addr, &val, 6);
+			break;
+		case 6: //uint16_t             eth_type
+			m->eth_type = val;
+			break;
+    	case 7: //uint16_t             vlan_vid
+			m->vlan_vid = val;
+			break;
+    	case 8: //uint8_t              vlan_pcp
+			m->vlan_pcp = val;
+			break;
+    	case 9: //uint8_t              ip_dscp
+			m->ip_dscp = val;
+			break;
+    	case 10: //uint8_t              ip_ecn
+			m->ip_ecn = val;
+			break;
+    	case 11: //uint8_t              ip_proto
+			m->ip_proto = val;
+			break;
+    	case 12: //of_ipv4_t            ipv4_src
+			m->ipv4_src = val;
+			break;
+    	case 13: //of_ipv4_t            ipv4_dst
+			m->ipv4_dst = val;
+			break;
+    	case 14: //uint16_t             tcp_src
+			m->tcp_src = val;
+			break;
+    	case 15: //uint16_t             tcp_dst
+			m->tcp_dst = val;
+			break;
+    	case 16: //uint16_t             udp_src
+			m->udp_src = val;
+			break;
+    	case 17: //uint16_t             udp_dst
+			m->udp_dst = val;
+			break;
+    	case 18: //uint16_t             sctp_src
+			m->sctp_src = val;
+			break;
+    	case 19: //uint16_t             sctp_dst
+			m->sctp_dst = val;
+			break;
+    	case 20: //uint8_t              icmpv4_type
+			m->icmpv4_type = val;
+			break;
+    	case 21: //uint8_t              icmpv4_code
+			m->icmpv4_code = val;
+			break;
+    	case 22: //uint16_t             arp_op
+			m->arp_op = val;
+			break;
+    	case 23: //uint32_t             arp_spa
+			m->arp_tpa = val;
+			break;
+    	case 24: //uint32_t             arp_tpa
+			m->arp_tpa = val;
+			break;
+    	case 25: //of_mac_addr_t        arp_sha
+			memcpy(m->arp_sha.addr,&val, 6);
+			break;
+    	case 26: //of_mac_addr_t        arp_tha
+			memcpy(m->arp_tha.addr,&val,6);
+			break;
+    	case 27: //of_ipv6_t            ipv6_src
+			//TODO
+			break;
+    	case 28: //of_ipv6_t            ipv6_dst
+			//TODO
+			break;
+    	case 29: //uint32_t             ipv6_flabel
+			m->ipv6_flabel = val;
+			break;
+    	case 30: //uint8_t              icmpv6_type
+			m->icmpv6_type = val;
+			break;
+    	case 31: //uint8_t              icmpv6_code
+			m->icmpv6_code = val;
+			break;
+    	case 32: //of_ipv6_t            ipv6_nd_target
+			//TODO
+			break;
+    	case 33: //of_mac_addr_t        ipv6_nd_sll
+			memcpy(m->ipv6_nd_sll.addr, &val, 6);
+			break;
+    	case 34: //of_mac_addr_t        ipv6_nd_tll;
+			memcpy(m->ipv6_nd_tll.addr, &val, 6);
+			break;
+    	case 35: //uint32_t             mpls_label
+			m->mpls_label = val;
+			break;
+    	case 36: //uint8_t              mpls_tc
+			m->mpls_tc = val;
+			break;
+    	case 37: //uint8_t              mpls_bos
+			m->mpls_bos = val;
+			break;
+    	case 38: //uint64_t             tunnel_id
+			m->tunnel_id = val;
+			break;
+    	case 39: //uint16_t             ipv6_exthdr
+			m->ipv6_exthdr = val;
+			break;
+    	case 40: //uint8_t              pbb_uca
+			m->pbb_uca = val;
+			break;
+    	case 41: //of_ipv4_t            tunnel_ipv4_src
+			m->tunnel_ipv4_src = val;
+			break;
+    	case 42: //of_ipv4_t            tunnel_ipv4_dst
+			m->tunnel_ipv4_dst = val;
+    	case 43: //of_bitmap_128_t      bsn_in_ports_128
+			break;
+    	case 44: //uint32_t             bsn_lag_id
+			m->bsn_lag_id = val;
+			break;
+    	case 45: //uint32_t             bsn_vrf
+			m->bsn_vrf = val;
+			break;
+    	case 46: //uint8_t              bsn_global_vrf_allowed
+			m->bsn_global_vrf_allowed = val;
+			break;
+    	case 47: //uint32_t             bsn_l3_interface_class_id
+			m->bsn_l3_interface_class_id = val;
+			break;
+    	case 48: //uint32_t             bsn_l3_src_class_id
+			m->bsn_l3_src_class_id = val;
+			break;
+    	case 49: //uint32_t             bsn_l3_dst_class_id
+			m->bsn_l3_dst_class_id = val;
+			break;
+    	case 50: //uint32_t             bsn_egr_port_group_id
+			m->bsn_egr_port_group_id = val;
+			break;
+    	case 51: //uint32_t             bsn_udf0
+			m->bsn_udf0 = val;
+			break;
+    	case 52: //uint32_t             bsn_udf1
+			m->bsn_udf1 = val;
+			break;
+    	case 53: //uint32_t             bsn_udf2
+			m->bsn_udf2 = val;
+			break;
+    	case 54: //uint32_t             bsn_udf3
+			m->bsn_udf3 = val;
+			break;
+    	case 55: //uint32_t             bsn_udf4
+			m->bsn_udf4 = val;
+			break;
+    	case 56: //uint32_t             bsn_udf5
+			m->bsn_udf5 = val;
+			break;
+    	case 57: //uint32_t             bsn_udf6
+			m->bsn_udf6 = val;
+			break;
+    	case 58: //uint32_t             bsn_udf7
+			m->bsn_udf7 = val;
+			break;
+    	case 59: //uint16_t             bsn_tcp_flags
+			m->bsn_tcp_flags = val;
+			break;
+    	case 60: //uint32_t             bsn_vlan_xlate_port_group_id
+			m->bsn_vlan_xlate_port_group_id = val;
+			break;
+    	case 61: //uint8_t              bsn_l2_cache_hit
+			m->bsn_l2_cache_hit = val;
+			break;
+    	case 62: //of_bitmap_512_t      bsn_in_ports_512
+			break;
+    	case 63: //uint32_t             bsn_ingress_port_group_id
+			m->bsn_ingress_port_group_id = val;
+			break;
+		default:
+			return;
+	}
+	return;
+}
+
+void OpenFlow::do_of_match_fields_get(of_match_fields_t *m, unsigned long int *val, std::vector<int> f, int l){
+	if ( l >= (int)f.size()) {
+		return;
+	}
+	int field = f[l];
+
+	switch(field){
+		case 1: //of_port_no_t         in_port
+			*val = m->in_port;
+			break;
+		case 2: //of_port_no_t         in_phy_port
+			*val = m->in_phy_port;
+			break;
+    	case 3: //uint64_t             metadata
+			*val = m->metadata;
+			break;
+		case 4: //of_mac_addr_t        eth_dst
+			memcpy(val, m->eth_dst.addr, 6);
+			break;
+		case 5: //of_mac_addr_t        eth_src
+			memcpy(val, m->eth_src.addr, 6);
+			break;
+		case 6: //uint16_t             eth_type
+			*val = m->eth_type;
+			break;
+    	case 7: //uint16_t             vlan_vid
+			*val = m->vlan_vid;
+			break;
+    	case 8: //uint8_t              vlan_pcp
+			*val = m->vlan_pcp;
+			break;
+    	case 9: //uint8_t              ip_dscp
+			*val = m->ip_dscp;
+			break;
+    	case 10: //uint8_t              ip_ecn
+			*val = m->ip_ecn;
+			break;
+    	case 11: //uint8_t              ip_proto
+			*val = m->ip_proto ;
+			break;
+    	case 12: //of_ipv4_t            ipv4_src
+			*val = m->ipv4_src;
+			break;
+    	case 13: //of_ipv4_t            ipv4_dst
+			*val = m->ipv4_dst;
+			break;
+    	case 14: //uint16_t             tcp_src
+			*val = m->tcp_src;
+			break;
+    	case 15: //uint16_t             tcp_dst
+			*val = m->tcp_dst;
+			break;
+    	case 16: //uint16_t             udp_src
+			*val = m->udp_src;
+			break;
+    	case 17: //uint16_t             udp_dst
+			*val = m->udp_dst;
+			break;
+    	case 18: //uint16_t             sctp_src
+			*val = m->sctp_src;
+			break;
+    	case 19: //uint16_t             sctp_dst
+			*val = m->sctp_dst;
+			break;
+    	case 20: //uint8_t              icmpv4_type
+			*val = m->icmpv4_type;
+			break;
+    	case 21: //uint8_t              icmpv4_code
+			*val = m->icmpv4_code;
+			break;
+    	case 22: //uint16_t             arp_op
+			*val = m->arp_op;
+			break;
+    	case 23: //uint32_t             arp_spa
+			*val = m->arp_tpa;
+			break;
+    	case 24: //uint32_t             arp_tpa
+			*val  = m->arp_tpa;
+			break;
+    	case 25: //of_mac_addr_t        arp_sha
+			memcpy(val, m->arp_sha.addr, 6);
+			break;
+    	case 26: //of_mac_addr_t        arp_tha
+			memcpy(val, m->arp_tha.addr, 6);
+			break;
+    	case 27: //of_ipv6_t            ipv6_src
+			//TODO
+			break;
+    	case 28: //of_ipv6_t            ipv6_dst
+			//TODO
+			break;
+    	case 29: //uint32_t             ipv6_flabel
+			*val = m->ipv6_flabel;
+			break;
+    	case 30: //uint8_t              icmpv6_type
+			*val = m->icmpv6_type;
+			break;
+    	case 31: //uint8_t              icmpv6_code
+			*val = m->icmpv6_code;
+			break;
+    	case 32: //of_ipv6_t            ipv6_nd_target
+			//TODO
+			break;
+    	case 33: //of_mac_addr_t        ipv6_nd_sll
+			memcpy(val, m->ipv6_nd_sll.addr, 6);
+			break;
+    	case 34: //of_mac_addr_t        ipv6_nd_tll;
+			memcpy(val, m->ipv6_nd_tll.addr, 6);
+			break;
+    	case 35: //uint32_t             mpls_label
+			*val = m->mpls_label;
+			break;
+    	case 36: //uint8_t              mpls_tc
+			*val = m->mpls_tc;
+			break;
+    	case 37: //uint8_t              mpls_bos
+			*val = m->mpls_bos;
+			break;
+    	case 38: //uint64_t             tunnel_id
+			*val = m->tunnel_id;
+			break;
+    	case 39: //uint16_t             ipv6_exthdr
+			*val = m->ipv6_exthdr;
+			break;
+    	case 40: //uint8_t              pbb_uca
+			*val = m->pbb_uca;
+			break;
+    	case 41: //of_ipv4_t            tunnel_ipv4_src
+			*val = m->tunnel_ipv4_src;
+			break;
+    	case 42: //of_ipv4_t            tunnel_ipv4_dst
+			*val = m->tunnel_ipv4_dst;
+    	case 43: //of_bitmap_128_t      bsn_in_ports_128
+			break;
+    	case 44: //uint32_t             bsn_lag_id
+			*val = m->bsn_lag_id;
+			break;
+    	case 45: //uint32_t             bsn_vrf
+			*val = m->bsn_vrf;
+			break;
+    	case 46: //uint8_t              bsn_global_vrf_allowed
+			*val = m->bsn_global_vrf_allowed;
+			break;
+    	case 47: //uint32_t             bsn_l3_interface_class_id
+			*val = m->bsn_l3_interface_class_id;
+			break;
+    	case 48: //uint32_t             bsn_l3_src_class_id
+			*val = m->bsn_l3_src_class_id;
+			break;
+    	case 49: //uint32_t             bsn_l3_dst_class_id
+			*val = m->bsn_l3_dst_class_id;
+			break;
+    	case 50: //uint32_t             bsn_egr_port_group_id
+			*val = m->bsn_egr_port_group_id;
+			break;
+    	case 51: //uint32_t             bsn_udf0
+			*val = m->bsn_udf0;
+			break;
+    	case 52: //uint32_t             bsn_udf1
+			*val = m->bsn_udf1;
+			break;
+    	case 53: //uint32_t             bsn_udf2
+			*val = m->bsn_udf2;
+			break;
+    	case 54: //uint32_t             bsn_udf3
+			*val = m->bsn_udf3;
+			break;
+    	case 55: //uint32_t             bsn_udf4
+			*val = m->bsn_udf4;
+			break;
+    	case 56: //uint32_t             bsn_udf5
+			*val = m->bsn_udf5;
+			break;
+    	case 57: //uint32_t             bsn_udf6
+			*val = m->bsn_udf6;
+			break;
+    	case 58: //uint32_t             bsn_udf7
+			*val = m->bsn_udf7;
+			break;
+    	case 59: //uint16_t             bsn_tcp_flags
+			*val = m->bsn_tcp_flags;
+			break;
+    	case 60: //uint32_t             bsn_vlan_xlate_port_group_id
+			*val = m->bsn_vlan_xlate_port_group_id;
+			break;
+    	case 61: //uint8_t              bsn_l2_cache_hit
+			*val = m->bsn_l2_cache_hit;
+			break;
+    	case 62: //of_bitmap_512_t      bsn_in_ports_512
+			break;
+    	case 63: //uint32_t             bsn_ingress_port_group_id
+			*val = m->bsn_ingress_port_group_id;
+			break;
+		default:
+			return;
+	}
+	return;
+}
+
 void OpenFlow::do_of_aggregate_stats_reply_xid_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
 	uint32_t tmp;
 	tmp = val;
@@ -169,12 +616,23 @@ void OpenFlow::do_of_aggregate_stats_request_cookie_mask_get(of_object_t* o, uns
 }
 
 void OpenFlow::do_of_aggregate_stats_request_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_aggregate_stats_request_match_get( (of_aggregate_stats_request_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_aggregate_stats_request_match_set( (of_aggregate_stats_request_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_aggregate_stats_request_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_aggregate_stats_request_match_get( (of_aggregate_stats_request_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -1768,12 +2226,23 @@ void OpenFlow::do_of_bsn_flow_idle_table_id_get(of_object_t* o, unsigned long in
 }
 
 void OpenFlow::do_of_bsn_flow_idle_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_bsn_flow_idle_match_get( (of_bsn_flow_idle_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_bsn_flow_idle_match_set( (of_bsn_flow_idle_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_bsn_flow_idle_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_bsn_flow_idle_match_get( (of_bsn_flow_idle_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -7978,12 +8447,23 @@ void OpenFlow::do_of_flow_add_importance_get(of_object_t* o, unsigned long int *
 }
 
 void OpenFlow::do_of_flow_add_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_add_match_get( (of_flow_add_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_flow_add_match_set( (of_flow_add_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_flow_add_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_add_match_get( (of_flow_add_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -8210,12 +8690,23 @@ void OpenFlow::do_of_flow_delete_importance_get(of_object_t* o, unsigned long in
 }
 
 void OpenFlow::do_of_flow_delete_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_delete_match_get( (of_flow_delete_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_flow_delete_match_set( (of_flow_delete_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_flow_delete_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_delete_match_get( (of_flow_delete_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -8442,12 +8933,23 @@ void OpenFlow::do_of_flow_delete_strict_importance_get(of_object_t* o, unsigned 
 }
 
 void OpenFlow::do_of_flow_delete_strict_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_delete_strict_match_get( (of_flow_delete_strict_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_flow_delete_strict_match_set( (of_flow_delete_strict_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_flow_delete_strict_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_delete_strict_match_get( (of_flow_delete_strict_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -8702,12 +9204,23 @@ void OpenFlow::do_of_flow_modify_importance_get(of_object_t* o, unsigned long in
 }
 
 void OpenFlow::do_of_flow_modify_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_modify_match_get( (of_flow_modify_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_flow_modify_match_set( (of_flow_modify_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_flow_modify_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_modify_match_get( (of_flow_modify_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -8934,12 +9447,23 @@ void OpenFlow::do_of_flow_modify_strict_importance_get(of_object_t* o, unsigned 
 }
 
 void OpenFlow::do_of_flow_modify_strict_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_modify_strict_match_get( (of_flow_modify_strict_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_flow_modify_strict_match_set( (of_flow_modify_strict_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_flow_modify_strict_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_modify_strict_match_get( (of_flow_modify_strict_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -9180,12 +9704,23 @@ void OpenFlow::do_of_flow_removed_byte_count_get(of_object_t* o, unsigned long i
 }
 
 void OpenFlow::do_of_flow_removed_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_removed_match_get( (of_flow_removed_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_flow_removed_match_set( (of_flow_removed_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_flow_removed_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_removed_match_get( (of_flow_removed_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -9343,12 +9878,23 @@ void OpenFlow::do_of_flow_stats_request_cookie_mask_get(of_object_t* o, unsigned
 }
 
 void OpenFlow::do_of_flow_stats_request_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_stats_request_match_get( (of_flow_stats_request_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_flow_stats_request_match_set( (of_flow_stats_request_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_flow_stats_request_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_stats_request_match_get( (of_flow_stats_request_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -10678,12 +11224,23 @@ void OpenFlow::do_of_packet_in_cookie_get(of_object_t* o, unsigned long int *val
 }
 
 void OpenFlow::do_of_packet_in_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_packet_in_match_get( (of_packet_in_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_packet_in_match_set( (of_packet_in_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_packet_in_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_packet_in_match_get( (of_packet_in_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 
@@ -15026,12 +15583,23 @@ void OpenFlow::do_of_flow_stats_entry_byte_count_get(of_object_t* o, unsigned lo
 }
 
 void OpenFlow::do_of_flow_stats_entry_match_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_stats_entry_match_get( (of_flow_stats_entry_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_set(&tmp, val, f, l);
+	if(of_flow_stats_entry_match_set( (of_flow_stats_entry_t *) o, &tmp) < 0){
+		return;
+	}
 	return;
 }
 
 void OpenFlow::do_of_flow_stats_entry_match_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l){
-	//TODO: Support Match manipulation
+	of_match_t tmp;
+	if(of_flow_stats_entry_match_get( (of_flow_stats_entry_t *) o, &tmp) < 0){
+		return;
+	}
+	do_of_match_get(&tmp, val, f, l);
 	return;
 }
 

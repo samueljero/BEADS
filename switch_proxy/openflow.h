@@ -3,11 +3,16 @@
 extern "C" {
 #include <loci/loci.h>
 #include <loci/of_object.h>
+#include <loci/of_match.h>
 #include <loci/loci_obj_dump.h>
 }
 #include <vector>
 class OpenFlow {
 private:
+	void do_of_match_set(of_match_t *m, unsigned long int val, std::vector<int> f, int l);
+	void do_of_match_get(of_match_t *m, unsigned long int *val, std::vector<int> f, int l);
+	void do_of_match_fields_set(of_match_fields_t *m, unsigned long int val, std::vector<int> f, int l);
+	void do_of_match_fields_get(of_match_fields_t *m, unsigned long int *val, std::vector<int> f, int l);
 	void do_of_aggregate_stats_reply_xid_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l);
 	void do_of_aggregate_stats_reply_xid_get(of_object_t* o, unsigned long int *val, std::vector<int> f, int l);
 	void do_of_aggregate_stats_reply_flags_set(of_object_t* o, unsigned long int val, std::vector<int> f, int l);
