@@ -7,7 +7,7 @@ CPPFLAGS=-O2 -Wall -Werror -g -I loci/inc
 CFLAGS=-O2 -Wall -Werror -g -I loci/inc
 
 BINARIES=sw_proxy sndcmd
-PROXY_HEADERS=sw_proxy.h listener.h connection.h half_conn.h control.h csv.h args.h attacker.h attacks.cc
+PROXY_HEADERS=sw_proxy.h listener.h connection.h half_conn.h control.h csv.h args.h
 PROXY_SRC=sw_proxy.cc listener.cc connection.cc half_conn.cc control.cc args.cc csv.cc attacker.cc
 LOCI_SRC=loci/src/*.c
 SNDCMD_SRC=sndcmd.cc
@@ -21,8 +21,12 @@ all:
 clean:
 	rm -f $(BINARIES) *.o *~
         
-sw_proxy: $(PROXY_HEADERS) $(PROXY_SRC) libloci.so
-	$(CPP) $(CPPFLAGS) $(PROXY_SRC) -o sw_proxy -lpthread -Wl,-rpath,. -L. -lloci
+sw_proxy: $(PROXY_HEADERS) $(PROXY_SRC) libloci.so openflow.o
+	$(CPP) $(CPPFLAGS) $(PROXY_SRC) openflow.o -o sw_proxy -lpthread -Wl,-rpath,. -L. -lloci
+
+openflow.o: openflow.cc openflow.h
+	$(CPP) -c $(CPPFLAGS) openflow.cc -o openflow.o
+	
 
 sndcmd: $(SNDCMD_SRC)
 	$(CPP) $(CPPFLAGS) $(SNDCMD_SRC) -o sndcmd

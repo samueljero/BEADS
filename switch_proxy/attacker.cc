@@ -17,7 +17,7 @@ extern "C" {
 #include <map>
 #include <list>
 #include <vector>
-#include "attacks.cc"
+#include "openflow.h"
 using namespace std;
 
 #define ATTACKER_ROW_NUM_FIELDS		7
