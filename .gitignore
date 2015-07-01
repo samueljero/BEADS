@@ -23,3 +23,9 @@
 *.out
 *.nav
 *.snm
+
+#VMs
+*.qcow2
+*.sav
+*.vdmk
+*.vdi
