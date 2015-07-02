@@ -71,6 +71,10 @@ def killvm(num):
 	s.send("q\n")
 	s.close()
 
+def vm2ip(num):
+	global vm_ip_base
+	return vm_ip_base.format(str(num))
+
 def initvm(num):
 	global vm_ip_base, vm_user
 	os.system("cat ~/.ssh/id_rsa.pub | ssh {0}@{1} \"cat >> ~/.ssh/authorized_keys\"".format(vm_user, vm_ip_base.format(num)))
