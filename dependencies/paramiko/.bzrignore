@@ -1,0 +1,7 @@
+*.pyc
+./build
+./paramiko.egg-info
+./dist
+./.project
+./paramiko.tmproj
+./test.log
