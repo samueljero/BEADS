@@ -30,7 +30,8 @@ char *default_host = (char*)"localhost";
 int main(int argc, char** argv)
 {
 	int port = 3333;
-	char *host = default_host;
+	char *host = NULL;
+	char *cmd = NULL;
 
 	/*loop through commandline options*/
 	for (int i = 1; i < argc; i++) {
@@ -46,10 +47,18 @@ int main(int argc, char** argv)
 				usage();
 			}
 		} else if (argv[i][0] != '-'){ /* default arg */
-			host = argv[i];
+			if (host) {
+				cmd = argv[i];
+			} else { 
+				host = argv[i];
+			}
 		}else{
 			usage();
 		}
+	}
+
+	if (!host) {
+		host = default_host;
 	}
 
 	/* Parse Host */
@@ -89,12 +98,23 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
+	/* Send Command */
 	char buff[256];
 	int len;
-	while((len = read(STDIN_FILENO, &buff[1], 255)) > 0) {
-		buff[0]=len;
+	if (cmd) {
+		/* Command specified on commandline*/
+		buff[0] = len = strlen(cmd);
+		strncpy(&buff[1],cmd,255);
 		send(sock,buff,len,0);
+	} else {
+		/* Read from stdin */
+		while((len = read(STDIN_FILENO, &buff[1], 255)) > 0) {
+			buff[0]=len;
+			send(sock,buff,len,0);
+		}
 	}
+
+	/* Close Socket */
 	close(sock);
 
 	return 0;
@@ -114,7 +134,7 @@ void version()
 /*Usage information for program*/
 void usage()
 {
-	dbgprintf(0,"Usage: sndcmd [-v] [-V] [-h] [-c local_port:remote_ip:remote_port] [-p control_port]\n");
+	dbgprintf(0,"Usage: sndcmd [-v] [-V] [-h] [-p control_port] [host] [cmd]\n");
 	dbgprintf(0, "          -v   verbose. May be repeated for additional verbosity.\n");
 	dbgprintf(0, "          -V   Version information\n");
 	dbgprintf(0, "          -h   Help\n");

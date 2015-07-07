@@ -22,7 +22,7 @@ clean:
 	rm -f $(BINARIES) *.o *~
         
 sw_proxy: $(PROXY_HEADERS) $(PROXY_SRC) libloci.so openflow.o
-	$(CPP) $(CPPFLAGS) $(PROXY_SRC) openflow.o -o sw_proxy -lpthread -Wl,-rpath,. -L. -lloci
+	$(CPP) $(CPPFLAGS) $(PROXY_SRC) openflow.o -o sw_proxy -lpthread -Wl,-rpath,`pwd` -L`pwd` -lloci
 
 openflow.o: openflow.cc openflow.h
 	$(CPP) -c $(CPPFLAGS) openflow.cc -o openflow.o

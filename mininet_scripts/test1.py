@@ -100,11 +100,11 @@ if __name__ == '__main__':
 		network.hosts[2].sendInt()
 		network.hosts[3].sendInt()
 
-		print results
+		print repr(results)
 
 		#Cleanup Network
 		network.stop()
 	except Exception as e:
-		print [False, False, False]
+		print repr([False, False, False])
 		lg.output(e)
 		os.system("mn -c > /dev/null 2>/dev/null")
