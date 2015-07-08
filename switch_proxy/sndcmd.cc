@@ -103,7 +103,7 @@ int main(int argc, char** argv)
 	int len;
 	if (cmd) {
 		/* Command specified on commandline*/
-		buff[0] = len = strlen(cmd);
+		buff[0] = len = strlen(cmd) + 1;
 		strncpy(&buff[1],cmd,255);
 		send(sock,buff,len,0);
 	} else {

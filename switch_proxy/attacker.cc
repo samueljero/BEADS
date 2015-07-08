@@ -85,6 +85,8 @@ bool Attacker::addCommand(Message m)
 	char **fields;
 	arg_node_t *args;
 
+	dbgprintf(2, "Received CMD: %s\n", m.buff);
+
 	/* Parse CSV */
 	fields = csv_parse(m.buff, m.len, &num_fields);
 	/*for (i = 0; i < num_fields; ++i) {
@@ -270,7 +272,7 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 		case ACTION_ID_LIE:
 			ma.field = normalize_field(fields);
 			if (ma.field.empty()) {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (field)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
@@ -278,7 +280,7 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 
 			targ = args_find(args, "act");
 			if (!targ || targ->type != ARG_VALUE_TYPE_STR) {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (no act tag)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
@@ -290,14 +292,14 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 			} else if (strcmp(targ->value.s, "-") == 0) {
 				ma.action = MOD_SUB;
 			} else {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (invalid act)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
 			}
 			targ = args_find(args, "val");
 			if (!targ || targ->type != ARG_VALUE_TYPE_INT) {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (no val tag)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;

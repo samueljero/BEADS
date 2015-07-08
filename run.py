@@ -42,8 +42,14 @@ def main(args):
 
 	#Do Tests
 	print "Starting Tests..."
-	res = doTest(mininet, controllers, ["d"], 1, lg)
+	#print "Test 1"
+	#res = doTest(mininet, controllers, ["*,*,*,*,*,CLEAR,*"], 1, lg)
+	#print "Test Result: " + str(res)
+	#print "******"
+	print "Test 2"
+	res = doTest(mininet, controllers, ["{controllers[0]},3,*,of_packet_in,12,LIE,act==&val=2"], 2, lg)
 	print "Test Result: " + str(res)
+	print "******"
 
 	#Stop VMs
 	print "Stopping VMs..."

@@ -49,24 +49,29 @@ def doTest(mininet, controllers, strategy, testnum, log):
 	for c in range(0,len(controlleraddrs)):
 		cmd = cmd + " -c " +  proxyports[c] + ":" + controlleraddrs[c]
 	log.write("Proxy CMD: " + cmd + "\n")
+	log.write("********* Proxy output ********\n")
+	log.flush()
 	try:
-		proxy = subprocess.Popen(cmd, shell = True)
+		proxy = subprocess.Popen(cmd, shell = True, stdout = log, stderr = subprocess.STDOUT)
 	except Exception as e:
 		print e
 		log.write("Exception: " + str(e) + "\n")
+		log.flush()
 		return False
+	time.sleep(1)
 
 	#Send Proxy Strategy
 	for l in strategy:
-		cmd = ctl_path + " -p " + str(test_proxy_com_port + mininet[0]) + " localhost \"" + l + "\""
+		cmd = ctl_path + " -p " + str(test_proxy_com_port + mininet[0]) + " localhost \"" + l.format(controllers=proxyports) + "\""
 		log.write("Strategy CMD: " + cmd + "\n")
-		log.write("********* Proxy output ********\n")
+		log.flush()
 		try:
 			com = subprocess.Popen(cmd, shell = True , stdout = log, stderr = subprocess.STDOUT)
 			com.wait()
 		except Exception as e:
 			print e
 			log.write("Exception: " + str(e) + "\n")
+			log.flush()
 			result = False
 
 
@@ -75,12 +80,14 @@ def doTest(mininet, controllers, strategy, testnum, log):
 		shell = spur.SshShell(hostname=mv.vm2ip(c), username = test_controller_user, missing_host_key=spur.ssh.MissingHostKey.accept)
 		res = shell.run(["/bin/bash","-i" ,"-c", test_controller_start_cmd])
 		log.write("Starting Controller (" + mv.vm2ip(c) + ")... " + res.output + "\n")
+		log.flush()
 	time.sleep(test_delay)
 
 	#Do Test
 	m = mininet[0]
 	shell = spur.SshShell(hostname=mv.vm2ip(m), username =test_mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept)
 	log.write("Starting Test: " + test_mininet_cmd.format(controllers=" ".join(proxyaddrs)) + "\n")
+	log.flush()
 	proc = shell.run(["/bin/bash","-i" ,"-c", test_mininet_cmd.format(controllers=" ".join(proxyaddrs))])
 	res = eval(proc.output)
 
@@ -101,6 +108,7 @@ def doTest(mininet, controllers, strategy, testnum, log):
 	proxy.terminate()
 	
 	#Log
+	log.flush()
 	log.write("*****************\n")
 	log.write("********* Test Script output ********\n")
 	log.write(proc.stderr_output)
