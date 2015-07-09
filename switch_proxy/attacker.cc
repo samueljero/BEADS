@@ -318,6 +318,76 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 			}
 
 			break;
+		case ACTION_ID_CLIE:
+			ma.field = normalize_field(fields);
+			if (ma.field.empty()) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (field)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+
+			targ = args_find(args, "act");
+			if (!targ || targ->type != ARG_VALUE_TYPE_STR) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no act tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			if (strcmp(targ->value.s, "=") == 0) {
+				ma.action = MOD_SET;
+			} else if (strcmp(targ->value.s, "+") == 0) {
+				ma.action = MOD_ADD;
+			} else if (strcmp(targ->value.s, "-") == 0) {
+				ma.action = MOD_SUB;
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments (invalid act)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			targ = args_find(args, "val");
+			if (!targ || targ->type != ARG_VALUE_TYPE_INT) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no val tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			ma.value = targ->value.i;
+			targ = args_find(args, "mfield");
+			if (!targ) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no mfield tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			if (targ->type == ARG_VALUE_TYPE_INT) {
+				ma.matchfield.push_back(targ->value.i);
+			} else {
+				ma.matchfield = normalize_field(targ->value.s);
+			}
+			targ = args_find(args, "mval");
+			if (!targ || targ->type != ARG_VALUE_TYPE_INT) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no mval tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			ma.matchvalue = targ->value.i;
+
+
+			if (it5->second == -3) {
+				/* New action set */
+				it5->second = nxt_param;
+				mod_params[nxt_param] = std::vector<modAttack>();
+				mod_params[nxt_param].push_back(ma);
+				nxt_param++;
+			} else {
+				/* Existing action set */
+				mod_params[it5->second].push_back(ma);
+			}
+
+			break;
 	}
 
 	dbgprintf(1, "New Rule Installed: cid=%i, dpid=%llu, version=%i, msg_type=%i, action_type=%i\n",
@@ -676,6 +746,18 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 		}
 		//print(pk);
 	}
+	it5 = it4->second.find(ACTION_ID_CLIE);
+	if (it5 != it4->second.end()) {
+		param = it5->second;
+		mod_acts = mod_params[param];
+		dbgprintf(1, "Modifying packet!\n");
+		for (unsigned int x = 0; x < mod_acts.size(); x++) {
+			if (!doModify(pk.ofo, mod_acts[x].field, mod_acts[x].action, mod_acts[x].value)){
+				break;
+			}
+		}
+		//print(pk);
+	}
 
 	/* Divert */
 	it5 = it4->second.find(ACTION_ID_DIVERT);
@@ -770,6 +852,35 @@ void Attacker::print(pkt_info pk)
 	of_object_dump((loci_writer_f)&writer,NULL,pk.ofo);
 	dbgprintf(0,"##################\n");
 	pthread_mutex_unlock(&ofo_print_serialization_mutex);
+}
+
+
+bool Attacker::doConditionalModify(of_object_t* ofo, vector<int> vfield, int action, int val, vector<int> cfield, int cval)
+{
+	int field;
+	vector<int> modfield;
+	unsigned long int vval;
+
+	if (cfield.empty()) {
+		return false;
+	}
+	field = cfield[0];
+
+	if (field >=1 && field <= 4) {
+		/* Global fields */
+		getHEADER(ofo,cfield, 0, &vval);
+		if (vval == (unsigned int)cval) {
+			return doModify(ofo, vfield, action, val);
+		}
+	}
+
+	modfield = vector<int>(cfield);
+	modfield[0] = modfield[0] - 3; //different start location
+	modifier->get_field(ofo, &vval, modfield, 0);
+	if (vval == (unsigned int) cval) {
+		return doModify(ofo, vfield, action, val);
+	}
+	return true;
 }
 
 
@@ -885,6 +996,42 @@ bool Attacker::ModifyHEADER(of_object_t* ofo, vector<int> vfield, int action, in
 				tmp3 -= val;
 				buf_u32_set(msg + OF_MESSAGE_XID_OFFSET, tmp3);
 			}
+			break;
+	}
+	return true;
+}
+
+bool Attacker::getHEADER(of_object_t* ofo, vector<int> vfield, unsigned int level, unsigned long int* vval)
+{
+	of_message_t msg;
+	unsigned char tmp;
+	uint16_t tmp2;
+	uint32_t tmp3;
+	int field;
+
+	if (vfield.empty() || vfield.size() <= level) {
+		return false;
+	}
+
+	field = vfield[level];
+	msg = OF_OBJECT_TO_MESSAGE(ofo);
+
+	switch(field) {
+		case 1: //Version
+			tmp = msg[OF_MESSAGE_VERSION_OFFSET];
+			*vval = tmp;
+			break;
+		case 2: //Type
+			tmp = msg[OF_MESSAGE_TYPE_OFFSET];
+			*vval = tmp;
+			break;
+		case 3: //length
+			tmp2 = of_message_length_get(msg);
+			*vval = tmp2;
+			break;
+		case 4: //XID
+			tmp3 = of_message_xid_get(msg);
+			*vval = tmp3;
 			break;
 	}
 	return true;

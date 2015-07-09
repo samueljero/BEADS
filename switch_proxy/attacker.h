@@ -30,7 +30,9 @@
 #define ACTION_ID_PRINT			4
 #define ACTION_ID_CLEAR			5
 #define ACTION_ID_DIVERT		6
-#define ACTION_ID_MAX			6
+#define ACTION_ID_CLIE			7
+#define ACTION_ID_CDIVERT		8
+#define ACTION_ID_MAX			8
 
 #define MOD_SET 1
 #define MOD_ADD 2
@@ -50,6 +52,9 @@ class modAttack {
 		std::vector<int> field;
 		int action;
 		int value;
+		std::vector<int> matchfield;
+		int matchvalue;
+		int sw;
 };
 
 class Attacker{
@@ -76,8 +81,10 @@ class Attacker{
 		bool clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type);
 		pkt_info applyActions(pkt_info pk, aamap_t::iterator it4);
 		void print(pkt_info pk);
+		bool doConditionalModify(of_object_t* ofo, std::vector<int> vfield, int action, int val, std::vector<int> cfield, int cval);
 		bool doModify(of_object_t* ofo, std::vector<int> vfield, int action, int val);
 		bool ModifyHEADER(of_object_t* ofo, std::vector<int> vfield, int action, int val, unsigned int level);
+		bool getHEADER(of_object_t* ofo, std::vector<int> vfield, unsigned int level, unsigned long int* vval);
 
 		pthread_rwlock_t lock;
 		// <cid, <dpid, <of_version, <pkt_type, <action, ID> > > >
