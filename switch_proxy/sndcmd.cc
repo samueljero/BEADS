@@ -134,9 +134,10 @@ void version()
 /*Usage information for program*/
 void usage()
 {
-	dbgprintf(0,"Usage: sndcmd [-v] [-V] [-h] [-p control_port] [host] [cmd]\n");
-	dbgprintf(0, "          -v   verbose. May be repeated for additional verbosity.\n");
+	dbgprintf(0,"Usage: sndcmd [-V] [-h] [-p control_port] [host] [cmd]\n");
+	//dbgprintf(0, "          -v   verbose. May be repeated for additional verbosity.\n");
 	dbgprintf(0, "          -V   Version information\n");
+	dbgprintf(0, "          -p   Connect to proxy on this port");
 	dbgprintf(0, "          -h   Help\n");
 	exit(0);
 }

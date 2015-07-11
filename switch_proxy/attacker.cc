@@ -37,6 +37,8 @@ using namespace std;
 #define ACTION_ALIAS_PRINT		"PRINT"
 #define ACTION_ALIAS_CLEAR		"CLEAR"
 #define ACTION_ALIAS_DIVERT		"DIVERT"
+#define ACTION_ALIAS_CLIE		"CLIE"
+#define ACTION_ALIAS_CDIVERT		"CDIVERT"
 
 #define OFP_MSG_TYPE_ERR		(-2)
 #define OFP_MSG_TYPE_ALL		(-1)
@@ -207,7 +209,7 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 					removeCommand(it5, it4, it3, it2, it1);
 				}
 			} else {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (no on tag)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
@@ -221,7 +223,7 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 					removeCommand(it5, it4, it3, it2, it1);
 				}
 			} else {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (no p tag)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
@@ -235,7 +237,7 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 					removeCommand(it5, it4, it3, it2, it1);
 				}
 			} else {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (no ms tag)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
@@ -249,7 +251,7 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 					removeCommand(it5, it4, it3, it2, it1);
 				}
 			} else {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (no t tag)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
@@ -263,13 +265,76 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 					removeCommand(it5, it4, it3, it2, it1);
 				}
 			} else {
-				dbgprintf(0, "Adding Command: failed with bad arguments\n");
+				dbgprintf(0, "Adding Command: failed with bad arguments (no p tag)\n");
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
 			}
 			break;
+		case ACTION_ID_CDIVERT:
+			ma.type = PARAMS_TYPE_LIE;
+			targ = args_find(args, "p");
+			if (targ && targ->type == ARG_VALUE_TYPE_INT) {
+				ma.percent = targ->value.i;
+				if (targ->value.i == 0) {
+					removeCommand(it5, it4, it3, it2, it1);
+				}
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no p tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			targ = args_find(args, "mfield");
+			if (!targ) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no mfield tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			if (targ->type == ARG_VALUE_TYPE_INT) {
+				ma.matchfield.push_back(targ->value.i);
+			} else {
+				ma.matchfield = normalize_field(targ->value.s);
+			}
+			targ = args_find(args, "mval");
+			if (!targ || targ->type != ARG_VALUE_TYPE_INT) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no mval tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			ma.matchvalue = targ->value.i;
+			targ = args_find(args, "sw");
+			if (!targ || targ->type != ARG_VALUE_TYPE_INT) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no sw tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			ma.sw = targ->value.i;
+			targ = args_find(args, "ctl");
+			if (!targ || targ->type != ARG_VALUE_TYPE_INT) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no ctl tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			ma.ctl = targ->value.i;
+			
+			if (it5->second == -3) {
+				/* New action set */
+				it5->second = nxt_param;
+				mod_params[nxt_param] = std::vector<modAttack>();
+				mod_params[nxt_param].push_back(ma);
+				nxt_param++;
+			} else {
+				/* Existing action set */
+				mod_params[it5->second].push_back(ma);
+			}
+			break;
 		case ACTION_ID_LIE:
+			ma.type = PARAMS_TYPE_LIE;
 			ma.field = normalize_field(fields);
 			if (ma.field.empty()) {
 				dbgprintf(0, "Adding Command: failed with bad arguments (field)\n");
@@ -319,6 +384,7 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 
 			break;
 		case ACTION_ID_CLIE:
+			ma.type = PARAMS_TYPE_LIE;
 			ma.field = normalize_field(fields);
 			if (ma.field.empty()) {
 				dbgprintf(0, "Adding Command: failed with bad arguments (field)\n");
@@ -541,6 +607,8 @@ int Attacker::normalize_action_type(char *s)
 	if (!strcmp(ACTION_ALIAS_PRINT, s)) return ACTION_ID_PRINT;
 	if (!strcmp(ACTION_ALIAS_CLEAR, s)) return ACTION_ID_CLEAR;
 	if (!strcmp(ACTION_ALIAS_DIVERT, s)) return ACTION_ID_DIVERT;
+	if (!strcmp(ACTION_ALIAS_CLIE, s)) return ACTION_ID_CLIE;
+	if (!strcmp(ACTION_ALIAS_CDIVERT, s)) return ACTION_ID_CDIVERT;
 	return ACTION_ID_ERR;
 }
 
@@ -738,8 +806,11 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 	if (it5 != it4->second.end()) {
 		param = it5->second;
 		mod_acts = mod_params[param];
-		dbgprintf(1, "Modifying packet!\n");
 		for (unsigned int x = 0; x < mod_acts.size(); x++) {
+			if (mod_acts[x].type != PARAMS_TYPE_LIE) {
+				continue;
+			}
+			dbgprintf(1, "Modifying packet!\n");
 			if (!doModify(pk.ofo, mod_acts[x].field, mod_acts[x].action, mod_acts[x].value)){
 				break;
 			}
@@ -750,8 +821,14 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 	if (it5 != it4->second.end()) {
 		param = it5->second;
 		mod_acts = mod_params[param];
-		dbgprintf(1, "Modifying packet!\n");
 		for (unsigned int x = 0; x < mod_acts.size(); x++) {
+			if (mod_acts[x].type != PARAMS_TYPE_LIE) {
+				continue;
+			}
+			if (!isFieldValue(pk.ofo,mod_acts[x].matchfield, mod_acts[x].matchvalue)) {
+				continue;
+			}
+			dbgprintf(1, "Modifying packet!\n");
 			if (!doModify(pk.ofo, mod_acts[x].field, mod_acts[x].action, mod_acts[x].value)){
 				break;
 			}
@@ -793,6 +870,43 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 					j++;
 				}
 				pthread_mutex_unlock(listeners_mutex);
+			}
+		} else {
+			dbgprintf(0, "Warning: DIVERT requested, but no listeners!\n");
+		}
+	}
+	it5 = it4->second.find(ACTION_ID_CDIVERT);
+	if (it5 != it4->second.end()) {
+		param = it5->second;
+		mod_acts = mod_params[param];
+		if (listeners != NULL && listeners_mutex != NULL) {
+			for (unsigned int x = 0; x < mod_acts.size(); x++) {
+				if (mod_acts[x].type == PARAMS_TYPE_DIVERT) {
+					if (!isFieldValue(pk.ofo,mod_acts[x].matchfield, mod_acts[x].matchvalue)) {
+						continue;
+					}
+					if (rand() % 100 < mod_acts[x].percent) {
+						pthread_mutex_lock(listeners_mutex);
+						for(list<Listener*>::iterator it = listeners->begin(); it != listeners->end(); it++) {
+							if ((*it)->getLport() == mod_acts[x].ctl) {
+								i = (*it)->numConnections();
+								for (j = 0; j < i; j++) {
+									c = (*it)->getConnection(j);
+									if (c && c->getBH()->getDPID() == (unsigned int)mod_acts[x].sw) {
+										dbgprintf(1, "Diverting packet!\n");
+										if (pk.dir == STOC) {
+											pk.snd = c->getTH();
+										} else {
+											pk.snd = c->getBH();
+										}
+										break;
+									}
+								}
+							}
+						}
+						pthread_mutex_unlock(listeners_mutex);
+					}
+				}
 			}
 		} else {
 			dbgprintf(0, "Warning: DIVERT requested, but no listeners!\n");
@@ -853,36 +967,6 @@ void Attacker::print(pkt_info pk)
 	dbgprintf(0,"##################\n");
 	pthread_mutex_unlock(&ofo_print_serialization_mutex);
 }
-
-
-bool Attacker::doConditionalModify(of_object_t* ofo, vector<int> vfield, int action, int val, vector<int> cfield, int cval)
-{
-	int field;
-	vector<int> modfield;
-	unsigned long int vval;
-
-	if (cfield.empty()) {
-		return false;
-	}
-	field = cfield[0];
-
-	if (field >=1 && field <= 4) {
-		/* Global fields */
-		getHEADER(ofo,cfield, 0, &vval);
-		if (vval == (unsigned int)cval) {
-			return doModify(ofo, vfield, action, val);
-		}
-	}
-
-	modfield = vector<int>(cfield);
-	modfield[0] = modfield[0] - 3; //different start location
-	modifier->get_field(ofo, &vval, modfield, 0);
-	if (vval == (unsigned int) cval) {
-		return doModify(ofo, vfield, action, val);
-	}
-	return true;
-}
-
 
 bool Attacker::doModify(of_object_t* ofo, vector<int> vfield, int action, int val)
 {
@@ -1036,3 +1120,27 @@ bool Attacker::getHEADER(of_object_t* ofo, vector<int> vfield, unsigned int leve
 	}
 	return true;
 }
+
+bool Attacker::isFieldValue(of_object_t* ofo, vector<int> cfield, int cval)
+{
+	int field;
+	vector<int> modfield;
+	unsigned long int vval;
+
+	if (cfield.empty()) {
+		return false;
+	}
+	field = cfield[0];
+
+	if (field >=1 && field <= 4) {
+		/* Global fields */
+		getHEADER(ofo,cfield, 0, &vval);
+		return vval == (unsigned int)cval;
+	}
+
+	modfield = vector<int>(cfield);
+	modfield[0] = modfield[0] - 3; //different start location
+	modifier->get_field(ofo, &vval, modfield, 0);
+	return vval == (unsigned int) cval;
+}
+

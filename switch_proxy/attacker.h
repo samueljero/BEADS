@@ -38,6 +38,9 @@
 #define MOD_ADD 2
 #define MOD_SUB 3
 
+#define PARAMS_TYPE_ERR			0
+#define PARAMS_TYPE_LIE			1
+#define PARAMS_TYPE_DIVERT		2
 
 typedef std::map<int, int> amap_t;
 typedef std::map<int, std::map<int, int> > aamap_t;
@@ -49,12 +52,15 @@ class OpenFlow;
 
 class modAttack {
 	public:
+		int type;
 		std::vector<int> field;
 		int action;
 		int value;
 		std::vector<int> matchfield;
 		int matchvalue;
 		int sw;
+		int ctl;
+		int percent;
 };
 
 class Attacker{
@@ -81,10 +87,10 @@ class Attacker{
 		bool clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type);
 		pkt_info applyActions(pkt_info pk, aamap_t::iterator it4);
 		void print(pkt_info pk);
-		bool doConditionalModify(of_object_t* ofo, std::vector<int> vfield, int action, int val, std::vector<int> cfield, int cval);
 		bool doModify(of_object_t* ofo, std::vector<int> vfield, int action, int val);
 		bool ModifyHEADER(of_object_t* ofo, std::vector<int> vfield, int action, int val, unsigned int level);
 		bool getHEADER(of_object_t* ofo, std::vector<int> vfield, unsigned int level, unsigned long int* vval);
+		bool isFieldValue(of_object_t* ofo, std::vector<int> cfield, int cval);
 
 		pthread_rwlock_t lock;
 		// <cid, <dpid, <of_version, <pkt_type, <action, ID> > > >

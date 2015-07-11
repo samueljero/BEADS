@@ -47,7 +47,7 @@ def main(args):
 	#print "Test Result: " + str(res)
 	#print "******"
 	print "Test 2"
-	res = doTest(mininet, controllers, ["{controllers[0]},3,*,of_packet_in,12,LIE,act==&val=2"], 2, lg)
+	res = doTest(mininet, controllers, ["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=1&act==&val=3"], 2, lg)
 	print "Test Result: " + str(res)
 	print "******"
 

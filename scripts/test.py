@@ -88,7 +88,12 @@ def doTest(mininet, controllers, strategy, testnum, log):
 	shell = spur.SshShell(hostname=mv.vm2ip(m), username =test_mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept)
 	log.write("Starting Test: " + test_mininet_cmd.format(controllers=" ".join(proxyaddrs)) + "\n")
 	log.flush()
-	proc = shell.run(["/bin/bash","-i" ,"-c", test_mininet_cmd.format(controllers=" ".join(proxyaddrs))])
+	try:
+		proc = shell.run(["/bin/bash","-i" ,"-c", test_mininet_cmd.format(controllers=" ".join(proxyaddrs))])
+	except Exception as e:
+		print e
+		log.write("Exception: " + str(e) + "\n")
+		log.flush()
 	res = eval(proc.output)
 
 	#Evaluate Results
