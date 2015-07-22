@@ -20,6 +20,7 @@ test_controller_stop_cmd = "stop"
 test_controller_user = "root"
 test_controller_port = 6633
 test_mininet_cmd = "/root/test1.py {controllers}"
+test_mininet_cleanup_cmd = "mn -c"
 test_mininet_user = "root"
 test_proxy_addr = "10.0.0.1"
 test_proxy_base_port = 1025
@@ -27,10 +28,10 @@ test_proxy_com_port = 1100
 test_delay = 30
 
 
-def doTest(mininet, controllers, strategy, testnum, log):
+def doTest(mininet, controllers, test_script, strategy, testnum, log):
 	global test_controller_port, test_proxy_base_port, test_proxy_addr, test_proxy_com_port
-	global test_controller_user, test_controller_start_cmd, test_mininet_user, test_mininet_cmd
-	global proxy_path, test_controller_stop_cmd, ctl_path, test_delay
+	global test_controller_user, test_controller_start_cmd, test_mininet_user
+	global proxy_path, test_controller_stop_cmd, ctl_path, test_delay, test_mininet_cleanup_cmd
 	assert(isinstance(mininet, (list,tuple)) and isinstance(controllers, (list,tuple)) and len(mininet) == 1)
 	result = True
 	log.write("##############################Starting Test " + str(testnum) + "###################################\n")
@@ -84,17 +85,19 @@ def doTest(mininet, controllers, strategy, testnum, log):
 	time.sleep(test_delay)
 
 	#Do Test
+	res = None
+	proc = None
 	m = mininet[0]
 	shell = spur.SshShell(hostname=mv.vm2ip(m), username =test_mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept)
 	log.write("Starting Test: " + test_mininet_cmd.format(controllers=" ".join(proxyaddrs)) + "\n")
 	log.flush()
 	try:
-		proc = shell.run(["/bin/bash","-i" ,"-c", test_mininet_cmd.format(controllers=" ".join(proxyaddrs))])
+		proc = shell.run(["/bin/bash","-i" ,"-c", test_script.format(controllers=" ".join(proxyaddrs))])
+		res = eval(proc.output)
 	except Exception as e:
 		print e
 		log.write("Exception: " + str(e) + "\n")
 		log.flush()
-	res = eval(proc.output)
 
 	#Evaluate Results
 	if  isinstance(res, (list,tuple)):
@@ -111,12 +114,17 @@ def doTest(mininet, controllers, strategy, testnum, log):
 
 	#Stop Proxy
 	proxy.terminate()
+
+	#Cleanup Any Mininet Remnants
+	shell = spur.SshShell(hostname=mv.vm2ip(m), username =test_mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept)
+	res = shell.run(["/bin/bash","-i" ,"-c", test_mininet_cleanup_cmd])
 	
 	#Log
 	log.flush()
 	log.write("*****************\n")
 	log.write("********* Test Script output ********\n")
-	log.write(proc.stderr_output)
+	if proc:
+		log.write(proc.stderr_output)
 	log.write("*****************\n")
 	log.write("Test Result: " + str(result) + "\n")
 	log.write("##############################Ending Test " + str(testnum) + "###################################\n")

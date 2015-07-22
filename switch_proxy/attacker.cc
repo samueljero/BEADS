@@ -272,7 +272,7 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 			}
 			break;
 		case ACTION_ID_CDIVERT:
-			ma.type = PARAMS_TYPE_LIE;
+			ma.type = PARAMS_TYPE_DIVERT;
 			targ = args_find(args, "p");
 			if (targ && targ->type == ARG_VALUE_TYPE_INT) {
 				ma.percent = targ->value.i;

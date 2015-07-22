@@ -30,11 +30,11 @@ def waitListening( client=None, server='127.0.0.1', port=80, timeout=None ):
 		raise Exception('Could not find telnet' )
 	# pylint: disable=maybe-no-member
 	serverIP = server if isinstance( server, basestring ) else server.IP()
-	cmd = ( 'ping -c 1 ' + serverIP)
-	result = runCmd( cmd )
-	if 'ttl' not in result:
-		lg.error( 'Could not connect to %s on port %d\n' % ( server, port ) )
-		return False
+        cmd = ( 'ping -c 1 ' + serverIP)
+        result = runCmd( cmd )
+        if 'ttl' not in result:
+                lg.error( 'Could not connect to %s on port %d\n' % ( server, port ) )
+                return False
 	cmd = ( 'echo A | telnet -e A %s %s' % ( serverIP, port ) )
 	start = time.time()
 	result = runCmd( cmd )
@@ -137,6 +137,11 @@ if __name__ == '__main__':
 			network.addController('c' + str(i+1), controller=RemoteController, ip=ctlip[i], port=ctlport[i])
 		network.start()
 
+		#Setup Evil Node
+		evilh = network.get("h3")
+		evilh.setMAC(network.get("h4").MAC())
+		evilh.setIP(network.get("h4").IP())
+
 		#Wait for topology discovery
 		sleep(10)
 
@@ -144,8 +149,14 @@ if __name__ == '__main__':
 
 		#Test 1 -- ping
 		lg.output("\n\nTest 1 --- Ping\n")
-		res = network.pingAll()
-		if res > 0:
+		found = False
+		for ha in network.hosts:
+			for hb in network.hosts:
+				if ha != hb and ha != evilh and hb != evilh:
+					res = network.ping([ha, hb])
+					if res > 0:
+						found = True
+		if found:
 			results.append(False)
 		else:
 			results.append(True)
@@ -155,7 +166,7 @@ if __name__ == '__main__':
 		found = False
 		for ha in network.hosts:
 			for hb in network.hosts:
-				if ha != hb:
+				if ha != hb and ha != evilh and hb != evilh:
 					try:
 						res = iperf([ha, hb], l4Type = 'TCP', seconds=2)
 						if res[0] == 0 or res[1] == 0:
@@ -174,19 +185,17 @@ if __name__ == '__main__':
 
 		#Test 3 -- www
 		lg.output("\n\nTest 3 --- WWW\n")
-		network.hosts[3].sendCmd("cd /root/web/benign; python -m SimpleHTTPServer 8080")
-		network.hosts[1].sendCmd("cd /root/web/evil; python -m SimpleHTTPServer 8080")
-		network.hosts[2].sendCmd("cd /root/web/evil; python -m SimpleHTTPServer 8080")
+		network.get("h4").sendCmd("cd /root/web/benign; python -m SimpleHTTPServer 8080")
+		evilh.sendCmd("cd /root/web/evil; python -m SimpleHTTPServer 8080")
 		sleep(1)
-		res = network.hosts[0].cmd("curl http://" + network.hosts[3].IP() + ":8080/")
+		res = network.hosts[0].cmd("curl http://" + network.get("h4").IP() + ":8080/")
 		lg.output(res + "\n")
 		if string.find(res, "HTML") > 0 and string.find(res, "Evil") == -1:
 			results.append(True)
 		else:
 			results.append(False)
-		network.hosts[1].sendInt()
-		network.hosts[2].sendInt()
-		network.hosts[3].sendInt()
+		evilh.sendInt()
+		network.get("h4").sendInt()
 
 		print repr(results)
 		lg.output(str(results) + "\n")

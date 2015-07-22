@@ -42,12 +42,20 @@ def main(args):
 
 	#Do Tests
 	print "Starting Tests..."
-	#print "Test 1"
-	#res = doTest(mininet, controllers, ["*,*,*,*,*,CLEAR,*"], 1, lg)
-	#print "Test Result: " + str(res)
-	#print "******"
+	print "Test 1"
+	res = doTest(mininet, controllers, "/root/test2.py {controllers}", ["*,*,*,*,*,CLEAR,*"], 1, lg)
+	print "Test Result: " + str(res)
+	print "******"
 	print "Test 2"
-	res = doTest(mininet, controllers, ["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=1&act==&val=3"], 2, lg)
+	res = doTest(mininet, controllers, "/root/test2.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=2&act==&val=1"], 2, lg)
+	print "Test Result: " + str(res)
+	print "******"
+	print "Test 3"
+	res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"], 3, lg)
+	print "Test Result: " + str(res)
+	print "******"
+	print "Test 4"
+	res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=2&ctl={controllers[0]}","{controllers[0]},2,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=3&ctl={controllers[0]}"], 4, lg)
 	print "Test Result: " + str(res)
 	print "******"
 
