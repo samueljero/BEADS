@@ -4,6 +4,7 @@ import os
 
 #Global
 system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
+logs_loc = system_home + "/logs/inst{instance}.log"
 
 #Proxy Section
 proxy_path = system_home + "/switch_proxy/sw_proxy"
@@ -22,6 +23,7 @@ controller_stop_cmd = "stop"
 controller_user = "root"
 controller_port = 6633
 controller_start_delay = 30
+controllers_per_instance = 1
 
 #VM Section
 vm_path = system_home + "/vms/"

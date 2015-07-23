@@ -1,18 +1,22 @@
 #!/bin/env python
 # Samuel Jero <sjero@purdue.edu>
 # Top-level testing script
-from scripts.test import *
+import os
 import sys
 import time
 from datetime import datetime
 
 system_home = os.path.dirname(os.path.realpath(__file__))
-controllers_per_instance = 1
-logs_loc = system_home + "/logs/inst{instance}.log"
+scripts_path = os.path.abspath(os.path.join(system_home, 'scripts'))
+config_path = os.path.abspath(os.path.join(system_home, 'config'))
+sys.path.insert(1,scripts_path)
+sys.path.insert(0,config_path)
+from scripts.test import *
+import config
+
 
 def main(args):
-	global controllers_per_instance, logs_loc
-	vms_per_instance = controllers_per_instance + 1
+	vms_per_instance = config.controllers_per_instance + 1
 	instance = 0
 
 	#Parse args
@@ -21,7 +25,7 @@ def main(args):
 	print "Running Instance " + str(instance) + "..."
 
 	#Open Log file
-	lg = open(logs_loc.format(instance=instance), "w")
+	lg = open(config.logs_loc.format(instance=instance), "w")
 	lg.write(str(datetime.today()) + "\n")
 	lg.write("Instance: " + str(instance) + "\n")
 
