@@ -8,78 +8,64 @@ import platform
 import subprocess
 import re
 
-
-vm_ram = "2048"
-vm_cores = "2"
-vm_telnet_base = 10100
-vm_vnc_base = 1
-vm_ip_base = "10.0.1.{0}"
-vm_user = "root"
 system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-vm_path = system_home + "/vms/"
-vm_name_bases = ["mininet", "onos", "onos", "onos"]
-master_name = "/ubuntu-1404-master.qcow2"
+config_path = os.path.abspath(os.path.join(system_home, 'config'))
+sys.path.append(config_path)
+import config
+
 
 def startvm(num):
-	global vm_ram,vm_cores,vm_telnet_base,vm_vnc_base, vm_path, vm_name_bases
-	img=vm_path + vm_name_bases[(num-1)%len(vm_name_bases)] + str(num) + ".qcow2"
+	img=config.vm_path + config.vm_name_bases[(num-1)%len(config.vm_name_bases)] + str(num) + ".qcow2"
 	nic1="-net nic,model=virtio,macaddr=00:00:00:01:00:{:02X},vlan=0 -net tap,ifname=tap-h{:d},downscript=no,script=no,vlan=0".format(num,num)
 	nic2="-net user,vlan=1 -net nic,vlan=1"
-	vnc="-vnc :{0}".format(str(vm_vnc_base + num))
-	telnet= vm_telnet_base + num
-	os.system("qemu-system-x86_64 -hda {0} -m {1} -smp {2} -enable-kvm -k \"en-us\" {3} {4} {5} -monitor telnet:127.0.0.1:{6},server,nowait &".format(img,vm_ram,vm_cores,nic1, nic2, vnc,str(telnet)))
+	vnc="-vnc :{0}".format(str(config.vm_vnc_base + num))
+	telnet= config.vm_telnet_base + num
+	os.system("qemu-system-x86_64 -hda {0} -m {1} -smp {2} -enable-kvm -k \"en-us\" {3} {4} {5} -monitor telnet:127.0.0.1:{6},server,nowait &".format(img,config.vm_ram,config.vm_cores,nic1, nic2, vnc,str(telnet)))
 
 def stopvm(num):
-	global vm_ip_base, vm_user
-	os.system("ssh {0}@{1} \"shutdown -h now\" &".format(vm_user, vm_ip_base.format(num)))
+	os.system("ssh {0}@{1} \"shutdown -h now\" &".format(config.vm_user, config.vm_ip_base.format(num)))
 
 def suspendvm(num, namebase):
-	global vm_telnet_base
 	filename = namebase + str(num) + ".sav"
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.connect(("127.0.0.1", vm_telnet_base + num))
+	s.connect(("127.0.0.1", config.vm_telnet_base + num))
 	s.send("migrate \"exec:cat > {0}\"\n".format(filename))
 	while (len(s.recv(1024))>0):
 		pass
 	s.close()
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.connect(("127.0.0.1", vm_telnet_base + num))
+	s.connect(("127.0.0.1", config.vm_telnet_base + num))
 	s.send("q\n")
 	s.close()
 
 def resumevm(num, namebase):
-	global vm_ram,vm_cores,vm_telnet_base,vm_vnc_base, vm_ip_base, vm_path, vm_name_bases
-	img = vm_path + vm_name_bases[(num-1)%len(vm_name_bases)] + str(num) + ".qcow2"
+	img = config.vm_path + config.vm_name_bases[(num-1)%len(config.vm_name_bases)] + str(num) + ".qcow2"
 	filename = namebase + str(num) + ".sav"
 	nic1="-net nic,model=virtio,macaddr=00:00:00:01:00:{:02X},vlan=0 -net tap,ifname=tap-h{:d},downscript=no,script=no,vlan=0".format(num,num)
 	nic2="-net user,vlan=1 -net nic,vlan=1"
-	vnc="-vnc {0}".format(str(vm_vnc_base + num))
-	telnet= vm_telnet_base + num
-	os.system("qemu-system-x86_64 -hda {0} -m {1} -smp {2} -enable-kvm -k \"en-us\" {3} {4} {5} -monitor telnet:127.0.0.1:{6},server,nowait -daemonize -incoming \"exec:cat {7}\"".format(img,vm_ram,vm_cores,nic1, nic2, vnc,str(telnet),filename))
-	if Ping(vm_ip_base.format(num), 4) == False:
+	vnc="-vnc {0}".format(str(config.vm_vnc_base + num))
+	telnet= config.vm_telnet_base + num
+	os.system("qemu-system-x86_64 -hda {0} -m {1} -smp {2} -enable-kvm -k \"en-us\" {3} {4} {5} -monitor telnet:127.0.0.1:{6},server,nowait -daemonize -incoming \"exec:cat {7}\"".format(img,config.vm_ram,config.vm_cores,nic1, nic2, vnc,str(telnet),filename))
+	if Ping(config.vm_ip_base.format(num), 4) == False:
 		print "Warning: VM {0} is not up!".format(str(num))
 
 def clonevm(num, master):
-	global vm_path, vm_name_bases
-	img=vm_path + vm_name_bases[(num-1)%len(vm_name_bases)] + str(num) + ".qcow2"
+	img=config.vm_path + config.vm_name_bases[(num-1)%len(config.vm_name_bases)] + str(num) + ".qcow2"
 	os.system("qemu-img create -b {0}  -F qcow2 -f qcow2 {1}".format(master, img))
 
 def killvm(num):
-	global vm_telnet_base
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.connect(("127.0.0.1", vm_telnet_base + num))
+	s.connect(("127.0.0.1", config.vm_telnet_base + num))
 	s.send("q\n")
 	s.close()
 
 def vm2ip(num):
-	global vm_ip_base
-	return vm_ip_base.format(str(num))
+	return config.vm_ip_base.format(str(num))
 
 def initvm(num):
-	global vm_ip_base, vm_user
-	os.system("cat ~/.ssh/id_rsa.pub | ssh {0}@{1} \"cat >> ~/.ssh/authorized_keys\"".format(vm_user, vm_ip_base.format(num)))
-	os.system("scp -o StrictHostKeyChecking=no CustomizeVM.pl {0}@{1}:/usr/local/bin/CustomizeVM.pl".format(vm_user, vm_ip_base.format(num)))
-	os.system("ssh {0}@{1} \"/usr/local/bin/CustomizeVM.pl\"".format(vm_user, vm_ip_base.format(num),))
+	os.system("cat ~/.ssh/id_rsa.pub | ssh {0}@{1} \"cat >> ~/.ssh/authorized_keys\"".format(config.vm_user, config.vm_ip_base.format(num)))
+	os.system("scp -o StrictHostKeyChecking=no CustomizeVM.pl {0}@{1}:/usr/local/bin/CustomizeVM.pl".format(config.vm_user, config.vm_ip_base.format(num)))
+	os.system("ssh {0}@{1} \"/usr/local/bin/CustomizeVM.pl\"".format(config.vm_user, config.vm_ip_base.format(num)))
 
 def Ping(hostname,timeout):
 	if platform.system() == "Windows":
