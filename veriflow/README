@@ -1,0 +1,90 @@
+# This file is protected by the VeriFlow Research License Agreement
+# available at http://www.cs.illinois.edu/~khurshi1/projects/veriflow/veriflow-research-license-agreement.txt.
+# A copy of this agreement is also included in this package.
+#
+# Copyright (c) 2012-2013 by
+# The Board of Trustees of the University of Illinois.
+# All rights reserved.
+
+VeriFlow - Real-Time Network Property Verifier
+----------------------------------------------
+
+This file contains information to compile, install and run the VeriFlow software.
+Please note that this is an early evaluation version of VeriFlow. Therefore, there
+can be bugs, and the user interface is not fully developed. This code has been tested
+with Mininet and NOX version 0.9.1~full~beta. If you have any question, or face any
+problem, then please contact us at khurshi1@illinois.edu.
+
+System requirements
+-------------------
+
+VeriFlow can be compiled and run on any Linux distribution supporting C++, pthreads
+and the make utility. The current code should compile without any error or warning
+on 64-bit Linux systems.
+
+Steps to use VeriFLow
+---------------------
+
+The following steps need to be followed to setup VeriFlow and test its functionality.
+
+1. Compile VeriFlow.
+2. Run VeriFlow in test mode.
+3. Run VeriFlow in proxy mode.
+
+The following paragraphs describe these steps in detail.
+
+1. Compile VeriFlow
+-------------------
+
+The VeriFlow directory contains the VeriFlow source code files. Use the following 
+commands to compile the code.
+
+- cd VeriFlow
+- make clean all
+
+It will produce the binary executable file VeriFlow.
+
+2. Run VeriFlow in test mode
+----------------------------
+
+Executing the VeriFlow binary without any command line argument runs it in test mode.
+In this mode, VeriFlow executes the Test::testVerification() function present in Test.cpp.
+Please go through this function to get a quick overview of how VeriFlow operates. This
+function creates a small topology by specifying a set of rules, and then checks the
+addition of a new rule. In this example, the egress gateway for a particular packet
+header signature is denoted by a rule where the next hop points to the same location.
+Use the following commands to run VeriFlow in test mode.
+
+- cd VeriFlow
+- ./VeriFlow
+
+3. Run VeriFlow in proxy mode
+-----------------------------
+
+In this mode, VeriFlow will act as a proxy between an OpenFlow controller and the network.
+It will intercept the rules that are sent by the controller, and check for loops and black holes.
+We need to supply a set of command line arguments to VeriFlow to run it in proxy mode.
+The command is shown below. You may need to update the PATH environment variable to include 
+the VeriFlow build directory.
+
+- VeriFlow <veriflow_port> <controller_address> <controller_port> <topology_file>
+
+Here,
+veriflow_port - is the port where VeriFlow listens for connections from network devices.
+controller_address - is the address of the machine where the controller is running.
+controller_port - is the port where the controller is listening for incoming connections.
+topology_file - is a text file containing the topology of the network.
+
+An example topology file named demo-topology-10-node.txt has been included in the package.
+A python version of this topology file (demo-topology-10-node.py) is also provided that 
+can be used to set up a Mininet network.
+
+The following commands can be used to test VeriFlow with NOX and Mininet.
+
+nox_core -i ptcp:5555 switch
+VeriFlow 6633 127.0.0.1 5555 demo-topology-10-node.txt
+sudo mn --custom demo-topology-10-node.py --topo customtopo --mac --switch ovsk --controller remote --ip 127.0.0.1 --port 6633
+
+Please check the VeriFlow project webpage at 
+http://www.cs.illinois.edu/~khurshi1/projects/veriflow/ for latest news and updates.
+
