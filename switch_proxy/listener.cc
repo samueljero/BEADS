@@ -88,9 +88,7 @@ void Listener::run(){
 		}
 		if (!conn->start()) {
 			dbgprintf(0, "Error starting connection!\n");
-			conn->stop();
-			delete conn;
-			continue;
+			//conn->stop();
 		}
 
 		cleanupConnections();

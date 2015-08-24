@@ -28,7 +28,7 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 		controlleraddrs.append(mv.vm2ip(c) + ":" + str(config.controller_port))
 		proxyaddrs.append(config.proxy_addr + ":" + str(config.proxy_base_port + c))
 		proxyports.append(str(config.proxy_base_port + c))
-	
+
 	#Start Proxy
 	cmd = config.proxy_path + " -p " + str(config.proxy_com_port + mininet[0])
 	for c in range(0,len(controlleraddrs)):
@@ -44,6 +44,26 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 		log.flush()
 		return False
 	time.sleep(1)
+
+	#Veriflow
+	veriflow = None
+	if config.veriflow_enabled:
+		assert(len(controllers)==1)
+		vf_port = config.veriflow_base_port + controllers[0]
+		topo_file = config.veriflow_topo_path + os.path.splitext(os.path.basename(test_script.format(controllers="").strip()))[0] + ".vft"
+		cmd = config.veriflow_path + " " + str(vf_port) + " 127.0.0.1  " + proxyports[0] + " " + topo_file
+		log.write("Veriflow CMD: " + cmd + "\n")
+		log.flush()
+		proxyaddrs = list()
+		proxyaddrs.append(config.proxy_addr + ":" + str(vf_port))
+		try:
+			veriflow = subprocess.Popen(cmd, shell = True, stdout = log, stderr = subprocess.STDOUT)
+		except Exception as e:
+			print e
+			log.write("Exception: " + str(e) + "\n")
+			log.flush()
+			return False
+		time.sleep(1)
 
 	#Send Proxy Strategy
 	for l in strategy:
@@ -98,6 +118,10 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 
 	#Stop Proxy
 	proxy.terminate()
+
+	#Stop Veriflow
+	if config.veriflow_enabled:
+		veriflow.terminate()
 
 	#Cleanup Any Mininet Remnants
 	shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept)

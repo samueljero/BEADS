@@ -25,6 +25,12 @@ controller_port = 6633
 controller_start_delay = 30
 controllers_per_instance = 1
 
+#VeriFlow Section
+veriflow_enabled = True
+veriflow_path = system_home + "/veriflow/VeriFlow/VeriFlow"
+veriflow_topo_path = system_home + "/mininet_scripts/"
+veriflow_base_port = 2048
+
 #VM Section
 vm_path = system_home + "/vms/"
 master_name = "/ubuntu-1404-master.qcow2"
