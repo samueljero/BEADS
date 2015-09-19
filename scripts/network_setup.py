@@ -31,6 +31,7 @@ def do_network(cmd, start, end):
 			os.system("sudo tunctl -d tap-h{0}".format(str(i)))
 		os.system("sudo ifconfig brhost down")
 		os.system("sudo brctl delbr brhost")
+		os.system("rm /tmp/ip-mac")
 	else:
 		return False
 	return True
