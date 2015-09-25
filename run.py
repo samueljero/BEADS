@@ -49,22 +49,22 @@ def main(args):
 	res = doTest(mininet, controllers, "/root/test2.py {controllers}", ["*,*,*,*,*,CLEAR,*"], 1, lg)
 	print "Test Result: " + str(res)
 	print "******"
-	#print "Test 2   " + str(datetime.today())
-	#res = doTest(mininet, controllers, "/root/test2.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=2&act==&val=1"], 2, lg)
-	#print "Test Result: " + str(res)
-	#print "******"
-	#print "Test 3   " + str(datetime.today())
-	#res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"], 3, lg)
-	#print "Test Result: " + str(res)
-	#print "******"
-	#print "Test 4   " + str(datetime.today())
-	#res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=2&ctl={controllers[0]}","{controllers[0]},2,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=3&ctl={controllers[0]}"], 4, lg)
-	#print "Test Result: " + str(res)
-	#print "******"
-	#print "Test 5   " + str(datetime.today())
-	#res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_out,7.1.1,CDIVERT,mfield=7.1.1&mval=2&p=100&sw=1&ctl={controllers[0]}"], 5, lg)
-	#print "Test Result: " + str(res)
-	#print "******"
+	print "Test 2   " + str(datetime.today())
+	res = doTest(mininet, controllers, "/root/test2.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=2&act==&val=1"], 2, lg)
+	print "Test Result: " + str(res)
+	print "******"
+	print "Test 3   " + str(datetime.today())
+	res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"], 3, lg)
+	print "Test Result: " + str(res)
+	print "******"
+	print "Test 4   " + str(datetime.today())
+	res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=2&ctl={controllers[0]}","{controllers[0]},2,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=3&ctl={controllers[0]}"], 4, lg)
+	print "Test Result: " + str(res)
+	print "******"
+	print "Test 5   " + str(datetime.today())
+	res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_out,7.1.1,CDIVERT,mfield=7.1.1&mval=2&p=100&sw=1&ctl={controllers[0]}"], 5, lg)
+	print "Test Result: " + str(res)
+	print "******"
 
 	#Stop VMs
 	print "Stopping VMs..."

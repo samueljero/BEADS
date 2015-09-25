@@ -21,37 +21,6 @@ import sys
 import re
 import time
 
-def waitListening( client=None, server='127.0.0.1', port=80, timeout=None ):
-	"""Wait until server is listening on port.
-	returns True if server is listening"""
-	runCmd = ( client.cmd if client else
-	       partial( quietRun, shell=True ) )
-	if not runCmd( 'which telnet' ):
-		raise Exception('Could not find telnet' )
-	# pylint: disable=maybe-no-member
-	serverIP = server if isinstance( server, basestring ) else server.IP()
-	cmd = ( 'ping -c 1 ' + serverIP)
-	result = runCmd( cmd )
-	if 'ttl' not in result:
-		lg.error( 'Could not connect to %s on port %d\n' % ( server, port ) )
-		return False
-	cmd = ( 'echo A | telnet -e A %s %s' % ( serverIP, port ) )
-	start = time.time()
-	result = runCmd( cmd )
-	while 'Connected' not in result:
-		if 'No route' in result:
-			rtable = runCmd( 'route' )
-			lg.error( 'no route to %s:\n%s' % ( server, rtable ) )
-			return False
-		if timeout and time.time() >= start + timeout:
-			lg.error( 'could not connect to %s on port %d\n' % ( server, port ) )
-			return False
-		lg.debug( 'waiting for', server, 'to listen on port', port, '\n' )
-		lg.info( '.' )
-		time.sleep(0.5)
-		result = runCmd( cmd )
-	return True
-
 def _parseIperf( iperfOutput ):
 	"""Parse iperf output and return bandwidth.
 	   iperfOutput: string
@@ -63,10 +32,10 @@ def _parseIperf( iperfOutput ):
 	else:
 	    # was: raise Exception(...)
 	    lg.error( 'could not parse iperf output: ' + iperfOutput )
-	    return ''
+	    return 0
 
 def iperf(hosts=None, l4Type='TCP', udpBw='10M', fmt=None,
-       seconds=5, port=5001, timeout=2):
+       seconds=5, port=5001, timeout=1):
 	"""Run iperf between two hosts.
 	   hosts: list of hosts; if None, uses first and last hosts
 	   l4Type: string, one of [ TCP, UDP ]
@@ -93,15 +62,18 @@ def iperf(hosts=None, l4Type='TCP', udpBw='10M', fmt=None,
 	if fmt:
 	    iperfArgs += '-f %s ' % fmt
 	server.sendCmd( iperfArgs + '-s' )
-	if l4Type == 'TCP':
-	    if not waitListening( client, server.IP(), port, timeout ):
-		raise Exception( 'Could not connect to iperf on port %d'
-				 % port )
-	cliout = client.cmd( iperfArgs + '-t %d -c ' % seconds +
+	time.sleep(0.1)
+	client.sendCmd( iperfArgs + '-t %d -c ' % seconds +
 			     server.IP() + ' ' + bwArgs )
-	lg.debug( 'Client output: %s\n' % cliout )
+	time.sleep(seconds + timeout)
+	client.sendInt()
 	server.sendInt()
+	#time.sleep(0.1)
+	#server.sendInt()
 	servout = server.waitOutput()
+	os.system("killall -9 iperf")
+	cliout = client.waitOutput()
+	lg.debug( 'Client output: %s\n' % cliout )
 	lg.debug( 'Server output: %s\n' % servout )
 	result = [ _parseIperf( servout ), _parseIperf( cliout ) ]
 	if l4Type == 'UDP':
@@ -144,7 +116,7 @@ if __name__ == '__main__':
 
 		#Test 1 -- ping
 		lg.output("\n\nTest 1 --- Ping\n")
-		res = network.pingAll()
+		res = network.pingAll(timeout=3)
 		if res > 0:
 			results.append(False)
 		else:
@@ -178,7 +150,7 @@ if __name__ == '__main__':
 		network.hosts[1].sendCmd("cd /root/web/evil; python -m SimpleHTTPServer 8080")
 		network.hosts[2].sendCmd("cd /root/web/evil; python -m SimpleHTTPServer 8080")
 		sleep(1)
-		res = network.hosts[0].cmd("curl http://" + network.hosts[3].IP() + ":8080/")
+		res = network.hosts[0].cmd("curl --connect-timeout 5 http://" + network.hosts[3].IP() + ":8080/")
 		lg.output(res + "\n")
 		if string.find(res, "HTML") > 0 and string.find(res, "Evil") == -1:
 			results.append(True)
