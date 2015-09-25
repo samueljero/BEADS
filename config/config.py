@@ -16,13 +16,13 @@ proxy_com_port = 1100
 #Mininet Section
 mininet_user = "root"
 mininet_cleanup_cmd = "mn -c"
+mininet_replace_scripts = True
 
 #Controller Section
 controller_start_cmd = "start"
 controller_stop_cmd = "stop"
 controller_user = "root"
 controller_port = 6633
-controller_start_delay = 30
 controllers_per_instance = 1
 
 #VeriFlow Section
