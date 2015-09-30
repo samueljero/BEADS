@@ -123,7 +123,7 @@ void OpenFlow::do_of_match_fields_set(of_match_fields_t *m, unsigned long int va
 			m->arp_op = val;
 			break;
     	case 23: //uint32_t             arp_spa
-			m->arp_tpa = val;
+			m->arp_spa = val;
 			break;
     	case 24: //uint32_t             arp_tpa
 			m->arp_tpa = val;

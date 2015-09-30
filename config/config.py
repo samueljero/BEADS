@@ -6,6 +6,9 @@ import os
 system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 logs_loc = system_home + "/logs/inst{instance}.log"
 
+#Coordinator Section
+coordinator_port = 3333
+
 #Proxy Section
 proxy_path = system_home + "/switch_proxy/sw_proxy"
 ctl_path = system_home + "/switch_proxy/sndcmd"
