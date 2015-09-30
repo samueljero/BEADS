@@ -133,7 +133,7 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 
 	#Stop Veriflow
 	if config.veriflow_enabled:
-		veriflow.terminate()
+		veriflow.send_signal(2)
 
 	#Cleanup Any Mininet Remnants
 	shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept)

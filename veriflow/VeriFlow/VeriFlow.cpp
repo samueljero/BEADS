@@ -331,7 +331,7 @@ void signalHandler(int sig)
 	close(tcpServerSocket);
 
 	pthread_mutex_lock(&veriflowMutex);
-	veriflow.print(logFile);
+	//veriflow.print(logFile);
 	fclose(logFile);
 	pthread_mutex_unlock(&veriflowMutex);
 
