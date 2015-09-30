@@ -1020,6 +1020,10 @@ ForwardingGraph* Trie::getForwardingGraph(FieldIndex currentFieldIndex, const ve
 						{
 							link.isGateway = true;
 						}
+						if(rule.location.compare(rule.nextHop) == 0)
+						{
+							link.isGateway = true;
+						}
 					}
 
 					// fprintf(stdout, "[Trie::getForwardingGraph] %s\n", link.toString().c_str());

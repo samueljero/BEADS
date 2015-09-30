@@ -58,6 +58,8 @@ static VeriFlow veriflow;
 
 int mode = TEST_MODE;
 
+vector<string> endhosts;
+
 int main(int argc, char** argv)
 {
 	if(argc == 1)
@@ -105,6 +107,23 @@ int main(int argc, char** argv)
 	createMutex(&veriflowMutex);
 
 	unsigned int i = 0;
+
+	for(int i=0; i < (int)endhosts.size();i++){
+		Rule r;
+		r.fieldValue[DL_SRC] = "0:0:0:0:0:0";
+		r.fieldMask[DL_SRC] = "0:0:0:0:0:0";
+		r.fieldValue[DL_DST] = "0:0:0:0:0:0";
+		r.fieldMask[DL_DST] = "0:0:0:0:0:0";
+		r.fieldValue[NW_SRC] = "0.0.0.0";
+		r.fieldMask[NW_SRC] = "0.0.0.0";
+		r.fieldValue[NW_DST] = "0.0.0.0";
+		r.fieldMask[NW_DST] = "0.0.0.0";
+		r.wildcards = OFPFW_ALL; // OFPFW_TP_SRC;
+		r.location = endhosts[i];
+		r.nextHop = endhosts[i];
+		r.type = FORWARDING;
+		veriflow.addRule(r);
+	}
 
 	while(1)
 	{
@@ -161,6 +180,10 @@ void parseTopologyFile(const string& fileName, Network& network)
 		unsigned int id = atoi(st.nextToken().c_str());
 		string ipAddress = st.nextToken();
 		bool endDevice = atoi(st.nextToken().c_str());
+
+		if (endDevice){
+				endhosts.push_back(ipAddress);
+		}
 
 		network.addDevice(id, ipAddress, endDevice);
 
