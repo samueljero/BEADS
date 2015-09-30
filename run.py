@@ -42,7 +42,6 @@ def main(args):
 	#Start VMs
 	print "Starting VMs..."
 	startVms(mininet, controllers)
-	time.sleep(30)
 
 	#Do Tests
 	print "Starting Tests..."
@@ -70,7 +69,6 @@ def main(args):
 	#Stop VMs
 	print "Stopping VMs..."
 	stopVms(mininet, controllers)
-	time.sleep(30)
 
 	#Close log
 	lg.write(str(datetime.today()) + "\n")

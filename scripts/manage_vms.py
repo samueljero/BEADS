@@ -23,7 +23,7 @@ def startvm(num):
 	os.system("qemu-system-x86_64 -hda {0} -m {1} -smp {2} -enable-kvm -k \"en-us\" {3} {4} {5} -monitor telnet:127.0.0.1:{6},server,nowait &".format(img,config.vm_ram,config.vm_cores,nic1, nic2, vnc,str(telnet)))
 
 def stopvm(num):
-	os.system("ssh {0}@{1} \"shutdown -h now\" &".format(config.vm_user, config.vm_ip_base.format(num)))
+	os.system("ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {0}@{1} \"shutdown -h now\" &".format(config.vm_user, config.vm_ip_base.format(num)))
 
 def suspendvm(num, namebase):
 	filename = namebase + str(num) + ".sav"
@@ -63,9 +63,9 @@ def vm2ip(num):
 	return config.vm_ip_base.format(str(num))
 
 def initvm(num):
-	os.system("cat ~/.ssh/id_rsa.pub | ssh {0}@{1} \"cat >> ~/.ssh/authorized_keys\"".format(config.vm_user, config.vm_ip_base.format(num)))
-	os.system("scp -o StrictHostKeyChecking=no CustomizeVM.pl {0}@{1}:/usr/local/bin/CustomizeVM.pl".format(config.vm_user, config.vm_ip_base.format(num)))
-	os.system("ssh {0}@{1} \"/usr/local/bin/CustomizeVM.pl\"".format(config.vm_user, config.vm_ip_base.format(num)))
+	os.system("cat ~/.ssh/id_rsa.pub | ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {0}@{1} \"cat >> ~/.ssh/authorized_keys\"".format(config.vm_user, config.vm_ip_base.format(num)))
+	os.system("scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no CustomizeVM.pl {0}@{1}:/usr/local/bin/CustomizeVM.pl".format(config.vm_user, config.vm_ip_base.format(num)))
+	os.system("ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {0}@{1} \"/usr/local/bin/CustomizeVM.pl\"".format(config.vm_user, config.vm_ip_base.format(num)))
 
 def Ping(hostname,timeout):
 	if platform.system() == "Windows":

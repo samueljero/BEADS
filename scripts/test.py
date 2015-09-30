@@ -6,10 +6,12 @@ import os
 import sys
 import subprocess
 import time
+from datetime import datetime
 
 system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 lib_path = os.path.abspath(os.path.join(system_home, 'scripts','libs'))
 config_path = os.path.abspath(os.path.join(system_home, 'config'))
+mininet_config_path = os.path.abspath(os.path.join(system_home, 'mininet_scripts'))
 sys.path.insert(1,lib_path)
 sys.path.insert(0,config_path)
 import spur
@@ -19,7 +21,7 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 	assert(isinstance(mininet, (list,tuple)) and isinstance(controllers, (list,tuple)) and len(mininet) == 1)
 	result = True
 	log.write("##############################Starting Test " + str(testnum) + "###################################\n")
-	
+	log.write(str(datetime.today()) + "\n")
 	#Create Address/Port strings
 	controlleraddrs = list()
 	proxyaddrs = list()
@@ -43,7 +45,10 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 		log.write("Exception: " + str(e) + "\n")
 		log.flush()
 		return False
-	time.sleep(1)
+	if(waitListening("localhost",config.proxy_com_port + mininet[0],60)==False):
+		log.write("Proxy failed to start after 60 seconds\n")
+		log.flush()
+		return False
 
 	#Veriflow
 	veriflow = None
@@ -63,7 +68,10 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 			log.write("Exception: " + str(e) + "\n")
 			log.flush()
 			return False
-		time.sleep(1)
+		if(waitListening("localhost",config.veriflow_base_port + controllers[0],60)==False):
+			log.write("Veriflow failed to start after 60 seconds\n")
+			log.flush()
+			return False
 
 	#Send Proxy Strategy
 	for l in strategy:
@@ -86,7 +94,11 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 		res = shell.run(["/bin/bash","-i" ,"-c", config.controller_start_cmd])
 		log.write("Starting Controller (" + mv.vm2ip(c) + ")... " + res.output + "\n")
 		log.flush()
-	time.sleep(config.controller_start_delay)
+	for c in controllers:
+		if(waitListening(mv.vm2ip(c),config.controller_port,60)==False):
+			log.write("Controller %s failed to start after %d seconds" % (mv.vm2ip(c),60))
+			log.flush()
+			result = False
 
 	#Do Test
 	res = None
@@ -135,6 +147,7 @@ def doTest(mininet, controllers, test_script, strategy, testnum, log):
 		log.write(proc.stderr_output)
 	log.write("*****************\n")
 	log.write("Test Result: " + str(result) + "\n")
+	log.write(str(datetime.today()) + "\n")
 	log.write("##############################Ending Test " + str(testnum) + "###################################\n")
 	log.flush()
 	return result
@@ -146,6 +159,15 @@ def startVms(mininet, controllers):
 		mv.startvm(c)
 	for m in mininet:
 		mv.startvm(m)
+	for c in controllers:
+		if(waitListening(mv.vm2ip(c),22,60,True)==False):
+			print "Error: Controller %d not started!" % (c)
+	for m in mininet:
+		if(waitListening(mv.vm2ip(m),22,60,True)==False):
+			print "Error: Mininet %d not started!" % (c)
+		else:
+			if config.mininet_replace_scripts:
+				os.system("scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s/* %s@%s:~\n" % (mininet_config_path, config.mininet_user, mv.vm2ip(m)))
 
 def stopVms(mininet, controllers):
 	assert(isinstance(mininet, (list,tuple)) and isinstance(controllers, (list,tuple)) and len(mininet) == 1)
@@ -153,6 +175,33 @@ def stopVms(mininet, controllers):
 		mv.stopvm(c)
 	for m in mininet:
 		mv.stopvm(m)
+
+def waitListening(host='127.0.0.1', port=80, timeout=None, output=False):
+        """Wait until server is listening on port.
+        returns True if server is listening"""
+        cmd = ('echo A | telnet -e A %s %s' % ( host, port ))
+        start = time.time()
+	result = ""
+	try:
+		result = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+	except subprocess.CalledProcessError as e:
+		pass
+        while 'Connected' not in result:
+                if 'No route' in result:
+                        return False
+                if timeout and time.time() >= start + timeout:
+			print 'could not connect to %s on port %d' % (host, port )
+                        return False
+                if output:
+			print 'waiting for ' + host + ' to listen on port ' + str(port)
+                time.sleep(0.5)
+		try:
+			result = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+		except subprocess.CalledProcessError as e:
+			pass
+	if output:
+		print host + " is listening on " + str(port)
+        return True
 
 if __name__ == "__main__":
 	print "Running demo..."
