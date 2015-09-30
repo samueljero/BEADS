@@ -108,23 +108,6 @@ int main(int argc, char** argv)
 
 	unsigned int i = 0;
 
-	for(int i=0; i < (int)endhosts.size();i++){
-		Rule r;
-		r.fieldValue[DL_SRC] = "0:0:0:0:0:0";
-		r.fieldMask[DL_SRC] = "0:0:0:0:0:0";
-		r.fieldValue[DL_DST] = "0:0:0:0:0:0";
-		r.fieldMask[DL_DST] = "0:0:0:0:0:0";
-		r.fieldValue[NW_SRC] = "0.0.0.0";
-		r.fieldMask[NW_SRC] = "0.0.0.0";
-		r.fieldValue[NW_DST] = "0.0.0.0";
-		r.fieldMask[NW_DST] = "0.0.0.0";
-		r.wildcards = OFPFW_ALL; // OFPFW_TP_SRC;
-		r.location = endhosts[i];
-		r.nextHop = endhosts[i];
-		r.type = FORWARDING;
-		veriflow.addRule(r);
-	}
-
 	while(1)
 	{
 		struct sockaddr_in clientAddress;

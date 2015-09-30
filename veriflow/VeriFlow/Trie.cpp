@@ -26,6 +26,7 @@
 using namespace std;
 
 extern int mode;
+extern vector<string> endhosts;
 
 Trie::Trie(FieldIndex fi)
 {
@@ -1020,9 +1021,11 @@ ForwardingGraph* Trie::getForwardingGraph(FieldIndex currentFieldIndex, const ve
 						{
 							link.isGateway = true;
 						}
-						if(rule.location.compare(rule.nextHop) == 0)
-						{
-							link.isGateway = true;
+						for(unsigned int i=0; i < endhosts.size(); i++){
+							if (rule.nextHop.compare(endhosts[i])==0){
+								link.isGateway = true;
+								break;
+							}
 						}
 					}
 
