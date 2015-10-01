@@ -1610,6 +1610,827 @@ fields_of_group_stats_request = [
 	{'name':'group_id', 'type':'uint32'},
 ]
 
+fields_of_hello = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'elements', 'fields':[
+		{'name':'list','fields':[
+			{'name':'element', 'max':1, 'fields':[
+				{'name':'version_bitmap', 'fields':[
+					{'name':'list', 'fields':[
+						{'name':'element', 'max':1, 'fields':[
+							{'name':'uint32', 'type':'uint32'},
+						]},
+					]},
+				]},
+			]},
+		]},
+	]},
+]
+
+fields_of_hello_failed_error_msg = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'code', 'type':'uint16'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_meter_config_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields':[
+			{'name':'element','fields':[
+				{'name':'flags', 'type':'uint16'},
+				{'name':'meter_id', 'type':'uint32'},
+				{'name':'entries', 'fields':[
+					##TODO: This Handling is bad
+					{'name':'list', 'fields':[
+						{'name':'element','type':'TLV','fields':[
+							{'name':'rate', 'type':'uint32'},
+							{'name':'burst_size', 'type':'uint32'},
+							{'name':'prec_level', 'type':'uint8'},
+						]},
+					]},
+				]},
+			]},
+		]},
+	]},
+]
+
+fields_of_meter_config_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'meter_id', 'type':'uint32'},
+]
+
+fields_of_meter_features_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'features', 'fields':[
+		{'name':'max_meter', 'type':'uint32'},
+		{'name':'band_types', 'type':'uint32'},
+		{'name':'capabilities', 'type':'uint32'},
+		{'name':'max_bands', 'type':'uint8'},
+		{'name':'max_color', 'type':'uint8'},
+	]},
+]
+
+fields_of_meter_features_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+]
+
+fields_of_meter_mod = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'meter_id', 'type':'uint32'},
+	{'name':'bands', 'fields':[
+		##TODO: This Handling is bad
+		{'name':'list', 'fields':[
+			{'name':'element','type':'TLV','fields':[
+				{'name':'rate', 'type':'uint32'},
+				{'name':'burst_size', 'type':'uint32'},
+				{'name':'prec_level', 'type':'uint8'},
+			]},
+		]},
+	]},
+	{'name':'meters', 'fields':[
+		##TODO: This Handling is bad
+		{'name':'list', 'fields':[
+			{'name':'element','type':'TLV','fields':[
+				{'name':'rate', 'type':'uint32'},
+				{'name':'burst_size', 'type':'uint32'},
+				{'name':'prec_level', 'type':'uint8'},
+			]},
+		]},
+	]},
+]
+
+fields_of_meter_mod_failed_error_msg = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'code', 'type':'uint16'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_meter_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields':[
+			{'name':'element','fields':[
+				{'name':'meter_id', 'type':'uint32'},
+				{'name':'flow_count', 'type':'uint32'},
+				{'name':'packet_in_count', 'type':'uint64'},
+				{'name':'byte_in_count', 'type':'uint64'},
+				{'name':'duration_sec', 'type':'uint32'},
+				{'name':'duration_nsec', 'type':'uint32'},
+				{'name':'band_stats', 'fields':[
+					{'name':'list', 'fields':[
+						{'name':'element','fields':[
+							{'name':'packet_count', 'type':'uint64'},
+							{'name':'byte_count', 'type':'uint64'},
+						]},
+					]},
+				]},
+			]},
+		]},
+	]},
+]
+
+fields_of_meter_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'meter_id', 'type':'uint32'},
+]
+
+fields_of_packet_in = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'buffer_id', 'type':'uint32'},
+	{'name':'total_len', 'type':'uint16'},
+	{'name':'reason', 'type':'uint8'},
+	{'name':'table_id', 'type':'uint8'},
+	{'name':'cookie', 'type':'uint64'},
+	{'name':'match', 'fields': [
+		{'name':'version', 'type':'uint8'},
+		{'name':'fields', 'fields':[
+			{'name':'in_port', 'type':'uint32'},
+			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'metadata', 'type':'uint64'},
+			{'name':'eth_dst', 'type':'uint48'},
+			{'name':'eth_src', 'type':'uint48'},
+			{'name':'eth_type', 'type':'uint16'},
+			{'name':'vlan_vid', 'type':'uint16'},
+			{'name':'vlan_pcp', 'type':'uint8'},
+			{'name':'ip_dscp', 'type':'uint8'},
+			{'name':'ip_ecn', 'type':'uint8'},
+			{'name':'ip_proto', 'type':'uint8'},
+			{'name':'ipv4_src', 'type':'uint32'},
+			{'name':'ipv4_dst', 'type':'uint32'},
+			{'name':'tcp_src', 'type':'uint16'},
+			{'name':'tcp_dst', 'type':'uint16'},
+			{'name':'udp_src', 'type':'uint16'},
+			{'name':'udp_dst', 'type':'uint16'},
+			{'name':'sctp_src', 'type':'uint16'},
+			{'name':'sctp_dst', 'type':'uint16'},
+			{'name':'icmpv4_type', 'type':'uint8'},
+			{'name':'icmpv4_code', 'type':'uint8'},
+			{'name':'arp_op', 'type':'uint16'},
+			{'name':'arp_spa', 'type':'uint32'},
+			{'name':'arp_tpa', 'type':'uint32'},
+			{'name':'arp_sha', 'type':'uint48'},
+			{'name':'arp_tha', 'type':'uint48'},
+			{'name':'ipv6_src', 'impl':False, 'type':'uint128'},
+			{'name':'ipv6_dst', 'impl':False, 'type':'uint128'},
+			{'name':'ipv6_flabel', 'type':'uint32'},
+			{'name':'icmpv6_type', 'type':'uint8'},
+			{'name':'icmpv6_code', 'type':'uint8'},
+			{'name':'ipv6_nd_target', 'impl':False, 'type':'uint128'},
+			{'name':'ipv6_nd_sll', 'type':'uint48'},
+			{'name':'ipv6_nd_tll', 'type':'uint48'},
+			{'name':'mpls_label', 'type':'uint32'},
+			{'name':'mpls_tc', 'type':'uint8'},
+			{'name':'mpls_bos', 'type':'uint8'},
+			{'name':'tunnel_id', 'type':'uint64'},
+			{'name':'ipv6_exthdr', 'type':'uint16'},
+			{'name':'pbb_uca', 'type':'uint8'},
+			{'name':'tunnel_ipv4_src', 'type':'uint32'},
+			{'name':'tunnel_ipv4_dst', 'type':'uint32'},
+		]},
+		{'name':'masks', 'fields':[
+			{'name':'in_port', 'type':'uint32'},
+			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'metadata', 'type':'uint64'},
+			{'name':'eth_dst', 'type':'uint48'},
+			{'name':'eth_src', 'type':'uint48'},
+			{'name':'eth_type', 'type':'uint16'},
+			{'name':'vlan_vid', 'type':'uint16'},
+			{'name':'vlan_pcp', 'type':'uint8'},
+			{'name':'ip_dscp', 'type':'uint8'},
+			{'name':'ip_ecn', 'type':'uint8'},
+			{'name':'ip_proto', 'type':'uint8'},
+			{'name':'ipv4_src', 'type':'uint32'},
+			{'name':'ipv4_dst', 'type':'uint32'},
+			{'name':'tcp_src', 'type':'uint16'},
+			{'name':'tcp_dst', 'type':'uint16'},
+			{'name':'udp_src', 'type':'uint16'},
+			{'name':'udp_dst', 'type':'uint16'},
+			{'name':'sctp_src', 'type':'uint16'},
+			{'name':'sctp_dst', 'type':'uint16'},
+			{'name':'icmpv4_type', 'type':'uint8'},
+			{'name':'icmpv4_code', 'type':'uint8'},
+			{'name':'arp_op', 'type':'uint16'},
+			{'name':'arp_spa', 'type':'uint32'},
+			{'name':'arp_tpa', 'type':'uint32'},
+			{'name':'arp_sha', 'type':'uint48'},
+			{'name':'arp_tha', 'type':'uint48'},
+			{'name':'ipv6_src', 'impl':False, 'type':'uint128'},
+			{'name':'ipv6_dst', 'impl':False, 'type':'uint128'},
+			{'name':'ipv6_flabel', 'type':'uint32'},
+			{'name':'icmpv6_type', 'type':'uint8'},
+			{'name':'icmpv6_code', 'type':'uint8'},
+			{'name':'ipv6_nd_target', 'impl':False, 'type':'uint128'},
+			{'name':'ipv6_nd_sll', 'type':'uint48'},
+			{'name':'ipv6_nd_tll', 'type':'uint48'},
+			{'name':'mpls_label', 'type':'uint32'},
+			{'name':'mpls_tc', 'type':'uint8'},
+			{'name':'mpls_bos', 'type':'uint8'},
+			{'name':'tunnel_id', 'type':'uint64'},
+			{'name':'ipv6_exthdr', 'type':'uint16'},
+			{'name':'pbb_uca', 'type':'uint8'},
+			{'name':'tunnel_ipv4_src', 'type':'uint32'},
+			{'name':'tunnel_ipv4_dst', 'type':'uint32'},
+		]},
+	]},
+	{'name':'data', 'impl':False},
+	{'name':'in_port', 'type':'uint32'},
+	{'name':'in_phy_port', 'type':'uint32'},
+]
+
+fields_of_packet_out = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'buffer_id', 'type':'uint32'},
+	{'name':'in_port', 'type':'uint32'},
+	{'name':'actions','fields':[
+		##TODO: This Handling is bad
+		{'name':'list', 'fields':[
+			{'name':'element','type':'TLV', 'fields': [
+				{'name':'port', 'type':'uint32'},
+				{'name':'max_len', 'type':'uint16'},
+			]},
+		]},
+	]},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_port_desc_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'port_no', 'type':'uint32'},
+				{'name':'hw_addr', 'type':'uint48'},
+				{'name':'name', 'impl':False},
+				{'name':'config', 'type':'uint32'},
+				{'name':'state', 'type':'uint32'},
+				{'name':'properties', 'fields':[
+					##TODO: This Handling is bad
+					{'name':'list', 'type':'TLV', 'fields': [
+						{'name':'element', 'max':3, 'fields':[
+							{'name':'curr', 'type':'uint32'},
+							{'name':'advertised', 'type':'uint32'},
+							{'name':'supported', 'type':'uint32'},
+							{'name':'peer', 'type':'uint32'},
+							{'name':'curr_speed', 'type':'uint32'},
+							{'name':'max_speed', 'type':'uint32'},
+							{'name':'rx_grid_freq_lmda', 'type':'uint32'},
+							{'name':'tx_pwr_min', 'type':'uint32'},
+							{'name':'tx_pwr_max', 'type':'uint32'},
+						]},
+					]},
+				]},
+				{'name':'curr', 'type':'uint32'},
+				{'name':'advertised', 'type':'uint32'},
+				{'name':'supported', 'type':'uint32'},
+				{'name':'peer', 'type':'uint32'},
+				{'name':'curr_speed', 'type':'uint32'},
+				{'name':'max_speed', 'type':'uint32'},
+			]},
+		]},
+	]}
+]
+
+fields_of_port_desc_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+]
+
+fields_of_port_mod = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'port_no', 'type':'uint32'},
+	{'name':'hw_addr', 'impl':False},
+	{'name':'config', 'type':'uint32'},
+	{'name':'mask', 'type':'uint32'},
+	{'name':'properties', 'fields':[
+		##TODO: This Handling is bad
+		{'name':'list', 'type':'TLV', 'fields': [
+			{'name':'element', 'max':1, 'fields':[
+				{'name':'advertise', 'type':'uint32'},
+				{'name':'freq_ldma', 'type':'uint32'},
+				{'name':'fl_offset', 'type':'uint32'},
+				{'name':'grid_span', 'type':'uint32'},
+				{'name':'tx_pwr', 'type':'uint32'},
+			]},
+		]},
+	]},
+	{'name':'advertise', 'type':'uint32'},
+]
+
+fields_of_port_mod_failed_error_msg = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'code', 'type':'uint16'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_port_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'port_no', 'type':'uint32'},
+				{'name':'duration_sec', 'type':'uint32'},
+				{'name':'duration_nsec', 'type':'uint32'},
+				{'name':'rx_packets', 'type':'uint64'},
+				{'name':'tx_packets', 'type':'uint64'},
+				{'name':'rx_bytes', 'type':'uint64'},
+				{'name':'tx_bytes', 'type':'uint64'},
+				{'name':'rx_dropped', 'type':'uint64'},
+				{'name':'tx_dropped', 'type':'uint64'},
+				{'name':'rx_errors', 'type':'uint64'},
+				{'name':'tx_errors', 'type':'uint64'},
+				{'name':'properties', 'fields':[
+					##TODO: This Handling is bad
+					{'name':'list', 'type':'TLV', 'fields': [
+						{'name':'element', 'max':3, 'fields':[
+							{'name':'rx_frame_err', 'type':'uint64'},
+							{'name':'rx_over_err', 'type':'uint64'},
+							{'name':'rx_crc_err', 'type':'uint64'},
+							{'name':'collisions', 'type':'uint64'},
+							{'name':'rx_freq_lmda', 'type':'uint32'},
+							{'name':'rx_offset', 'type':'uint32'},
+							{'name':'rx_grid_span', 'type':'uint32'},
+							{'name':'tx_pwr', 'type':'uint16'},
+							{'name':'rx_pwr', 'type':'uint16'},
+							{'name':'bias_current', 'type':'uint16'},
+							{'name':'temperature', 'type':'uint16'},
+						]},
+					]},
+				]},
+				{'name':'rx_frame_err', 'type':'uint64'},
+				{'name':'rx_over_err', 'type':'uint64'},
+				{'name':'rx_crc_err', 'type':'uint64'},
+				{'name':'collisions', 'type':'uint64'},
+			]},
+		]},
+	]}
+]
+
+fields_of_port_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'port_no', 'type':'uint32'},
+]
+
+fields_of_port_status = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'reason', 'type':'uint8'},
+	{'name':'desc', 'fields':[
+		{'name':'port_no', 'type':'uint32'},
+		{'name':'hw_addr', 'type':'uint48'},
+		{'name':'name', 'impl':False},
+		{'name':'config', 'type':'uint32'},
+		{'name':'state', 'type':'uint32'},
+		{'name':'properties', 'fields':[
+			##TODO: This Handling is bad
+			{'name':'list', 'type':'TLV', 'fields': [
+				{'name':'element', 'max':3, 'fields':[
+					{'name':'curr', 'type':'uint32'},
+					{'name':'advertised', 'type':'uint32'},
+					{'name':'supported', 'type':'uint32'},
+					{'name':'peer', 'type':'uint32'},
+					{'name':'curr_speed', 'type':'uint32'},
+					{'name':'max_speed', 'type':'uint32'},
+					{'name':'rx_grid_freq_lmda', 'type':'uint32'},
+					{'name':'tx_pwr_min', 'type':'uint32'},
+					{'name':'tx_pwr_max', 'type':'uint32'},
+				]},
+			]},
+		]},
+		{'name':'curr', 'type':'uint32'},
+		{'name':'advertised', 'type':'uint32'},
+		{'name':'supported', 'type':'uint32'},
+		{'name':'peer', 'type':'uint32'},
+		{'name':'curr_speed', 'type':'uint32'},
+		{'name':'max_speed', 'type':'uint32'},
+	]},
+]
+
+fields_of_queue_desc_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'port_no', 'type':'uint32'},
+				{'name':'queue_id', 'type':'uint32'},
+				{'name':'properties', 'fields':[
+					##TODO: This Handling is bad
+					{'name':'list', 'type':'TLV', 'fields': [
+						{'name':'element', 'max':2, 'fields':[
+							{'name':'rate', 'type':'uint16'},
+						]},
+					]},
+				]},
+			]},
+		]},
+	]},
+]
+
+fields_of_queue_desc_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+]
+
+fields_of_queue_get_config_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'port', 'type':'uint32'},
+	{'name':'queues', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'queue_id', 'type':'uint32'},
+				{'name':'port', 'type':'uint32'},
+				{'name':'properties', 'fields':[
+					##TODO: This Handling is bad
+					{'name':'list', 'type':'TLV', 'fields': [
+						{'name':'element', 'max':2, 'fields':[
+							{'name':'rate', 'type':'uint16'},
+						]},
+					]},
+				]},
+			]},
+		]},
+	]},
+]
+
+fields_of_queue_get_config_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'port', 'type':'uint32'},
+]
+
+fields_of_queue_op_failed_error_msg = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'code', 'type':'uint16'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_queue_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'port_no', 'type':'uint32'},
+				{'name':'queue_id', 'type':'uint32'},
+				{'name':'tx_bytes', 'type':'uint64'},
+				{'name':'tx_packets', 'type':'uint64'},
+				{'name':'tx_errors', 'type':'uint64'},
+				{'name':'duration_sec', 'type':'uint32'},
+				{'name':'duration_nsec', 'type':'uint32'},
+				{'name':'properties','impl':False,'fields':[
+					##TODO: This Handling is bad
+					{'name':'list', 'type':'TLV', 'fields': [
+						{'name':'element', 'fields':[
+						]},
+					]},
+				]},
+			]},
+		]},
+	]},
+]
+
+fields_of_queue_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'port_no', 'type':'uint32'},
+	{'name':'queue_id', 'type':'uint32'},
+]
+
+fields_of_requestforward = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'role', 'type':'uint32'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_role_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'role', 'type':'uint32'},
+	{'name':'generation_id', 'type':'uint64'},
+]
+
+fields_of_role_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'role', 'type':'uint32'},
+	{'name':'generation_id', 'type':'uint64'},
+]
+
+fields_of_role_request_failed_error_msg = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'code', 'type':'uint16'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_role_status = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'role', 'type':'uint32'},
+	{'name':'generation_id', 'type':'uint64'},
+	{'name':'properties','impl':False,'fields':[
+		##TODO: This Handling is bad
+		{'name':'list', 'type':'TLV', 'fields': [
+			{'name':'element', 'fields':[
+			]},
+		]},
+	]},
+]
+
+fields_of_set_config = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'miss_send_len', 'type':'uint16'},
+]
+
+fields_of_switch_config_failed_error_msg = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'code', 'type':'uint16'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_table_desc_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'table_id', 'type':'uint8'},
+				{'name':'config', 'type':'uint32'},
+			]},
+		]},
+	]},
+]
+
+fields_of_table_desc_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+]
+
+fields_of_table_features_failed_error_msg = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'code', 'type':'uint16'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_table_features_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'table_id', 'type':'uint8'},
+				{'name':'name', 'impl':False},
+				{'name':'metadata_match', 'type':'uint64'},
+				{'name':'matadata_write', 'type':'uint64'},
+				{'name':'config', 'type':'uint32'},
+				{'name':'max_entries', 'type':'uint32'},
+				{'name':'properties','impl':False,'fields':[
+					##TODO: This Handling is bad
+					{'name':'list', 'type':'TLV', 'fields': [
+						{'name':'element', 'max':14,'fields':[
+							{'name':'ids','impl':False,'fields':[
+								##TODO: This Handling is bad
+								{'name':'list', 'type':'TLV', 'fields': [
+									{'name':'element', 'fields':[
+										{'name':'field', 'type':'uint32'},
+									]},
+								]},
+							]},
+						]},
+					]},
+				]},
+			]},
+		]},
+	]},
+]
+
+fields_of_table_features_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'table_id', 'type':'uint8'},
+				{'name':'name', 'impl':False},
+				{'name':'metadata_match', 'type':'uint64'},
+				{'name':'matadata_write', 'type':'uint64'},
+				{'name':'config', 'type':'uint32'},
+				{'name':'max_entries', 'type':'uint32'},
+				{'name':'properties','impl':False,'fields':[
+					##TODO: This Handling is bad
+					{'name':'list', 'type':'TLV', 'fields': [
+						{'name':'element', 'max':14,'fields':[
+							{'name':'ids','impl':False,'fields':[
+								##TODO: This Handling is bad
+								{'name':'list', 'type':'TLV', 'fields': [
+									{'name':'element', 'fields':[
+										{'name':'field', 'type':'uint32'},
+									]},
+								]},
+							]},
+						]},
+					]},
+				]},
+			]},
+		]},
+	]},
+]
+
+fields_of_table_mod = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'table_id', 'type':'uint8'},
+	{'name':'config', 'type':'uint32'},
+	{'name':'properties','fields':[
+		##TODO: This Handling is bad
+		{'name':'list', 'type':'TLV', 'fields': [
+			{'name':'element', 'max':2,'fields':[
+				{'name':'vancancy_down', 'type':'uint8'},
+				{'name':'vancancy_up', 'type':'uint8'},
+				{'name':'vancancy_get', 'type':'uint8'},
+			]},
+		]},
+	]},
+]
+
+fields_of_table_mod_failed_error_msg = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'code', 'type':'uint16'},
+	{'name':'data', 'impl':False},
+]
+
+fields_of_table_stats_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+	{'name':'entries', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element', 'fields':[
+				{'name':'table_id', 'type':'uint8'},
+				{'name':'active_count', 'type':'uint32'},
+				{'name':'lookup_count', 'type':'uint64'},
+				{'name':'matched_count', 'type':'uint64'},
+				{'name':'name', 'impl':False},
+				{'name':'match', 'type':'uint64'},
+				{'name':'wildcards', 'type':'uint64'},
+				{'name':'write_actions', 'type':'uint32'},
+				{'name':'apply_actions', 'type':'uint32'},
+				{'name':'write_setfields', 'type':'uint64'},
+				{'name':'apply_setfields', 'type':'uint64'},
+				{'name':'metadata_match', 'type':'uint64'},
+				{'name':'metadata_write', 'type':'uint64'},
+				{'name':'instructions', 'type':'uint32'},
+				{'name':'config', 'type':'uint32'},
+				{'name':'max_entries', 'type':'uint32'},
+			]},
+		]},
+	]},
+]
+
+fields_of_table_stats_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'flags', 'type':'uint16'},
+]
+
+fields_of_table_status = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'role', 'type':'uint32'},
+	{'name':'reason', 'type':'uint8'},
+	{'name':'table', 'type':'uint8'},
+]
+
 openflow = [
 	['of_aggregate_stats_reply', fields_of_aggregate_stats_reply],
 	['of_aggregate_stats_request', fields_of_aggregate_stats_request],
@@ -1659,47 +2480,47 @@ openflow = [
 	['of_group_modify', fields_of_group_modify],
 	['of_group_stats_reply', fields_of_group_stats_reply],
 	['of_group_stats_request', fields_of_group_stats_request],
-	#['of_hello', fields_of_hello],
-	#['of_hello_failed_error_msg', fields_of_hello_failed_error_msg],
-	#['of_meter_config_stats_reply', fields_of_meter_config_stats_reply],
-	#['of_meter_config_stats_request', fields_of_meter_config_stats_request],
-	#['of_meter_features_stats_reply', fields_of_meter_features_stats_reply],
-	#['of_meter_features_stats_request', fields_of_meter_features_stats_request],
-	#['of_meter_mod', fields_of_meter_mod],
-	#['of_meter_mod_failed_error_msg', fields_of_meter_mod_failed_error_msg],
-	#['of_meter_stats_reply', fields_of_meter_stats_reply],
-	#['of_meter_stats_request', fields_of_meter_stats_request],
-	#['of_packet_in', fields_of_packet_in],
-	#['of_packet_out', fields_of_packet_out],
-	#['of_port_desc_stats_reply', fields_of_port_desc_stats_reply],
-	#['of_port_desc_stats_request', fields_of_port_desc_stats_request],
-	#['of_port_mod', fields_of_port_mod],
-	#['of_port_mod_failed_error_msg', fields_of_port_mod_failed_error_msg],
-	#['of_port_stats_reply', fields_of_port_stats_reply],
-	#['of_port_stats_request', fields_of_port_stats_request],
-	#['of_port_status', fields_of_port_status],
-	#['of_queue_desc_stats_reply', fields_of_queue_desc_stats_reply],
-	#['of_queue_desc_stats_request', fields_of_queue_desc_stats_request],
-	#['of_queue_get_config_reply', fields_of_queue_get_config_reply],
-	#['of_queue_get_config_request', fields_of_queue_get_config_request],
-	#['of_queue_op_failed_error_msg', fields_of_queue_op_failed_error_msg],
-	#['of_queue_stats_reply', fields_of_queue_stats_reply],
-	#['of_queue_stats_request', fields_of_queue_stats_request],
-	#['of_requestforward', fields_of_requestforward],
-	#['of_role_reply', fields_of_role_reply],
-	#['of_role_request', fields_of_role_request],
-	#['of_role_request_failed_error_msg', fields_of_role_request_failed_error_msg],
-	#['of_role_status', fields_of_role_status],
-	#['of_set_config', fields_of_set_config],
-	#['of_switch_config_failed_error_msg', fields_of_switch_config_failed_error_msg],
-	#['of_table_desc_stats_reply', fields_of_table_desc_stats_reply],
-	#['of_table_desc_stats_request', fields_of_table_desc_stats_request],
-	#['of_table_features_failed_error_msg', fields_of_table_features_failed_error_msg],
-	#['of_table_features_stats_reply', fields_of_table_features_stats_reply],
-	#['of_table_features_stats_request', fields_of_table_features_stats_request],
-	#['of_table_mod', fields_of_table_mod],
-	#['of_table_mod_failed_error_msg', fields_of_table_mod_failed_error_msg],
-	#['of_table_stats_reply', fields_of_table_stats_reply],
-	#['of_table_stats_request', fields_of_table_stats_request],
-	#['of_table_status', fields_of_table_status],
+	['of_hello', fields_of_hello],
+	['of_hello_failed_error_msg', fields_of_hello_failed_error_msg],
+	['of_meter_config_stats_reply', fields_of_meter_config_stats_reply],
+	['of_meter_config_stats_request', fields_of_meter_config_stats_request],
+	['of_meter_features_stats_reply', fields_of_meter_features_stats_reply],
+	['of_meter_features_stats_request', fields_of_meter_features_stats_request],
+	['of_meter_mod', fields_of_meter_mod],
+	['of_meter_mod_failed_error_msg', fields_of_meter_mod_failed_error_msg],
+	['of_meter_stats_reply', fields_of_meter_stats_reply],
+	['of_meter_stats_request', fields_of_meter_stats_request],
+	['of_packet_in', fields_of_packet_in],
+	['of_packet_out', fields_of_packet_out],
+	['of_port_desc_stats_reply', fields_of_port_desc_stats_reply],
+	['of_port_desc_stats_request', fields_of_port_desc_stats_request],
+	['of_port_mod', fields_of_port_mod],
+	['of_port_mod_failed_error_msg', fields_of_port_mod_failed_error_msg],
+	['of_port_stats_reply', fields_of_port_stats_reply],
+	['of_port_stats_request', fields_of_port_stats_request],
+	['of_port_status', fields_of_port_status],
+	['of_queue_desc_stats_reply', fields_of_queue_desc_stats_reply],
+	['of_queue_desc_stats_request', fields_of_queue_desc_stats_request],
+	['of_queue_get_config_reply', fields_of_queue_get_config_reply],
+	['of_queue_get_config_request', fields_of_queue_get_config_request],
+	['of_queue_op_failed_error_msg', fields_of_queue_op_failed_error_msg],
+	['of_queue_stats_reply', fields_of_queue_stats_reply],
+	['of_queue_stats_request', fields_of_queue_stats_request],
+	['of_requestforward', fields_of_requestforward],
+	['of_role_reply', fields_of_role_reply],
+	['of_role_request', fields_of_role_request],
+	['of_role_request_failed_error_msg', fields_of_role_request_failed_error_msg],
+	['of_role_status', fields_of_role_status],
+	['of_set_config', fields_of_set_config],
+	['of_switch_config_failed_error_msg', fields_of_switch_config_failed_error_msg],
+	['of_table_desc_stats_reply', fields_of_table_desc_stats_reply],
+	['of_table_desc_stats_request', fields_of_table_desc_stats_request],
+	['of_table_features_failed_error_msg', fields_of_table_features_failed_error_msg],
+	['of_table_features_stats_reply', fields_of_table_features_stats_reply],
+	['of_table_features_stats_request', fields_of_table_features_stats_request],
+	['of_table_mod', fields_of_table_mod],
+	['of_table_mod_failed_error_msg', fields_of_table_mod_failed_error_msg],
+	['of_table_stats_reply', fields_of_table_stats_reply],
+	['of_table_stats_request', fields_of_table_stats_request],
+	['of_table_status', fields_of_table_status],
 ]
