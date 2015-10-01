@@ -8,6 +8,7 @@ logs_loc = system_home + "/logs/inst{instance}.log"
 
 #Coordinator Section
 coordinator_port = 3333
+coord_log = system_home + "/logs/coordinator.log"
 
 #Proxy Section
 proxy_path = system_home + "/switch_proxy/sw_proxy"

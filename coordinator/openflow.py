@@ -1,3 +1,5 @@
+#Samuel Jero <sjero@purdue.edu>
+#SDN Testing Strategy Generation
 fields_of_aggregate_stats_reply = [
 	{'name':'version', 'type':'uint8'},
 	{'name':'type', 'type':'uint8'},

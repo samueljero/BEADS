@@ -49,7 +49,7 @@ def main(args):
 
 	#Start VMs
 	print "Starting VMs..."
-	#startVms(mininet, controllers)
+	startVms(mininet, controllers)
 
 	#Do Tests
 	if standalone:
@@ -59,7 +59,7 @@ def main(args):
 
 	#Stop VMs
 	print "Stopping VMs..."
-	#stopVms(mininet, controllers)
+	stopVms(mininet, controllers)
 
 	#Close log
 	lg.write(str(datetime.today()) + "\n")
@@ -72,7 +72,7 @@ def reconnect(addr):
 			sock = socket.create_connection(addr)
 			break
 		except Exception as e:
-			print "Failed to connect to coordinator (%s:%d): %s...retrying" % (addr[0], addr[1], e)
+			print "[%s] Failed to connect to coordinator (%s:%d): %s...retrying" % (str(datetime.today()),addr[0], addr[1], e)
 			time.sleep(1)
 			continue
 	return sock
@@ -90,17 +90,21 @@ def coordinated_tests(mininet, controllers, instance, lg, addr):
 	try:
 		sock = socket.create_connection(addr)
 	except Exception as e:
-		print "Failed to connect to coordinator (%s:%d): %s" % (addr[0], addr[1], e)
+		print "[%s] Failed to connect to coordinator (%s:%d): %s" % (str(datetime.today()),addr[0], addr[1], e)
 		return
 	rf = sock.makefile()
 
 	#Loop Testing Strategies
 	while True:
 		#Ask for Next Strategy
+		print "[%s] Asking for Next Strategy..." % (str(datetime.today()))
+		lg.write("[%s] Asking for Next Strategy...\n" % (str(datetime.today())))
 		try:
 			sock.send("READY %s:%d\n" %(socket.gethostname(),instance))
 		except Exception as e:
 			print "Failed to send on socket..."
+			sock = reconnect(addr)
+			continue
 
 		#Get Strategy
 		line = rf.readline()
@@ -111,9 +115,17 @@ def coordinated_tests(mininet, controllers, instance, lg, addr):
 			rf = sock.makefile()
 		strat = eval(line)
 
+		#Check for finished
+		if len(strat)==0:
+			print "[%s] Finished... Shutting down..." % (str(datetime.today()))
+			lg.write("[%s] Finished... Shutting down...\n" % (str(datetime.today()))
+			break
+
 		#Test
 		print strat
+		print "[%s] Test %d: %s" % (str(datetime.today()), num, str(strat))
 		doTest(mininet,controllers,strat[0],strat[1], num, lg)
+		print "******"
 		num+=1
 
 	#Cleanup
