@@ -66,7 +66,7 @@ def main(args):
 	lg.close()
 
 def reconnect(addr):
-	sock = null
+	sock = 0
 	while True:
 		try:
 			sock = socket.create_connection(addr)
@@ -113,20 +113,24 @@ def coordinated_tests(mininet, controllers, instance, lg, addr):
 			sock.close()
 			sock = reconnect(addr)
 			rf = sock.makefile()
-		strat = eval(line)
+		try:
+			strat = eval(line)
+		except Exception as e:
+			continue
 
 		#Check for finished
 		if len(strat)==0:
 			print "[%s] Finished... Shutting down..." % (str(datetime.today()))
-			lg.write("[%s] Finished... Shutting down...\n" % (str(datetime.today()))
+			lg.write("[%s] Finished... Shutting down...\n" % (str(datetime.today())))
 			break
 
 		#Test
 		print strat
 		print "[%s] Test %d: %s" % (str(datetime.today()), num, str(strat))
+		lg.write("[%s] Test %d: %s\n" % (str(datetime.today()), num, str(strat)))
 		res = doTest(mininet,controllers,strat[0],strat[1], num, lg)
 		print "[%s] Test Result: %s" %(str(datetime.today()),str(res))
-		lg.write("[%s] Test Result: %s" %(str(datetime.today()),str(res)))
+		lg.write("[%s] Test Result: %s\n" %(str(datetime.today()),str(res)))
 		print "******"
 		num+=1
 

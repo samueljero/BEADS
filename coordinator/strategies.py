@@ -22,10 +22,10 @@ class StrategyGenerator:
 	def next_strategy(self):
 		if (self.strat_ptr >= len(self.strat_lst)):
 			return ""
-		strat = self.strat_lst[strat_ptr]
+		strat = self.strat_lst[self.strat_ptr]
 		self.strat_ptr+=1
 		if self.strat_ptr % 100 == 0:
-			self.lg.write("[%s] Returning Strategy: %d" % (str(datetime.today()),self.strat_ptr))
+			self.lg.write("[%s] Returning Strategy: %d\n" % (str(datetime.today()),self.strat_ptr))
 			print "[%s] Returning Strategy: %d" % (str(datetime.today()),self.strat_ptr)
 		return strat
 
@@ -54,7 +54,7 @@ class StrategyGenerator:
 								for v in manipulations.field_lie_values[f['type']]:
 									strat = "{controllers[" +str(c) + "]}" + ",{sw},*,{pkt_type},{fld},{action}".format(sw=switch, pkt_type=mtype,fld=f['field'],action=a[1].format(m,v))
 									self.strat_lst.append([config.coord_test_case, [strat]])
-		self.lg.write("[%s] Strategies: %d" % (str(datetime.today()),len(self.strat_lst)))
+		self.lg.write("[%s] Strategies: %d\n" % (str(datetime.today()),len(self.strat_lst)))
 		print "[%s] Strategies: %d" % (str(datetime.today()),len(self.strat_lst))
 
 	def build_field_list(self,fields):

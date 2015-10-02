@@ -53,9 +53,9 @@ class ExecutorHandler(ss.StreamRequestHandler):
 			parsed = msg.split()
 			if parsed[0]=="READY":
 				#Check if in executor list
-				exec_lst_lock.aquire()
+				exec_lst_lock.acquire()
 				if parsed[1] not in exec_lst:
-					lg_lock.aquire()
+					lg_lock.acquire()
 					lg.write("[%s] New Executor: %s\n" % (str(datetime.today()),parsed[1]))
 					print "[%s] New Executor: %s" % (str(datetime.today()),parsed[1])
 					lg_lock.release()
@@ -63,13 +63,13 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				exec_lst_lock.release()
 	
 				#Get Next Strategy
-				strat_lock.aquire()
+				strat_lock.acquire()
 				strat = strat_gen.next_strategy()
 				strat_lock.release()
 
 				if strat=="":
 					#Finished
-					lg_lock.aquire()
+					lg_lock.acquire()
 					lg.write("[%s] Finished Testing\n" % (str(datetime.today())))
 					print "[%s] Finished Testing" % (str(datetime.today()))
 					lg_lock.release()
@@ -78,14 +78,15 @@ class ExecutorHandler(ss.StreamRequestHandler):
 
 				#Send strategy
 				string = repr(strat)
-				lg_lock.aquire()
+				lg_lock.acquire()
 				lg.write("[%s] Executor (%s) testing strategy: %s\n" % (str(datetime.today()),parsed[1], string))
+				lg.flush()
 				print "[%s] Executor (%s) testing strategy: %s" % (str(datetime.today()),parsed[1], string)
 				lg_lock.release()
 				self.request.send("%s\n"%(string))
 
 def main(args):
-	global lg, strat
+	global lg, strat_gen
 	#Parse Args
 	argp = argparse.ArgumentParser(description='Testing Coordinator')
 	argp.add_argument('-p','--port', type=int, default=config.coordinator_port)
@@ -95,6 +96,7 @@ def main(args):
 	#Open Log file
 	lg = open(config.coord_log, "w")
 	lg.write("[%s] Starting Coordinator\n" % (str(datetime.today())))
+	lg.flush()
 
 	#Create Strategy Generator
 	strat_gen = strategies.StrategyGenerator(lg)
