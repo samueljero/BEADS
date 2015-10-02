@@ -130,8 +130,11 @@ fields_of_async_get_reply = [
 	{'name':'length', 'type':'uint16'},
 	{'name':'xid', 'type':'uint32'},
 	{'name':'properties', 'fields': [
-		{'name':'list','type':'TLV', 'fields':[
-			{'name':'mask', 'type':'uint32'},
+		##TODO: This Handling is bad
+		{'name':'list', 'fields':[
+			{'name':'element','type':'TLV', 'fields':[
+				{'name':'mask', 'type':'uint32'},
+			]},
 		]},
 	]},
 	{'name':'packet_in_mask_equal_master', 'type':'uint32'},
@@ -149,8 +152,10 @@ fields_of_async_get_request = [
 	{'name':'xid', 'type':'uint32'},
 	{'name':'properties', 'fields': [
 		##TODO: This Handling is bad
-		{'name':'list','type':'TLV', 'fields':[
-			{'name':'mask', 'type':'uint32'},
+		{'name':'list', 'fields':[
+			{'name':'element','type':'TLV','fields':[
+				{'name':'mask', 'type':'uint32'},
+			]},
 		]},
 	]},
 	{'name':'packet_in_mask_equal_master', 'type':'uint32'},
@@ -168,8 +173,8 @@ fields_of_async_set = [
 	{'name':'xid', 'type':'uint32'},
 	{'name':'properties', 'fields': [
 		##TODO: This Handling is bad
-		{'name':'list','type':'TLV', 'fields':[
-			{'name':'element','fields':[
+		{'name':'list', 'fields':[
+			{'name':'element','type':'TLV','fields':[
 				{'name':'mask', 'type':'uint32'},
 			]},
 		]},
@@ -261,8 +266,8 @@ fields_of_bundle_ctrl_msg = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'properties', 'fields': [
 		##TODO: This Handling is bad
-		{'name':'list','type':'TLV', 'fields':[
-			{'name':'elements', 'max':2, 'fields':[
+		{'name':'list', 'fields':[
+			{'name':'element','type':'TLV', 'max':2, 'fields':[
 				{'name':'seconds', 'type':'uint32'},
 				{'name':'nanoseconds', 'type':'uint32'},
 			]},
@@ -365,7 +370,7 @@ fields_of_features_reply = [
 	{'name':'reserved', 'type':'uint32'},
 	{'name':'ports', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'port_no', 'type':'uint32'},
 				{'name':'hw_addr', 'type':'uint48'},
 				{'name':'name', 'impl':False},
@@ -373,8 +378,8 @@ fields_of_features_reply = [
 				{'name':'state', 'type':'uint32'},
 				{'name':'properties', 'fields':[
 					##TODO: This Handling is bad
-					{'name':'list', 'type':'TLV', 'fields': [
-						{'name':'element', 'max':3, 'fields':[
+					{'name':'list','type':'list', 'fields': [
+						{'name':'element','type':'TLV', 'max':3, 'fields':[
 							{'name':'curr', 'type':'uint32'},
 							{'name':'advertised', 'type':'uint32'},
 							{'name':'supported', 'type':'uint32'},
@@ -1170,7 +1175,7 @@ fields_of_flow_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'table_id', 'type':'uint8'},
 				{'name':'duration_sec', 'type':'uint64'},
 				{'name':'duration_nsec', 'type':'uint64'},
@@ -1425,7 +1430,7 @@ fields_of_group_add = [
 	{'name':'group_id', 'type':'uint32'},
 	{'name':'buckets','fields':[
 		{'name':'list', 'fields':[
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'weight', 'type':'uint16'},
 				{'name':'watch_port', 'type':'uint32'},
 				{'name':'watch_group', 'type':'uint32'},
@@ -1453,7 +1458,7 @@ fields_of_group_delete = [
 	{'name':'group_id', 'type':'uint32'},
 	{'name':'buckets','fields':[
 		{'name':'list', 'fields':[
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'weight', 'type':'uint16'},
 				{'name':'watch_port', 'type':'uint32'},
 				{'name':'watch_group', 'type':'uint32'},
@@ -1479,12 +1484,12 @@ fields_of_group_desc_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields':[
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'group_type', 'type':'uint8'},
 				{'name':'group_id', 'type':'uint32'},
 				{'name':'buckets','fields':[
 					{'name':'list', 'fields':[
-						{'name':'element', 'fields':[
+						{'name':'element','type':'list', 'fields':[
 							{'name':'weight', 'type':'uint16'},
 							{'name':'watch_port', 'type':'uint32'},
 							{'name':'watch_group', 'type':'uint32'},
@@ -1557,7 +1562,7 @@ fields_of_group_modify = [
 	{'name':'group_id', 'type':'uint32'},
 	{'name':'buckets','fields':[
 		{'name':'list', 'fields':[
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'weight', 'type':'uint16'},
 				{'name':'watch_port', 'type':'uint32'},
 				{'name':'watch_group', 'type':'uint32'},
@@ -1583,7 +1588,7 @@ fields_of_group_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list','fields':[
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'group_id', 'type':'uint32'},
 				{'name':'ref_count', 'type':'uint32'},
 				{'name':'packet_count', 'type':'uint64'},
@@ -1592,7 +1597,7 @@ fields_of_group_stats_reply = [
 				{'name':'duration_nsec', 'type':'uint32'},
 				{'name':'bucket_stats', 'fields':[
 					{'name':'list','fields':[
-						{'name':'element', 'fields':[
+						{'name':'element','type':'list', 'fields':[
 							{'name':'packet_count', 'type':'uint64'},
 							{'name':'byte_count', 'type':'uint64'},
 						]},
@@ -1617,12 +1622,12 @@ fields_of_hello = [
 	{'name':'type', 'type':'uint8'},
 	{'name':'length', 'type':'uint16'},
 	{'name':'xid', 'type':'uint32'},
-	{'name':'elements', 'fields':[
+	{'name':'elements','type':'list', 'fields':[
 		{'name':'list','fields':[
-			{'name':'element', 'max':1, 'fields':[
+			{'name':'element','type':'list', 'max':1, 'fields':[
 				{'name':'version_bitmap', 'fields':[
 					{'name':'list', 'fields':[
-						{'name':'element', 'max':1, 'fields':[
+						{'name':'element','type':'list', 'max':1, 'fields':[
 							{'name':'uint32', 'type':'uint32'},
 						]},
 					]},
@@ -1649,7 +1654,7 @@ fields_of_meter_config_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields':[
-			{'name':'element','fields':[
+			{'name':'element','type':'list','fields':[
 				{'name':'flags', 'type':'uint16'},
 				{'name':'meter_id', 'type':'uint32'},
 				{'name':'entries', 'fields':[
@@ -1744,7 +1749,7 @@ fields_of_meter_stats_reply = [
 	{'name':'xid', 'type':'uint32'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields':[
-			{'name':'element','fields':[
+			{'name':'element','type':'list','fields':[
 				{'name':'meter_id', 'type':'uint32'},
 				{'name':'flow_count', 'type':'uint32'},
 				{'name':'packet_in_count', 'type':'uint64'},
@@ -1753,7 +1758,7 @@ fields_of_meter_stats_reply = [
 				{'name':'duration_nsec', 'type':'uint32'},
 				{'name':'band_stats', 'fields':[
 					{'name':'list', 'fields':[
-						{'name':'element','fields':[
+						{'name':'element','type':'list','fields':[
 							{'name':'packet_count', 'type':'uint64'},
 							{'name':'byte_count', 'type':'uint64'},
 						]},
@@ -1906,7 +1911,7 @@ fields_of_port_desc_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'port_no', 'type':'uint32'},
 				{'name':'hw_addr', 'type':'uint48'},
 				{'name':'name', 'impl':False},
@@ -1914,8 +1919,8 @@ fields_of_port_desc_stats_reply = [
 				{'name':'state', 'type':'uint32'},
 				{'name':'properties', 'fields':[
 					##TODO: This Handling is bad
-					{'name':'list', 'type':'TLV', 'fields': [
-						{'name':'element', 'max':3, 'fields':[
+					{'name':'list', 'fields': [
+						{'name':'element','type':'TLV', 'max':3, 'fields':[
 							{'name':'curr', 'type':'uint32'},
 							{'name':'advertised', 'type':'uint32'},
 							{'name':'supported', 'type':'uint32'},
@@ -1958,8 +1963,8 @@ fields_of_port_mod = [
 	{'name':'mask', 'type':'uint32'},
 	{'name':'properties', 'fields':[
 		##TODO: This Handling is bad
-		{'name':'list', 'type':'TLV', 'fields': [
-			{'name':'element', 'max':1, 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element','type':'TLV', 'max':1, 'fields':[
 				{'name':'advertise', 'type':'uint32'},
 				{'name':'freq_ldma', 'type':'uint32'},
 				{'name':'fl_offset', 'type':'uint32'},
@@ -1988,7 +1993,7 @@ fields_of_port_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'port_no', 'type':'uint32'},
 				{'name':'duration_sec', 'type':'uint32'},
 				{'name':'duration_nsec', 'type':'uint32'},
@@ -2002,8 +2007,8 @@ fields_of_port_stats_reply = [
 				{'name':'tx_errors', 'type':'uint64'},
 				{'name':'properties', 'fields':[
 					##TODO: This Handling is bad
-					{'name':'list', 'type':'TLV', 'fields': [
-						{'name':'element', 'max':3, 'fields':[
+					{'name':'list', 'fields': [
+						{'name':'element','type':'TLV', 'max':3, 'fields':[
 							{'name':'rx_frame_err', 'type':'uint64'},
 							{'name':'rx_over_err', 'type':'uint64'},
 							{'name':'rx_crc_err', 'type':'uint64'},
@@ -2050,8 +2055,8 @@ fields_of_port_status = [
 		{'name':'state', 'type':'uint32'},
 		{'name':'properties', 'fields':[
 			##TODO: This Handling is bad
-			{'name':'list', 'type':'TLV', 'fields': [
-				{'name':'element', 'max':3, 'fields':[
+			{'name':'list', 'fields': [
+				{'name':'element','type':'TLV', 'max':3, 'fields':[
 					{'name':'curr', 'type':'uint32'},
 					{'name':'advertised', 'type':'uint32'},
 					{'name':'supported', 'type':'uint32'},
@@ -2081,13 +2086,13 @@ fields_of_queue_desc_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'port_no', 'type':'uint32'},
 				{'name':'queue_id', 'type':'uint32'},
 				{'name':'properties', 'fields':[
 					##TODO: This Handling is bad
-					{'name':'list', 'type':'TLV', 'fields': [
-						{'name':'element', 'max':2, 'fields':[
+					{'name':'list', 'fields': [
+						{'name':'element','type':'TLV', 'max':2, 'fields':[
 							{'name':'rate', 'type':'uint16'},
 						]},
 					]},
@@ -2113,13 +2118,13 @@ fields_of_queue_get_config_reply = [
 	{'name':'port', 'type':'uint32'},
 	{'name':'queues', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'queue_id', 'type':'uint32'},
 				{'name':'port', 'type':'uint32'},
 				{'name':'properties', 'fields':[
 					##TODO: This Handling is bad
-					{'name':'list', 'type':'TLV', 'fields': [
-						{'name':'element', 'max':2, 'fields':[
+					{'name':'list', 'fields': [
+						{'name':'element','type':'TLV', 'max':2, 'fields':[
 							{'name':'rate', 'type':'uint16'},
 						]},
 					]},
@@ -2154,7 +2159,7 @@ fields_of_queue_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'port_no', 'type':'uint32'},
 				{'name':'queue_id', 'type':'uint32'},
 				{'name':'tx_bytes', 'type':'uint64'},
@@ -2164,8 +2169,8 @@ fields_of_queue_stats_reply = [
 				{'name':'duration_nsec', 'type':'uint32'},
 				{'name':'properties','impl':False,'fields':[
 					##TODO: This Handling is bad
-					{'name':'list', 'type':'TLV', 'fields': [
-						{'name':'element', 'fields':[
+					{'name':'list', 'fields': [
+						{'name':'element','type':'TLV', 'fields':[
 						]},
 					]},
 				]},
@@ -2229,8 +2234,8 @@ fields_of_role_status = [
 	{'name':'generation_id', 'type':'uint64'},
 	{'name':'properties','impl':False,'fields':[
 		##TODO: This Handling is bad
-		{'name':'list', 'type':'TLV', 'fields': [
-			{'name':'element', 'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element','type':'TLV', 'fields':[
 			]},
 		]},
 	]},
@@ -2262,7 +2267,7 @@ fields_of_table_desc_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'table_id', 'type':'uint8'},
 				{'name':'config', 'type':'uint32'},
 			]},
@@ -2295,7 +2300,7 @@ fields_of_table_features_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'table_id', 'type':'uint8'},
 				{'name':'name', 'impl':False},
 				{'name':'metadata_match', 'type':'uint64'},
@@ -2304,12 +2309,12 @@ fields_of_table_features_stats_reply = [
 				{'name':'max_entries', 'type':'uint32'},
 				{'name':'properties','impl':False,'fields':[
 					##TODO: This Handling is bad
-					{'name':'list', 'type':'TLV', 'fields': [
-						{'name':'element', 'max':14,'fields':[
+					{'name':'list', 'fields': [
+						{'name':'element','type':'TLV', 'max':14,'fields':[
 							{'name':'ids','impl':False,'fields':[
 								##TODO: This Handling is bad
-								{'name':'list', 'type':'TLV', 'fields': [
-									{'name':'element', 'fields':[
+								{'name':'list', 'fields': [
+									{'name':'element','type':'TLV', 'fields':[
 										{'name':'field', 'type':'uint32'},
 									]},
 								]},
@@ -2330,7 +2335,7 @@ fields_of_table_features_stats_request = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'table_id', 'type':'uint8'},
 				{'name':'name', 'impl':False},
 				{'name':'metadata_match', 'type':'uint64'},
@@ -2339,12 +2344,12 @@ fields_of_table_features_stats_request = [
 				{'name':'max_entries', 'type':'uint32'},
 				{'name':'properties','impl':False,'fields':[
 					##TODO: This Handling is bad
-					{'name':'list', 'type':'TLV', 'fields': [
-						{'name':'element', 'max':14,'fields':[
+					{'name':'list', 'fields': [
+						{'name':'element','type':'TLV', 'max':14,'fields':[
 							{'name':'ids','impl':False,'fields':[
 								##TODO: This Handling is bad
-								{'name':'list', 'type':'TLV', 'fields': [
-									{'name':'element', 'fields':[
+								{'name':'list', 'fields': [
+									{'name':'element','type':'TLV', 'fields':[
 										{'name':'field', 'type':'uint32'},
 									]},
 								]},
@@ -2366,8 +2371,8 @@ fields_of_table_mod = [
 	{'name':'config', 'type':'uint32'},
 	{'name':'properties','fields':[
 		##TODO: This Handling is bad
-		{'name':'list', 'type':'TLV', 'fields': [
-			{'name':'element', 'max':2,'fields':[
+		{'name':'list', 'fields': [
+			{'name':'element','type':'TLV', 'max':2,'fields':[
 				{'name':'vancancy_down', 'type':'uint8'},
 				{'name':'vancancy_up', 'type':'uint8'},
 				{'name':'vancancy_get', 'type':'uint8'},
@@ -2393,7 +2398,7 @@ fields_of_table_stats_reply = [
 	{'name':'flags', 'type':'uint16'},
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
-			{'name':'element', 'fields':[
+			{'name':'element','type':'list', 'fields':[
 				{'name':'table_id', 'type':'uint8'},
 				{'name':'active_count', 'type':'uint32'},
 				{'name':'lookup_count', 'type':'uint64'},

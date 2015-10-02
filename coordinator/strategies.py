@@ -3,6 +3,7 @@
 import os
 import sys
 import time
+from datetime import datetime
 import openflow
 import manipulations
 
@@ -17,10 +18,16 @@ class StrategyGenerator:
 		self.lg = lg
 		self.strat_lst = []
 		self.strat_ptr = 0
-		self.test_case = "/root/test2.py {controllers}"
 
 	def next_strategy(self):
-		return self.strat_lst.pop()
+		if (self.strat_ptr >= len(self.strat_lst)):
+			return ""
+		strat = self.strat_lst[strat_ptr]
+		self.strat_ptr+=1
+		if self.strat_ptr % 100 == 0:
+			self.lg.write("[%s] Returning Strategy: %d" % (str(datetime.today()),self.strat_ptr))
+			print "[%s] Returning Strategy: %d" % (str(datetime.today()),self.strat_ptr)
+		return strat
 
 	def build_strategies(self):
 		for pkt in openflow.openflow:
@@ -29,28 +36,36 @@ class StrategyGenerator:
 			fields = pkt[1]
 
 			#Message Delivery Strategies
-			for t in manipulations.message_actions:
-				act = t[1]
-				for v in t[2]:
-					strat = "{controllers[" +str(0) + "]}" + ",{sw},*,{pkt_type},*,{action}".format(sw=2, pkt_type=mtype,action=act.format(v))
-					self.strat_lst.append([self.test_case, [strat]])
+			for c in config.coord_test_controllers:
+				for switch in config.coord_test_switches:
+					for t in manipulations.message_actions:
+						act = t[1]
+						for v in t[2]:
+							strat = "{controllers[" +str(c) + "]}" + ",{sw},*,{pkt_type},*,{action}".format(sw=switch, pkt_type=mtype,action=act.format(v))
+							self.strat_lst.append([config.coord_test_case, [strat]])
 
 			#Message Modification Strategies
 			flds = self.build_field_list(fields)
-			for f in flds:
-				for a in manipulations.field_actions:
-					for m in manipulations.field_lies:
-						for v in manipulations.field_lie_values[f['type']]:
-							strat = "{controllers[" +str(0) + "]}" + ",{sw},*,{pkt_type},{fld},{action}".format(sw=2, pkt_type=mtype,fld=f['field'],action=a[1].format(m,v))
-							self.strat_lst.append([self.test_case, [strat]])
-		print "Strategies:" + str(len(self.strat_lst))
+			for c in config.coord_test_controllers:
+				for switch in config.coord_test_switches:
+					for f in flds:
+						for a in manipulations.field_actions:
+							for m in manipulations.field_lies:
+								for v in manipulations.field_lie_values[f['type']]:
+									strat = "{controllers[" +str(c) + "]}" + ",{sw},*,{pkt_type},{fld},{action}".format(sw=switch, pkt_type=mtype,fld=f['field'],action=a[1].format(m,v))
+									self.strat_lst.append([config.coord_test_case, [strat]])
+		self.lg.write("[%s] Strategies: %d" % (str(datetime.today()),len(self.strat_lst)))
+		print "[%s] Strategies: %d" % (str(datetime.today()),len(self.strat_lst))
 
 	def build_field_list(self,fields):
 		lst = []
-		if len(fields)==1 and fields[0]['name']=='element' and 'fields' in fields[0]:
+		if len(fields)==1 and 'type' in fields[0] and (fields[0]['type']=='list' or fields[0]['type']=='TLV'):
 			#Lists
 			l = self.build_field_list(fields[0]['fields'])
-			for i in range(1,4):
+			iterations = config.coord_test_list_iters
+			if('max' in fields[0]):
+				iterations = fields[0]['max']
+			for i in range(1,iterations + 1):
 				for elm in l:
 					lst.append({'field':str(i) + "." + elm['field'], 'type':elm['type']})
 		else:

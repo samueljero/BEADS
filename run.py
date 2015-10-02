@@ -124,7 +124,9 @@ def coordinated_tests(mininet, controllers, instance, lg, addr):
 		#Test
 		print strat
 		print "[%s] Test %d: %s" % (str(datetime.today()), num, str(strat))
-		doTest(mininet,controllers,strat[0],strat[1], num, lg)
+		res = doTest(mininet,controllers,strat[0],strat[1], num, lg)
+		print "[%s] Test Result: %s" %(str(datetime.today()),str(res))
+		lg.write("[%s] Test Result: %s" %(str(datetime.today()),str(res)))
 		print "******"
 		num+=1
 

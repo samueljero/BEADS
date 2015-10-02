@@ -6,9 +6,20 @@ import os
 system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 logs_loc = system_home + "/logs/inst{instance}.log"
 
+#Topology
+topo_switches = 3
+topo_hosts = 4
+topo_ports_per_sw = 3
+topo_controllers = 1
+
 #Coordinator Section
 coordinator_port = 3333
 coord_log = system_home + "/logs/coordinator.log"
+coord_test_controllers = range(0,topo_controllers)
+#coord_test_switches = range(1,topo_switches+1)
+coord_test_switches = [1,2]
+coord_test_list_iters = topo_ports_per_sw
+coord_test_case = "/root/test2.py {controllers}"
 
 #Proxy Section
 proxy_path = system_home + "/switch_proxy/sw_proxy"
@@ -27,7 +38,7 @@ controller_start_cmd = "start"
 controller_stop_cmd = "stop"
 controller_user = "root"
 controller_port = 6633
-controllers_per_instance = 1
+controllers_per_instance = topo_controllers
 
 #VeriFlow Section
 veriflow_enabled = True
