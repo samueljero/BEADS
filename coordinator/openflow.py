@@ -1426,9 +1426,9 @@ fields_of_group_add = [
 	{'name':'buckets','fields':[
 		{'name':'list', 'fields':[
 			{'name':'element', 'fields':[
-				{'name':'weight'},
-				{'name':'watch_port'},
-				{'name':'watch_group'},
+				{'name':'weight', 'type':'uint16'},
+				{'name':'watch_port', 'type':'uint32'},
+				{'name':'watch_group', 'type':'uint32'},
 				{'name':'actions','fields':[
 					##TODO: This Handling is bad
 					{'name':'list', 'fields':[
