@@ -19,7 +19,7 @@ coord_test_controllers = range(0,topo_controllers)
 #coord_test_switches = range(1,topo_switches+1)
 coord_test_switches = [1,2]
 coord_test_list_iters = topo_ports_per_sw
-coord_test_case = "/root/test2.py {controllers}"
+coord_test_case = "/root/test1.py {controllers}"
 
 #Proxy Section
 proxy_path = system_home + "/switch_proxy/sw_proxy"
@@ -49,7 +49,8 @@ veriflow_base_port = 2048
 #VM Section
 vm_path = system_home + "/vms/"
 master_name = "/ubuntu-1404-master.qcow2"
-vm_name_bases = ["mininet", "onos", "onos", "onos"]
+#vm_name_bases = ["mininet", "onos", "onos", "onos"]
+vm_name_bases = ["mininet", "onos"]
 vm_user = "root"
 vm_ip_base = "10.0.1.{0}"
 vm_ram = "2048"
