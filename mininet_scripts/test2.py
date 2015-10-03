@@ -23,7 +23,8 @@ import time
 import threading
 
 def func_timeout():
-	os.system("pkill -9 iperf")
+	lg.error('iperf timeout\n')
+	os.system("killall -9 iperf")
 
 def _parseIperf( iperfOutput ):
 	"""Parse iperf output and return bandwidth.
@@ -70,9 +71,10 @@ def iperf(hosts=None, l4Type='TCP', udpBw='10M', fmt=None,
         client.sendCmd( iperfArgs + '-t %d -c ' % seconds +
                              server.IP() + ' ' + bwArgs )
         time.sleep(seconds + timeout)
+	tmr = threading.Timer(15,func_timeout)
+	tmr.start()
         client.sendInt()
         server.sendInt()
-	tmr = threading.Timer(15,func_timeout)
 	servout = server.waitOutput()
 	os.system("killall -9 iperf")
         cliout = client.waitOutput()
