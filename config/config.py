@@ -57,3 +57,4 @@ vm_ram = "2048"
 vm_cores = "2"
 vm_telnet_base = 10100
 vm_vnc_base = 1
+vm_ssh_key = system_home + "/config/ssh.key"

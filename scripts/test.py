@@ -60,7 +60,7 @@ class SDNTester:
 		#Veriflow
 		veriflow = None
 		if config.veriflow_enabled:
-			assert(len(controllers)==1)
+			assert(len(self.controllers)==1)
 			vf_port = config.veriflow_base_port + self.controllers[0]
 			topo_file = config.veriflow_topo_path + os.path.splitext(os.path.basename(test_script.format(controllers="").strip()))[0] + ".vft"
 			cmd = config.veriflow_path + " " + str(vf_port) + " 127.0.0.1  " + proxyports[0] + " " + topo_file
@@ -86,7 +86,7 @@ class SDNTester:
 			self.log.write("Strategy CMD: " + cmd + "\n")
 			self.log.flush()
 			try:
-				com = subprocess.Popen(cmd, shell = True , stdout = log, stderr = subprocess.STDOUT)
+				com = subprocess.Popen(cmd, shell = True , stdout = self.log, stderr = subprocess.STDOUT)
 				com.wait()
 			except Exception as e:
 				print e
@@ -97,7 +97,7 @@ class SDNTester:
 
 		#Start Controllers
 		for c in self.controllers:
-			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept)
+			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 			res = shell.run(["/bin/bash","-i" ,"-c", config.controller_start_cmd])
 			self.log.write("Starting Controller (" + mv.vm2ip(c) + ")... " + res.output + "\n")
 			self.log.flush()
@@ -110,8 +110,8 @@ class SDNTester:
 		#Do Test
 		res = None
 		proc = None
-		m = mininet[0]
-		shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept)
+		m = self.mininet[0]
+		shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 		self.log.write("Starting Test: " + test_script.format(controllers=" ".join(proxyaddrs)) + "\n")
 		self.log.flush()
 		try:
@@ -132,7 +132,7 @@ class SDNTester:
 		
 		#Stop Controllers
 		for c in self.controllers:
-			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept)
+			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 			res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
 
 		#Stop Proxy
@@ -143,7 +143,7 @@ class SDNTester:
 			veriflow.send_signal(2)
 
 		#Cleanup Any Mininet Remnants
-		shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept)
+		shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 		res = shell.run(["/bin/bash","-i" ,"-c", config.mininet_cleanup_cmd])
 	
 		#Log
@@ -174,7 +174,7 @@ class SDNTester:
 				print "Error: Mininet %d not started!" % (c)
 			else:
 				if config.mininet_replace_scripts:
-					os.system("scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s/* %s@%s:~\n" % (mininet_config_path, config.mininet_user, mv.vm2ip(m)))
+					os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s/* %s@%s:~\n" % (config.vm_ssh_key,mininet_config_path, config.mininet_user, mv.vm2ip(m)))
 
 	def stopVms(self):
 		for c in self.controllers:

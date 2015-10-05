@@ -47,7 +47,6 @@ class ExecutorHandler(ss.StreamRequestHandler):
 			msg = self.rfile.readline()
 			if msg == "":
 				break
-			print msg
 
 			#Parse Message
 			try:
@@ -93,7 +92,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 			elif msg['msg']=="RESULT":
 				#Testing Results
 				instance = msg['instance']
-				res = msg['val']
+				res = msg['value']
 				strat = msg['data']
 				lg_lock.acquire()
 				lg.write("[%s] Executor (%s) finished strategy (%s) with result: %s\n" % (str(datetime.today()),instance, strat, str(res)))
