@@ -49,17 +49,23 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				break
 			print msg
 
-			#Parse message
-			parsed = msg.split()
-			if parsed[0]=="READY":
+			#Parse Message
+			try:
+				msg = eval(msg)
+			except Exception as e:
+				continue
+
+			if msg['msg'] == 'READY':
+				#New Strategy Request
+				instance = msg['instance']	
 				#Check if in executor list
 				exec_lst_lock.acquire()
-				if parsed[1] not in exec_lst:
+				if instance not in exec_lst:
 					lg_lock.acquire()
-					lg.write("[%s] New Executor: %s\n" % (str(datetime.today()),parsed[1]))
-					print "[%s] New Executor: %s" % (str(datetime.today()),parsed[1])
+					lg.write("[%s] New Executor: %s\n" % (str(datetime.today()),instance))
+					print "[%s] New Executor: %s" % (str(datetime.today()),instance)
 					lg_lock.release()
-					exec_lst.append(parsed[1])
+					exec_lst.append(instance)
 				exec_lst_lock.release()
 	
 				#Get Next Strategy
@@ -67,23 +73,37 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				strat = strat_gen.next_strategy()
 				strat_lock.release()
 
-				if strat=="":
+				if len(strat)==0:
 					#Finished
 					lg_lock.acquire()
 					lg.write("[%s] Finished Testing\n" % (str(datetime.today())))
 					print "[%s] Finished Testing" % (str(datetime.today()))
 					lg_lock.release()
-					self.request.send("%s\n"%(repr([])))
+					msg = {'msg':'DONE'}
+					self.request.send("%s\n"%(repr(msg)))
 					return
 
 				#Send strategy
-				string = repr(strat)
 				lg_lock.acquire()
-				lg.write("[%s] Executor (%s) testing strategy: %s\n" % (str(datetime.today()),parsed[1], string))
-				lg.flush()
-				print "[%s] Executor (%s) testing strategy: %s" % (str(datetime.today()),parsed[1], string)
+				lg.write("[%s] Executor (%s) testing strategy: %s\n" % (str(datetime.today()),instance, strat))
+				print "[%s] Executor (%s) testing strategy: %s" % (str(datetime.today()),instance, strat)
 				lg_lock.release()
-				self.request.send("%s\n"%(string))
+				msg = {'msg':'STRATEGY', 'data':strat}
+				self.request.send("%s\n"%(repr(msg)))
+			elif msg['msg']=="RESULT":
+				#Testing Results
+				instance = msg['instance']
+				res = msg['val']
+				strat = msg['data']
+				lg_lock.acquire()
+				lg.write("[%s] Executor (%s) finished strategy (%s) with result: %s\n" % (str(datetime.today()),instance, strat, str(res)))
+				print "[%s] Executor (%s) finished strategy (%s) with result: %s" % (str(datetime.today()),instance, strat, str(res))
+				lg_lock.release()
+			else:
+				print "Unknown Message: %s" % msg
+			lg_lock.acquire()
+			lg.flush()
+			lg_lock.release()
 
 def main(args):
 	global lg, strat_gen

@@ -21,7 +21,7 @@ class StrategyGenerator:
 
 	def next_strategy(self):
 		if (self.strat_ptr >= len(self.strat_lst)):
-			return ""
+			return []
 		strat = self.strat_lst[self.strat_ptr]
 		self.strat_ptr+=1
 		if self.strat_ptr % 100 == 0:
@@ -83,4 +83,36 @@ class StrategyGenerator:
 				else:
 					lst.append({'field':string, 'type':f['type']})
 		return lst
+
+	def pretty_print_field(self, msg_type, field):
+		if type(field)!=str or type(msg_type)!=str:
+			return
+		flist = field.split(".")
+		fdata = []
+		for i in openflow.openflow:
+			if i[0]==msg_type:
+				fdata = i[1]
+				break
+		if len(fdata)==0:
+			return
+		full=""
+		for i in flist:
+			v = int(i) - 1
+			if len(fdata)==1 and 'type' in fdata[0] and (fdata[0]['type']=='list' or fdata[0]['type']=='TLV'):
+				full+=i
+				full+="."
+				fdata = fdata[0]['fields']
+			elif len(fdata) <= v:
+				print "Error: Invalid field description"
+				break
+			else:
+				full +=fdata[v]['name']
+				full +="."
+				if 'fields' in fdata[v]:
+					fdata = fdata[v]['fields']
+				else:
+					fdata = []
+		if full[len(full)-1]=='.':
+			full = full[0:len(full)-1]
+		return full
 

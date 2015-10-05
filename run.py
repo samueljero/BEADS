@@ -46,20 +46,21 @@ def main(args):
 	lg.write("Mininet: " + str(mininet) + "\n")
 	lg.write("Controllers: " + str(controllers) + "\n")
 	lg.flush()
+	tester = SDNTester(mininet,controllers,lg)
 
 	#Start VMs
 	print "Starting VMs..."
-	startVms(mininet, controllers)
+	tester.startVms()
 
 	#Do Tests
 	if standalone:
-		standalone_tests(mininet,controllers,lg)
+		standalone_tests(tester)
 	else:
-		coordinated_tests(mininet,controllers,instance, lg, (args['coordinator'], args['port']))
+		coordinated_tests(tester, instance, lg,(args['coordinator'], args['port']))
 
 	#Stop VMs
 	print "Stopping VMs..."
-	stopVms(mininet, controllers)
+	tester.stopVms()
 
 	#Close log
 	lg.write(str(datetime.today()) + "\n")
@@ -73,7 +74,7 @@ def reconnect(addr):
 			break
 		except Exception as e:
 			print "[%s] Failed to connect to coordinator (%s:%d): %s...retrying" % (str(datetime.today()),addr[0], addr[1], e)
-			time.sleep(1)
+			time.sleep(5)
 			continue
 	return sock
 
@@ -83,7 +84,7 @@ def reconnect(addr):
 # readline() properly handles waiting for a full message before delivering it. On
 # error, an empty string is returned.
 # Arbitrary python can be passed back and forth with str=repr(data) and data=eval(str)
-def coordinated_tests(mininet, controllers, instance, lg, addr):
+def coordinated_tests(tester, instance,lg, addr):
 	num = 1
 
 	#Connect
@@ -96,68 +97,82 @@ def coordinated_tests(mininet, controllers, instance, lg, addr):
 
 	#Loop Testing Strategies
 	while True:
+		print "****************"
 		#Ask for Next Strategy
 		print "[%s] Asking for Next Strategy..." % (str(datetime.today()))
 		lg.write("[%s] Asking for Next Strategy...\n" % (str(datetime.today())))
 		try:
-			sock.send("READY %s:%d\n" %(socket.gethostname(),instance))
+			msg = {'msg':'READY','instance':"%s:%d"%(socket.gethostname(),instance)}
+			sock.send("%s\n" %(repr(msg)))
 		except Exception as e:
 			print "Failed to send on socket..."
 			sock = reconnect(addr)
 			continue
 
-		#Get Strategy
+		#Get Reply
 		line = rf.readline()
 		if line=="":
 			rf.close()
 			sock.close()
 			sock = reconnect(addr)
 			rf = sock.makefile()
+			continue
 		try:
-			strat = eval(line)
+			msg = eval(line)
 		except Exception as e:
 			continue
 
 		#Check for finished
-		if len(strat)==0:
+		if msg['msg']=="DONE":
+			#Done, shutdown
 			print "[%s] Finished... Shutting down..." % (str(datetime.today()))
 			lg.write("[%s] Finished... Shutting down...\n" % (str(datetime.today())))
 			break
+		elif msg['msg']=="STRATEGY":
+			#Test Strategy
+			strat = msg['data']
+			print "[%s] Test %d: %s" % (str(datetime.today()), num, str(strat))
+			lg.write("[%s] Test %d: %s\n" % (str(datetime.today()), num, str(strat)))
+			res = tester.doTest(strat[0],strat[1])
+			num+=1
 
-		#Test
-		print strat
-		print "[%s] Test %d: %s" % (str(datetime.today()), num, str(strat))
-		lg.write("[%s] Test %d: %s\n" % (str(datetime.today()), num, str(strat)))
-		res = doTest(mininet,controllers,strat[0],strat[1], num, lg)
-		print "[%s] Test Result: %s" %(str(datetime.today()),str(res))
-		lg.write("[%s] Test Result: %s\n" %(str(datetime.today()),str(res)))
-		print "******"
-		num+=1
+			#Return Result
+			print "[%s] Test Result: %s" %(str(datetime.today()),str(res))
+			lg.write("[%s] Test Result: %s\n" %(str(datetime.today()),str(res)))
+			try:
+				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res, 'data':strat}
+				sock.send("%s\n" %(repr(msg)))
+			except Exception as e:
+				print "Failed to send on socket..."
+				sock = reconnect(addr)
+				continue
+		else:
+			print "Unknown Message: %s" % (msg)
 
 	#Cleanup
 	rf.close()
 	sock.close()
 
-def standalone_tests(mininet, controllers, lg):
+def standalone_tests(tester):
 	print "Starting Tests..."
 	print "Test 1   " + str(datetime.today())
-	res = doTest(mininet, controllers, "/root/test2.py {controllers}", ["*,*,*,*,*,CLEAR,*"], 1, lg)
+	res = tester.doTest("/root/test2.py {controllers}", ["*,*,*,*,*,CLEAR,*"])
 	print "Test Result: " + str(res)
 	print "******"
 	print "Test 2   " + str(datetime.today())
-	res = doTest(mininet, controllers, "/root/test2.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=2&act==&val=1"], 2, lg)
+	res = tester.doTest("/root/test2.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=2&act==&val=1"])
 	print "Test Result: " + str(res)
 	print "******"
 	print "Test 3   " + str(datetime.today())
-	res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"], 3, lg)
+	res = tester.doTest("/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"])
 	print "Test Result: " + str(res)
 	print "******"
 	print "Test 4   " + str(datetime.today())
-	res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=2&ctl={controllers[0]}","{controllers[0]},2,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=3&ctl={controllers[0]}"], 4, lg)
+	res = tester.doTest("/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=2&ctl={controllers[0]}","{controllers[0]},2,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=3&ctl={controllers[0]}"])
 	print "Test Result: " + str(res)
 	print "******"
 	print "Test 5   " + str(datetime.today())
-	res = doTest(mininet, controllers, "/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_out,7.1.1,CDIVERT,mfield=7.1.1&mval=2&p=100&sw=1&ctl={controllers[0]}"], 5, lg)
+	res = tester.doTest("/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_out,7.1.1,CDIVERT,mfield=7.1.1&mval=2&p=100&sw=1&ctl={controllers[0]}"])
 	print "Test Result: " + str(res)
 	print "******"
 
