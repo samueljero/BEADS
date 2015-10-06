@@ -7,6 +7,8 @@ import sys
 import subprocess
 import time
 from datetime import datetime
+import socket
+import struct
 
 
 from . import system_home, lib_path, config_path, config
@@ -95,15 +97,12 @@ class SDNTester:
 		#Send Proxy Strategy
 		ts = time.time()
 		for l in strategy:
-			cmd = config.ctl_path + " -p " + str(config.proxy_com_port + self.mininet[0]) + " localhost \"" + l.format(controllers=proxyports) + "\""
+			cmd = l.format(controllers=proxyports)
 			self.log.write("Strategy CMD: " + cmd + "\n")
 			self.log.flush()
-			try:
-				com = subprocess.Popen(cmd, shell = True , stdout = self.log, stderr = subprocess.STDOUT)
-				com.wait()
-			except Exception as e:
-				print e
-				self.log.write("Exception: " + str(e) + "\n")
+			res = self._communicate_proxy(("localhost",config.proxy_com_port + self.mininet[0]), cmd)
+			if (res == False):
+				self.log.write("Failed to Send Command\n")
 				self.log.flush()
 				result = False
 		if config.enable_stat:
@@ -240,6 +239,61 @@ class SDNTester:
 		if output:
 			print host + " is listening on " + str(port)
 			return True
+
+	def _proxy_communicate(addr, msg, wait_for_reponse = False):
+		rsp = ""
+
+		#Connect
+		try:
+			sock = socket.create_connection(addr)
+		except Exception as e:
+			self.log.write("Failed to connect to to proxy(%s:%d): %s\n" % (addr[0], addr[1], e))
+			self.log.flush()
+			return False
+
+		#Buid command
+		snd = struct.pack("!Hs",len(msg), msg)
+
+		#Send command
+		sock.send(snd)
+
+		if wait_for_response:
+			#Wait for Length
+			data = ""
+			while (len(data) < 3):
+				data = sock.recv(4,socket.MSG_PEEK)
+				if len(data) == 0:
+					sock.close()
+					return False
+				
+			
+			#compute length
+			try:
+				length = struct.unpack("!H",data[0:1])
+				length = length[0]
+			except Exception as e:
+				sock.close()
+				return False
+			
+			#Receive Message
+			msg = ""
+			mlen = length
+			while(len(msg) < mlen):
+				data = sock.recv(length)
+				if len(data) == 0:
+					sock.close()
+					return False
+				msg += data
+				length -= len(data)
+
+			#Process Message
+			rsp = msg[2:]
+
+		#Close Socket
+		sock.close()
+		if wait_for_response:
+			return rsp;
+		return True
 
 if __name__ == "__main__":
 	print "Running demo..."

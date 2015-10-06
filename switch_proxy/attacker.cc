@@ -502,6 +502,9 @@ bool Attacker::clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type)
 		if (dpid == (uint64_t)DPID_ALL) {
 			if (ofp_ver == OF_VERSION_ALL) {
 				if (msg_type == OFP_MSG_TYPE_ALL) {
+					pthread_rwlock_wrlock(&pkt_types_lock);
+					pkt_types_seen.clear();
+					pthread_rwlock_unlock(&pkt_types_lock);
 					actions_map.clear();
 					mod_params.clear();
 					nxt_param = 0;
