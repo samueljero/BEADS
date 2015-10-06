@@ -100,7 +100,7 @@ class SDNTester:
 			cmd = l.format(controllers=proxyports)
 			self.log.write("Strategy CMD: " + cmd + "\n")
 			self.log.flush()
-			res = self._communicate_proxy(("localhost",config.proxy_com_port + self.mininet[0]), cmd)
+			res = self._proxy_communicate(("localhost",config.proxy_com_port + self.mininet[0]), cmd)
 			if (res == False):
 				self.log.write("Failed to Send Command\n")
 				self.log.flush()
@@ -198,10 +198,10 @@ class SDNTester:
 		for m in self.mininet:
 			mv.startvm(m)
 		for c in self.controllers:
-			if(self._waitListening(mv.vm2ip(c),22,60,True)==False):
+			if(self._waitListening(mv.vm2ip(c),22,240,True)==False):
 				print "Error: Controller %d not started!" % (c)
 		for m in self.mininet:
-			if(self._waitListening(mv.vm2ip(m),22,60,True)==False):
+			if(self._waitListening(mv.vm2ip(m),22,240,True)==False):
 				print "Error: Mininet %d not started!" % (c)
 			else:
 				if config.mininet_replace_scripts:
@@ -240,7 +240,7 @@ class SDNTester:
 			print host + " is listening on " + str(port)
 			return True
 
-	def _proxy_communicate(addr, msg, wait_for_reponse = False):
+	def _proxy_communicate(self,addr, msg, wait_for_response = False):
 		rsp = ""
 
 		#Connect
@@ -252,7 +252,8 @@ class SDNTester:
 			return False
 
 		#Buid command
-		snd = struct.pack("!Hs",len(msg), msg)
+		snd = struct.pack("!H",len(msg) + 2)
+		snd += msg
 
 		#Send command
 		sock.send(snd)

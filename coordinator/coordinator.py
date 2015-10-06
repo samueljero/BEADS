@@ -56,7 +56,8 @@ class ExecutorHandler(ss.StreamRequestHandler):
 					strat_gen.return_strategy(strat)
 					strat_lock.release()
 				exec_lst_lock.acquire()
-				del exec_lst[instance]
+				if len(instance) > 0 and instance in exec_lst:
+					del exec_lst[instance]
 				exec_lst_lock.release()
 				lg_lock.acquire()
 				lg.write("[%s] Executor (%s) failed\n" % (str(datetime.today()),instance))
