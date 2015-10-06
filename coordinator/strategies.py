@@ -26,7 +26,7 @@ class StrategyGenerator:
 		# Check for new failed strategies that need to be retried
 		if (self.failed_ptr < len(self.failed_lst)):
 			strat = self.failed_lst[self.failed_ptr]
-			self_failed_ptr+=1
+			self.failed_ptr+=1
 			return strat
 
 		#Check if all strategies have been tested
@@ -43,7 +43,7 @@ class StrategyGenerator:
 		return strat
 
 	def return_strategy(self, strat):
-		self.strat_list.insert(self.strat_ptr + 1, strat)
+		self.strat_lst.insert(self.strat_ptr + 1, strat)
 
 	def strategy_result(self, strat, res):
 		if res == False:
@@ -53,8 +53,8 @@ class StrategyGenerator:
 			else:
 				self.results.write("FAILED, %s\n" %(str(strat)))
 				self.results.flush()
-				self.log.write("[%s] Strategy HARD FAILED: %s\n" % (str(datetime.today(),str(strat)))
-				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today(),str(strat))
+				self.log.write("[%s] Strategy HARD FAILED: %s\n" % (str(datetime.today()),str(strat)))
+				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today()),str(strat))
 
 	def build_strategies(self):
 		for pkt in openflow.openflow:

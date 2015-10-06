@@ -58,6 +58,10 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				exec_lst_lock.acquire()
 				del exec_lst[instance]
 				exec_lst_lock.release()
+				lg_lock.acquire()
+				lg.write("[%s] Executor (%s) failed\n" % (str(datetime.today()),instance))
+				print "[%s] Executor (%s) failed" % (str(datetime.today()),instance)
+				lg_lock.release()
 				break
 
 			#Parse Message
@@ -96,6 +100,10 @@ class ExecutorHandler(ss.StreamRequestHandler):
 							strat_gen.return_strategy(strat)
 							strat_lock.release()
 						del exec_lst[instance]
+						lg_lock.acquire()
+						lg.write("[%s] Executor (%s) failed\n" % (str(datetime.today()),instance))
+						print "[%s] Executor (%s) failed" % (str(datetime.today()),instance)
+						lg_lock.release()
 						exec_lst_lock.release()
 						break
 					exec_lst_lock.release()
@@ -148,6 +156,10 @@ class ExecutorHandler(ss.StreamRequestHandler):
 					exec_lst_lock.acquire()
 					del exec_lst[instance]
 					exec_lst_lock.release()
+					lg_lock.acquire()
+					lg.write("[%s] Executor (%s) failed\n" % (str(datetime.today()),instance))
+					print "[%s] Executor (%s) failed" % (str(datetime.today()),instance)
+					lg_lock.release()
 					break
 			elif msg['msg']=="RESULT":
 				#Testing Results
@@ -187,7 +199,7 @@ def main(args):
 
 	#Open Results File
 	res_lg = open(config.coord_results_log, "w")
-	res_lg.write("#Started %s\n" % (str(datetime.today()))
+	res_lg.write("#Started %s\n" % (str(datetime.today())))
 	res_lg.flush()
 
 	#Create Strategy Generator

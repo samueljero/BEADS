@@ -146,7 +146,7 @@ def coordinated_tests(tester, instance,lg, addr):
 				print "Failed to send on socket..."
 				sock = reconnect(addr)
 				continue
-		elif msg['msg' == 'BASELINE']:
+		elif msg['msg'] == 'BASELINE':
 			print "[%s] Creating Baseline..." % (str(datetime.today()))
 			lg.write("[%s] Creating Baseline...\n" % (str(datetime.today())))
 			tester.baseline(msg['test'])
