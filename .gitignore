@@ -1,5 +1,10 @@
-# Compiled binaries
+# Generated files
+/log.txt
 /monitors/procmon
+/switch_proxy/libloci.so
+/switch_proxy/sndcmd
+/switch_proxy/sw_proxy
+/veriflow/VeriFlow/VeriFlow
 
 # Temporary
 *~
