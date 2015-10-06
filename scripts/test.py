@@ -8,17 +8,16 @@ import subprocess
 import time
 from datetime import datetime
 
-system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-lib_path = os.path.abspath(os.path.join(system_home, 'scripts','libs'))
-config_path = os.path.abspath(os.path.join(system_home, 'config'))
-mininet_config_path = os.path.abspath(os.path.join(system_home, 'mininet_scripts'))
-sys.path.insert(1,lib_path)
-sys.path.insert(0,config_path)
+
+from . import system_home, lib_path, config_path, config
 import spur
-import config
+
+
+mininet_config_path = os.path.abspath(os.path.join(system_home, 'mininet_scripts'))
+
 
 class SDNTester:
-	def __init__(self,mininet, controllers, log):
+	def __init__(self, mininet, controllers, log):
 		assert(isinstance(mininet, (list,tuple)) and isinstance(controllers, (list,tuple)) and len(mininet) == 1)
 		self.mininet = mininet
 		self.controllers = controllers
@@ -39,6 +38,7 @@ class SDNTester:
 			proxyports.append(str(config.proxy_base_port + c))
 
 		#Start Proxy
+		ts = time.time()
 		cmd = config.proxy_path + " -p " + str(config.proxy_com_port + self.mininet[0])
 		for c in range(0,len(controlleraddrs)):
 			cmd = cmd + " -c " +  proxyports[c] + ":" + controlleraddrs[c]
@@ -56,11 +56,14 @@ class SDNTester:
 			self.log.write("Proxy failed to start after 60 seconds\n")
 			self.log.flush()
 			return False
+		if config.enable_stat:
+			self.log.write('[timer] Start proxy: %d sec.\n' % (time.time() - ts))
 
-		#Veriflow
+		#VeriFlow
 		veriflow = None
 		if config.veriflow_enabled:
 			assert(len(self.controllers)==1)
+			ts = time.time()
 			vf_port = config.veriflow_base_port + self.controllers[0]
 			topo_file = config.veriflow_topo_path + os.path.splitext(os.path.basename(test_script.format(controllers="").strip()))[0] + ".vft"
 			cmd = config.veriflow_path + " " + str(vf_port) + " 127.0.0.1  " + proxyports[0] + " " + topo_file
@@ -79,8 +82,11 @@ class SDNTester:
 				self.log.write("Veriflow failed to start after 60 seconds\n")
 				self.log.flush()
 				return False
+			if config.enable_stat:
+				self.log.write('[timer] Start VeriFlow: %d sec.\n' % (time.time() - ts))
 
 		#Send Proxy Strategy
+		ts = time.time()
 		for l in strategy:
 			cmd = config.ctl_path + " -p " + str(config.proxy_com_port + self.mininet[0]) + " localhost \"" + l.format(controllers=proxyports) + "\""
 			self.log.write("Strategy CMD: " + cmd + "\n")
@@ -93,9 +99,11 @@ class SDNTester:
 				self.log.write("Exception: " + str(e) + "\n")
 				self.log.flush()
 				result = False
-
+		if config.enable_stat:
+			self.log.write('[timer] Send strategy: %d sec.\n' % (time.time() - ts))
 
 		#Start Controllers
+		ts = time.time()
 		for c in self.controllers:
 			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 			res = shell.run(["/bin/bash","-i" ,"-c", config.controller_start_cmd])
@@ -106,8 +114,11 @@ class SDNTester:
 				self.log.write("Controller %s failed to start after %d seconds" % (mv.vm2ip(c),60))
 				self.log.flush()
 				result = False
+		if config.enable_stat:
+			self.log.write('[timer] Start controllers: %d sec.\n' % (time.time() - ts))
 
 		#Do Test
+		ts = time.time()
 		res = None
 		proc = None
 		m = self.mininet[0]
@@ -121,6 +132,8 @@ class SDNTester:
 			print e
 			self.log.write("Exception: " + str(e) + "\n")
 			self.log.flush()
+		if config.enable_stat:
+			self.log.write('[timer] Do all tests: %d sec.\n' % (time.time() - ts))
 
 		#Evaluate Results
 		if  isinstance(res, (list,tuple)):
@@ -131,21 +144,33 @@ class SDNTester:
 			result = False
 		
 		#Stop Controllers
+		ts = time.time()
 		for c in self.controllers:
 			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 			res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
+		if config.enable_stat:
+			self.log.write('[timer] Stop controllers: %d sec.\n' % (time.time() - ts))
 
 		#Stop Proxy
+		ts = time.time()
 		proxy.terminate()
+		if config.enable_stat:
+			self.log.write('[timer] Stop proxy: %d sec.\n' % (time.time() - ts))
 
-		#Stop Veriflow
+		#Stop VeriFlow
+		ts = time.time()
 		if config.veriflow_enabled:
 			veriflow.send_signal(2)
+		if config.enable_stat:
+			self.log.write('[timer] Stop VeriFlow: %d sec.\n' % (time.time() - ts))
 
 		#Cleanup Any Mininet Remnants
+		ts = time.time()
 		shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 		res = shell.run(["/bin/bash","-i" ,"-c", config.mininet_cleanup_cmd])
-	
+		if config.enable_stat:
+			self.log.write('[timer] Clean up mininet: %d sec.\n' % (time.time() - ts))
+
 		#Log
 		self.log.flush()
 		self.log.write("*****************\n")

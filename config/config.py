@@ -5,6 +5,7 @@ import os
 #Global
 system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 logs_loc = system_home + "/logs/inst{instance}.log"
+enable_stat = True
 
 #Topology
 topo_switches = 3

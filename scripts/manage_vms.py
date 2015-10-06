@@ -8,10 +8,8 @@ import platform
 import subprocess
 import re
 
-system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-config_path = os.path.abspath(os.path.join(system_home, 'config'))
-sys.path.insert(0,(config_path))
-import config
+
+from . import system_home, config_path, config
 
 
 def startvm(num):
