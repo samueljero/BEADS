@@ -16,6 +16,7 @@ topo_controllers = 1
 #Coordinator Section
 coordinator_port = 3333
 coord_log = system_home + "/logs/coordinator.log"
+coord_results_log = system_home + "/logs/results.log"
 coord_test_controllers = range(0,topo_controllers)
 #coord_test_switches = range(1,topo_switches+1)
 coord_test_switches = [1,2]

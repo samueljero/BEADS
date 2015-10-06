@@ -24,6 +24,13 @@ class SDNTester:
 		self.log = log
 		self.testnum = 1
 
+	def baseline(self, test_script):
+		num = self.testnum
+		for i in range(0,1):
+			self.testnum = 0
+			self.doTest(test_script, ["*,*,*,*,*,CLEAR,*"])
+		self.testnum = num
+
 	def doTest(self,test_script, strategy):
 		result = True
 		self.log.write("##############################Starting Test " + str(self.testnum) + "###################################\n")
