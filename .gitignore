@@ -1,16 +1,23 @@
-#Temporary
+# Compiled binaries
+/monitors/procmon
+
+# Temporary
 *~
+.Trash-*
 
-#C
+# C++
 *.o
+*.out
 
-#Python
-*.pyc
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 
-#Java
+# Java
 *.class
 
-#LaTeX
+# LaTeX
 *.gz
 *.aux
 *.dvi
@@ -24,7 +31,7 @@
 *.nav
 *.snm
 
-#VMs
+# VMs
 *.qcow2
 *.sav
 *.vdmk
