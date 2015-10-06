@@ -1,0 +1,218 @@
+/**
+ * procmon.c
+ * Periodically monitor CPU usage of a given process. To exit, either terminate the monitored
+ * process or issue a SIGINT to procmon.
+ * 
+ * @author Xiangyu Bu <bu1@purdue.edu>
+ */
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <climits>
+#include <ctime>
+#include <signal.h>
+#include <unistd.h>
+#include "constants.h"
+#include "debug.h"
+#include "procmon.h"
+
+long ticks_per_sec;
+bool continue_loop = true;
+char stat_path[PATH_MAX];
+
+unsigned long long counter = 0;
+double uptime;
+double total_seconds = 0;
+double avg_cpu_percentage = 0;
+double peak_cpu_percentage = 0;
+double avg_vsize = 0;
+unsigned long peak_vsize = 0;
+
+/**
+ * Break infinite loop if SIGINT is received.
+ */
+void on_interrupted(int sig, siginfo_t *siginfo, void *context) {
+    continue_loop = false;
+}
+
+double get_uptime() {
+    int fields_read;
+    double sec;
+    FILE *f = fopen("/proc/uptime", "r");
+    fields_read = fscanf(f, "%lfs", &sec);
+    fclose(f);
+    return sec;
+}
+
+/**
+ * Poll process information and print to stdout.
+ * See https://linux.die.net/man/5/proc
+ * See https://www.kernel.org/doc/Documentation/filesystems/proc.txt
+ * @return RETURN_OK if okay; RETURN_ERR otherwise.
+ */
+int pollstat() {
+    time_t ts;
+    FILE *f;
+    int fields_read;
+    unsigned long long total_time;
+    double cpu_percentage;
+
+    int pid;
+    char comm[PATH_MAX];
+    char state;
+    int ppid, pgid, sid;
+    int tty_nr;             // tty the process uses
+    int tty_pgid;           // the controlling terminal of the process
+    unsigned int flags;     // task flags
+    unsigned long min_flt, maj_flt;   // number of minor/major faults
+    unsigned long cmin_flt, cmaj_flt; // number of minor/major faults for children
+    unsigned long utime;    // user mode jiffies
+    unsigned long stimev;   // kernel mode jiffies
+    long cutime;             // user mode jiffies with child's
+    long cstime;             // kernel mode jiffies with child's
+    long priority;
+    long nicev;
+    long num_threads;
+    long it_real_value;
+    unsigned long long start_time;
+    unsigned long vsize;
+    long rss;
+    unsigned long rsslim;
+    unsigned long start_code;
+    unsigned long end_code;
+    unsigned long start_stack;
+    unsigned long esp, eip;
+    unsigned long sig_pending;
+    unsigned long sig_blocked;
+    unsigned long sig_ignore;
+    unsigned long sig_catch;
+    unsigned long wchan;
+    unsigned long nswap;
+    unsigned long cnswap;           // Not maintained.
+    int exit_signal;
+    int cpu;                        // Signal to be sent to parent when we die.
+    unsigned int rt_priority;       // CPU number last executed on.
+    int policy;
+    unsigned long long delayacct_blkio_ticks;// Aggregated block I/O delays, measured in clock ticks (centiseconds).
+    unsigned long guest_time;       // Guest time of the process (time spent running a virtual CPU for a guest operating system), measured in clock ticks (divide by sysconf(_SC_CLK_TCK)).
+    long cguest_time;               // Guest time of the process's children, measured in clock ticks (divide by sysconf(_SC_CLK_TCK)).
+    
+    if (!(f = fopen(stat_path, "r"))) {
+        return RETURN_ERR;
+    }
+
+    fields_read = fscanf(f, 
+        "%d %s %c %d %d %d "
+        "%d %d "
+        "%u %lu %lu %lu %lu "
+        "%lu %lu %ld %ld "
+        "%ld %ld %ld "
+        "%ld %llu "
+        "%lu %ld %lu "
+        "%lu %lu "
+        "%lu %lu "
+        "%lu %lu "
+        "%lu %lu %lu "
+        "%lu %lu %lu %d"
+        "%d %u %d"
+        "%llu %lu %ld",
+        &pid, comm, &state, &ppid, &pgid, &sid,
+        &tty_nr, &tty_pgid,
+        &flags, &min_flt, &cmin_flt, &maj_flt, &cmaj_flt,
+        &utime, &stimev, &cutime, &cstime,
+        &priority, &nicev, &num_threads,
+        &it_real_value, &start_time,
+        &vsize, &rss, &rsslim,
+        &start_code, &end_code,
+        &start_stack, &esp,
+        &eip, &sig_pending,
+        &sig_blocked, &sig_ignore, &sig_catch,
+        &wchan, &nswap, &cnswap, &exit_signal,
+        &cpu, &rt_priority, &policy,
+        &delayacct_blkio_ticks, &guest_time, &cguest_time);    
+    
+    time(&ts);
+    total_time = utime + stimev + cutime + cstime;
+    uptime = get_uptime();
+    total_seconds = uptime - start_time  / ticks_per_sec;
+    cpu_percentage = 100 * (total_time / ticks_per_sec) / total_seconds;
+    
+    // Update virtual memory size.
+    avg_vsize += vsize;
+    if (vsize > peak_vsize) peak_vsize = vsize;
+
+    // Update CPU usage.
+    avg_cpu_percentage += cpu_percentage;
+    if (cpu_percentage > peak_cpu_percentage) peak_cpu_percentage = cpu_percentage;
+
+    fprintf(stdout, "[%ld] pid=%d, utime=%lu, stime=%lu, total_time=%llu, total_seconds=%lf, cpu=%lf%%, vsize=%luB\n",
+        ts, pid, utime, stimev, total_time, total_seconds, cpu_percentage, vsize);
+    fclose(f);
+
+    ++counter;
+}
+
+/**
+ * Print usage information.
+ */
+void print_usage(const char *prog_name) {
+    fprintf(stdout,
+        "Usage: %s PID INTERVAL\n"
+        " PID: ID of the process to monitor.\n"
+        " INTERVAL: Amount of time, in ms, to poll process info.\n",
+        prog_name);
+}
+
+int main(int argc, char *argv[]) {
+    pid_t target_pid;
+    useconds_t poll_interval;
+    struct sigaction act;
+ 
+    ticks_per_sec = sysconf(_SC_CLK_TCK);
+
+    if (argc != EXPECTED_ARGC) {
+        print_usage(argv[0]);
+        return ERR_INVALID_ARGC;
+    }
+
+    target_pid = atoi(argv[1]);
+    poll_interval = atoi(argv[2]) * 1000;
+
+    snprintf(stat_path, PATH_MAX, "/proc/%d/stat", target_pid);
+
+    // Prepare signal handler.
+    memset(&act, 0, sizeof(struct sigaction));
+    act.sa_sigaction = &on_interrupted;
+    act.sa_flags = SA_SIGINFO;
+    if (sigaction(SIGINT, &act, NULL) < 0) {
+        perror("sigaction");
+        return ERR_SIGACTION;
+    }
+
+    while (continue_loop) {
+        if (pollstat() < 0)
+            break;
+        usleep(poll_interval);
+    }
+
+    if (counter == 0) {
+        fprintf(stdout, "Error: no sample.\n");
+    } else {
+        avg_cpu_percentage /= counter;
+        avg_vsize /= counter;
+        fprintf(stdout,
+            "Statistics:\n"
+            "Total samples:  %llu\n"
+            "Total uptime:   %lf sec\n"
+            "Total CPU time: %lf sec\n"
+            "Avg CPU usage:  %lf %%\n"
+            "Peak CPU usage: %lf %%\n"
+            "Avg VM size:    %.0lf B\n"
+            "Peak VM size:   %lu B\n",
+            counter, uptime, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_vsize, peak_vsize);
+    }
+
+    fflush(stdout);
+    return RETURN_OK;
+}

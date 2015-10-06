@@ -1,0 +1,6 @@
+G++ = g++ -std=gnu++11
+GCC = gcc -std=gnu99
+OPT_FLAGS = -O1 -mtune=native -march=native -mfpmath=sse -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mavx
+
+BUILD_DIR = build
+SRC_DIR = src
