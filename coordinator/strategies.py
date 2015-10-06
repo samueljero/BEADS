@@ -53,7 +53,7 @@ class StrategyGenerator:
 			else:
 				self.results.write("FAILED, %s\n" %(str(strat)))
 				self.results.flush()
-				self.log.write("[%s] Strategy HARD FAILED: %s\n" % (str(datetime.today()),str(strat)))
+				self.lg.write("[%s] Strategy HARD FAILED: %s\n" % (str(datetime.today()),str(strat)))
 				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today()),str(strat))
 
 	def build_strategies(self):

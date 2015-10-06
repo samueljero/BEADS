@@ -38,17 +38,21 @@ using namespace std;
 #define ACTION_ALIAS_CLEAR		"CLEAR"
 #define ACTION_ALIAS_DIVERT		"DIVERT"
 #define ACTION_ALIAS_CLIE		"CLIE"
-#define ACTION_ALIAS_CDIVERT		"CDIVERT"
+#define ACTION_ALIAS_CDIVERT	"CDIVERT"
+#define ACTION_ALIAS_PKT_TYPES	"PKT_TYPES"
 
 #define OFP_MSG_TYPE_ERR		(-2)
 #define OFP_MSG_TYPE_ALL		(-1)
 #define OFP_MSG_TYPE_MAX		34
+
+#define PKT_TYPES_STR_LEN		5000
 
 pthread_mutex_t ofo_print_serialization_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 Attacker::Attacker()
 {
 	pthread_rwlock_init(&lock, NULL);
+	pthread_rwlock_init(&pkt_types_lock, NULL);
 	listeners = NULL;
 	listeners_mutex = NULL;
 	nxt_param = 0;
@@ -75,7 +79,7 @@ bool Attacker::loadListeners(std::list<Listener*> *listeners, pthread_mutex_t *l
 	return true;
 }
 
-bool Attacker::addCommand(Message m)
+bool Attacker::addCommand(Message m, Message *resp)
 {
 	bool ret = true;
 	size_t num_fields;
@@ -139,14 +143,14 @@ bool Attacker::addCommand(Message m)
 		goto out;
 	}
 
-	ret = loadmap(cid, dpid, ofp_ver, msg_type, action_type, args, fields[4]);
+	ret = loadmap(cid, dpid, ofp_ver, msg_type, action_type, args, fields[4], resp);
 	args_free(args);
 out:
 	csv_free(fields);
 	return ret;
 }
 
-bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args, char* fields)
+bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args, char* fields, Message *resp)
 {
 	bool ret = true;
 	arg_node_t *targ;
@@ -160,9 +164,13 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 	/* Add command */
 	pthread_rwlock_wrlock(&lock);
 
-	/* Clear action is special */
+	/* Special Actions */
 	if (action_type == ACTION_ID_CLEAR) {
 		ret = clearRules(cid, dpid, ofp_ver, msg_type);
+		goto out;
+	}
+	if (action_type == ACTION_ID_PKT_TYPES) {
+		ret = dump_pkt_types(resp);
 		goto out;
 	}
 
@@ -609,6 +617,7 @@ int Attacker::normalize_action_type(char *s)
 	if (!strcmp(ACTION_ALIAS_DIVERT, s)) return ACTION_ID_DIVERT;
 	if (!strcmp(ACTION_ALIAS_CLIE, s)) return ACTION_ID_CLIE;
 	if (!strcmp(ACTION_ALIAS_CDIVERT, s)) return ACTION_ID_CDIVERT;
+	if (!strcmp(ACTION_ALIAS_PKT_TYPES, s)) return ACTION_ID_PKT_TYPES;
 	return ACTION_ID_ERR;
 }
 
@@ -707,6 +716,9 @@ pkt_info Attacker::doAttack(pkt_info pk)
 	if (sw_proxy_debug > 2) {
 		print(pk);
 	}
+
+	/* Log packet type */
+	log_pkt_type(pk.ofo);
 
 	/* Check cid */
 	it1 = actions_map.find(pk.cid);
@@ -1144,3 +1156,54 @@ bool Attacker::isFieldValue(of_object_t* ofo, vector<int> cfield, int cval)
 	return vval == (unsigned int) cval;
 }
 
+void  Attacker::log_pkt_type(of_object_t *ofo)
+{
+	std::map<int,int>::iterator it;
+
+	pthread_rwlock_rdlock(&pkt_types_lock);
+	it = pkt_types_seen.find(ofo->object_id);
+	if (it == pkt_types_seen.end()) {
+		/*Isn't present, add it*/
+		pthread_rwlock_unlock(&pkt_types_lock);
+		pthread_rwlock_wrlock(&pkt_types_lock);
+		it = pkt_types_seen.find(ofo->object_id);
+		if (it == pkt_types_seen.end()){
+			pkt_types_seen[ofo->object_id] = ofo->object_id;
+		}
+	}
+	pthread_rwlock_unlock(&pkt_types_lock);
+}
+
+bool Attacker::dump_pkt_types(Message *m)
+{
+	std::map<int,int>::iterator it;
+	char *ptr;
+	int rlen;
+	int clen;
+
+	rlen = m->len = PKT_TYPES_STR_LEN;
+	ptr = m->buff = (char*)malloc(m->len);
+	if (!m->buff) {
+		dbgprintf(0, "Error: Cannot allocate Memory!\n");
+		m->buff = NULL;
+		return false;
+	}
+
+	pthread_rwlock_rdlock(&pkt_types_lock);
+	for (it = pkt_types_seen.begin(); it != pkt_types_seen.end(); it++) {
+		clen = strlen(of_object_id_str[it->first]);
+		if (clen < rlen) {
+			strcpy(ptr, of_object_id_str[it->first]);
+			rlen -= clen;
+			ptr += clen;
+			*ptr = ',';
+			ptr++;
+			rlen--;
+			*ptr = '\0';
+		}
+	}
+	pthread_rwlock_unlock(&pkt_types_lock);
+
+	m->len = strlen(m->buff);
+	return true;
+}

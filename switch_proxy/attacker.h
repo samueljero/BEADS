@@ -32,7 +32,8 @@
 #define ACTION_ID_DIVERT		6
 #define ACTION_ID_CLIE			7
 #define ACTION_ID_CDIVERT		8
-#define ACTION_ID_MAX			8
+#define ACTION_ID_PKT_TYPES		9
+#define ACTION_ID_MAX			9
 
 #define MOD_SET 1
 #define MOD_ADD 2
@@ -71,7 +72,7 @@ class Attacker{
 		~Attacker();
 		static Attacker& get();
 		bool loadListeners(std::list<Listener*> *listeners, pthread_mutex_t *listeners_mutex);
-		bool addCommand(Message m);
+		bool addCommand(Message m, Message *resp);
 		pkt_info doAttack(pkt_info pk);
 
 	private:
@@ -81,7 +82,7 @@ class Attacker{
 		int normalize_cid(char *s);
 		uint64_t normalize_dpid(char *s);
 		std::vector<int> normalize_field(char *s);
-		bool loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args, char *field);
+		bool loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int action_type, arg_node_t *args, char *field, Message *resp);
 		bool removeCommand(amap_t::iterator it5, aamap_t::iterator it4, aaamap_t::iterator it3,
 				aaaamap_t::iterator it2, aaaaamap_t::iterator it1);
 		bool clearRules(int cid, uint64_t dpid, int ofp_ver, int msg_type);
@@ -91,12 +92,16 @@ class Attacker{
 		bool ModifyHEADER(of_object_t* ofo, std::vector<int> vfield, int action, int val, unsigned int level);
 		bool getHEADER(of_object_t* ofo, std::vector<int> vfield, unsigned int level, unsigned long int* vval);
 		bool isFieldValue(of_object_t* ofo, std::vector<int> cfield, int cval);
+		void log_pkt_type(of_object_t *ofo);
+		bool dump_pkt_types(Message *m);
 
 		pthread_rwlock_t lock;
 		// <cid, <dpid, <of_version, <pkt_type, <action, ID> > > >
 		aaaaamap_t actions_map;
 		// <ID, list_of_attacks>
 		std::map<int, std::vector<modAttack> > mod_params;
+		std::map<int,int> pkt_types_seen;
+		pthread_rwlock_t pkt_types_lock;
 		int nxt_param;
 		std::list<Listener*> *listeners;
 		pthread_mutex_t *listeners_mutex;

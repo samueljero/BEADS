@@ -29,7 +29,7 @@ openflow.o: openflow.cc openflow.h
 	
 
 sndcmd: $(SNDCMD_SRC)
-	$(CPP) $(CPPFLAGS) $(SNDCMD_SRC) -o sndcmd
+	$(CPP) $(CPPFLAGS) $(SNDCMD_SRC) -lpthread -o sndcmd
 
 libloci.so: $(LOCI_SRC)
 	$(CC) -fPIC -shared $(CFLAGS) $(LOCI_SRC) -o libloci.so

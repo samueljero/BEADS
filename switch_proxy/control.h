@@ -20,6 +20,7 @@ class Control {
 		static void* thread_run(void* arg);
 		void run();
 		Message recvMsg();
+		bool sendMsg(Message m);
 
 		int sock;
 		bool running;

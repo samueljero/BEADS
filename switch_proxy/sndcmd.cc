@@ -15,12 +15,15 @@
 #include <errno.h>
 #include <netdb.h>
 #include <ifaddrs.h>
+#include <pthread.h>
 
 #define SNDCMD_VERSION 0.1
 #define COPYRIGHT_YEAR 2015
 
 int debug = 0;
 
+void* rcv_thread_run(void* arg);
+void recvMsg(int sock);
 void version();
 void usage();
 void dbgprintf(int level, const char *fmt, ...);
@@ -101,15 +104,27 @@ int main(int argc, char** argv)
 	/* Send Command */
 	char buff[256];
 	int len;
+	uint16_t len16;
 	if (cmd) {
 		/* Command specified on commandline*/
-		buff[0] = len = strlen(cmd) + 1;
-		strncpy(&buff[1],cmd,255);
+		len = strlen(cmd) + 2;
+		len16 = htons(len);
+		memcpy(&buff[0], (char*)&len16, 2);
+		strncpy(&buff[2],cmd,254);
 		send(sock,buff,len,0);
 	} else {
+		/* Start Read Thread */
+		pthread_t r_thread;
+		if (pthread_create(&r_thread, NULL, rcv_thread_run, &sock) < 0) {
+			dbgprintf(0, "Can't start receive thread!\n");
+			close(sock);
+			return -1;
+		}
+
 		/* Read from stdin */
-		while((len = read(STDIN_FILENO, &buff[1], 255)) > 0) {
-			buff[0]=len;
+		while((len = read(STDIN_FILENO, &buff[2], 254)) > 0) {
+			len16 = htons(len + 2);
+			memcpy(&buff[0], (char*)&len16, 2);
 			send(sock,buff,len,0);
 		}
 	}
@@ -118,6 +133,72 @@ int main(int argc, char** argv)
 	close(sock);
 
 	return 0;
+}
+
+void* rcv_thread_run(void* arg)
+{
+	int sock = *((int *)arg);
+	recvMsg(sock);
+	return NULL;
+}
+
+void recvMsg(int sock)
+{
+	unsigned char hdrbuff[4];
+	char *buff, *mbuff;
+	int blen;
+	int len;
+	int mlen;
+	uint16_t len16;
+
+	while (true) {
+		/* Peak at header */
+		len = 0;
+		while (len < 3) {
+			if ((len = recv(sock,hdrbuff,3,MSG_PEEK)) < 0) {
+				dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
+				buff = NULL;
+				return;
+			}
+			if (len == 0) {
+				return;
+			}
+		}
+
+		/* Determine message length */
+		memcpy(&len16, hdrbuff,2);
+		blen = ntohs(len16);
+		mlen = 0;
+
+		mbuff = buff = (char*)malloc(blen);
+		if (!buff) {
+			dbgprintf(0, "Error: Cannot allocate Memory!\n");
+			return;
+		}
+
+		/* Receive Message */
+		while (blen > 0) {
+			if ((len = recv(sock,buff,blen,0)) < 0) {
+				dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
+				return;
+			}
+			if (len == 0) {
+				return;
+			}
+
+			buff += len;
+			mlen += len;
+			blen -= len;
+		}
+
+		/* Convert to string */
+		memmove(&mbuff[0], &mbuff[2], mlen - 2);
+		mbuff[mlen-2] = 0;
+
+		/* Print */
+		printf("%s\n", mbuff);
+		free(mbuff);
+	}
 }
 
 
