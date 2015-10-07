@@ -60,16 +60,17 @@ class StrategyGenerator:
 	def strategy_feedback(self, strat, feedback):
 		if 'msg_types' in feedback and not self.msg_type_fb:
 			msg_types = feedback['msg_types']
-			mset = set(msg_types)
 
 			#Prioritize Strategies with these messges types
 			for strat in self.strat_lst:
-				if strat[1] in mset:
+				for t in msg_types:
+					if t in str(strat[1]):
 						strat[2] = 100
+						break
 
 			#Sort Strategies by priority
 			remaining = self.strat_lst[self.strat_ptr:]
-			remaining.sort(key = lambda s: s[2])
+			remaining.sort(reverse=True, key = lambda s: s[2])
 			self.strat_lst = self.strat_lst[0: self.strat_ptr] + remaining
 
 			self.msg_type_fb = True
