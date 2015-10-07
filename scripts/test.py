@@ -280,7 +280,7 @@ class SDNTester:
 			
 			#compute length
 			try:
-				length = struct.unpack("!H",data[0:1])
+				length = struct.unpack("!H",data[0:2])
 				length = length[0]
 			except Exception as e:
 				sock.close()
@@ -303,14 +303,17 @@ class SDNTester:
 		#Close Socket
 		sock.close()
 		if wait_for_response:
-			return True, rsp
+			return rsp
 		return True
 
 	def _get_msg_types(self, addr):
-		res, resp = self._proxy_communicate(addr,"*,*,*,*,*,PKT_TYPES,*",wait_for_response = True)
-		if res == False:
+		resp = self._proxy_communicate(addr,"*,*,*,*,*,PKT_TYPES,*",wait_for_response = True)
+		if type(resp) is bool and resp == False:
+			print "Error: Failed to get message type feedback from proxy!"
+			self.log.write("Error: Failed to get message type feedback from proxy!\n")
+			self.log.flush()
 			return
-		print resp
 		self.msg_types = resp.split(",")
-		print self.msg_types
+		while '' in self.msg_types:
+			self.msg_types.remove('')
 		return
