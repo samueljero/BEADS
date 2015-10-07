@@ -37,7 +37,7 @@ class SDNTester:
 		self.query_msg_types = False
 
 	def retrieve_feedback(self):
-		return self.msg_types
+		return {'msg_types':self.msg_types}
 
 	def doTest(self,test_script, strategy):
 		result = True

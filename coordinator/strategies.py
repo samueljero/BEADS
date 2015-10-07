@@ -21,6 +21,7 @@ class StrategyGenerator:
 		self.strat_ptr = 0
 		self.failed_lst = []
 		self.failed_ptr = 0
+		self.msg_type_fb = False
 
 	def next_strategy(self):
 		# Check for new failed strategies that need to be retried
@@ -57,6 +58,21 @@ class StrategyGenerator:
 				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today()),str(strat))
 
 	def strategy_feedback(self, strat, feedback):
+		if 'msg_types' in feedback and not self.msg_type_fb:
+			msg_types = feedback['msg_types']
+			mset = set(msg_types)
+
+			#Prioritize Strategies with these messges types
+			for strat in self.strat_lst:
+				if strat[1] in mset:
+						strat[2] = 100
+
+			#Sort Strategies by priority
+			remaining = self.strat_lst[self.strat_ptr:]
+			remaining.sort(key = lambda s: s[2])
+			self.strat_lst = self.strat_lst[0: self.strat_ptr] + remaining
+
+			self.msg_type_fb = True
 		return
 
 	def build_strategies(self):
@@ -72,7 +88,7 @@ class StrategyGenerator:
 						act = t[1]
 						for v in t[2]:
 							strat = "{controllers[" +str(c) + "]}" + ",{sw},*,{pkt_type},*,{action}".format(sw=switch, pkt_type=mtype,action=act.format(v))
-							self.strat_lst.append([config.coord_test_case, [strat]])
+							self.strat_lst.append([config.coord_test_case, [strat], 0])
 
 			#Message Modification Strategies
 			flds = self.build_field_list(fields)
@@ -83,7 +99,7 @@ class StrategyGenerator:
 							for m in manipulations.field_lies:
 								for v in manipulations.field_lie_values[f['type']]:
 									strat = "{controllers[" +str(c) + "]}" + ",{sw},*,{pkt_type},{fld},{action}".format(sw=switch, pkt_type=mtype,fld=f['field'],action=a[1].format(m,v))
-									self.strat_lst.append([config.coord_test_case, [strat]])
+									self.strat_lst.append([config.coord_test_case, [strat], 0])
 		self.lg.write("[%s] Strategies: %d\n" % (str(datetime.today()),len(self.strat_lst)))
 		print "[%s] Strategies: %d" % (str(datetime.today()),len(self.strat_lst))
 
