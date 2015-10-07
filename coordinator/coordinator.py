@@ -205,22 +205,39 @@ def main(args):
 	#Parse Args
 	argp = argparse.ArgumentParser(description='Testing Coordinator')
 	argp.add_argument('-p','--port', type=int, default=config.coordinator_port)
+	argp.add_argument('-c','--checkpoint', default=config.coord_checkpoint_file)
+	argp.add_argument('-r','--restore', action='store_true')
 	args = vars(argp.parse_args(args[1:]))
+	if args['restore'] == True:
+		mode = "a"
+	else:
+		mode = "w"
 	print "Starting Coordinator..."
 
 	#Open Log file
-	lg = open(config.coord_log, "w")
+	lg = open(config.coord_log, mode)
 	lg.write("[%s] Starting Coordinator\n" % (str(datetime.today())))
 	lg.flush()
 
 	#Open Results File
-	res_lg = open(config.coord_results_log, "w")
+	res_lg = open(config.coord_results_log, mode)
 	res_lg.write("#Started %s\n" % (str(datetime.today())))
 	res_lg.flush()
 
 	#Create Strategy Generator
 	strat_gen = strategies.StrategyGenerator(lg, res_lg)
 	strat_gen.build_strategies()
+
+	#Restore, if needed
+	if args['restore'] == True:
+		ck = open(args['checkpoint'], "r")
+		if strat_gen.restore(ck) == False:
+			return
+
+	#Open Checkpoint file
+	if len(args['checkpoint']) > 0:
+		ck = open(args['checkpoint'], "w")
+		strat_gen.enable_checkpointing(ck)
 	
 	#Start Server
 	ThreadingTCPServer.allow_reuse_address = True

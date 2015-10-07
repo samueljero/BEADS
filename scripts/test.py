@@ -24,11 +24,9 @@ class SDNTester:
 		self.controllers = controllers
 		self.log = log
 		self.testnum = 1
-		self.query_msg_types = False
 		self.msg_types = []
 
 	def baseline(self, test_script):
-		self.query_msg_types = True
 		num = self.testnum
 		for i in range(0,1):
 			self.testnum = 0
@@ -36,7 +34,6 @@ class SDNTester:
 			if res[0] == False:
 				print "Warning!!! Baseline failed!!!"
 		self.testnum = num
-		self.query_msg_types = False
 
 	def retrieve_feedback(self):
 		return {'msg_types':self.msg_types}
@@ -107,14 +104,15 @@ class SDNTester:
 		#Stop Controllers
 		self._stop_controllers()
 
-		#Query Message Types
-		if self.query_msg_types:
-			if self._get_msg_types(("localhost",config.proxy_com_port + self.mininet[0])) == False:
-				self._stop_controllers()
-				if veriflow is not None:
-					veriflow.terminate()
-				proxy.terminate()
-				return (False, "System Failure")
+		#Check Message Types
+		if self._get_msg_types(("localhost",config.proxy_com_port + self.mininet[0])) == False:
+			self._stop_controllers()
+			if veriflow is not None:
+				veriflow.terminate()
+			proxy.terminate()
+			return (False, "System Failure")
+		if self._check_for_error_msgs():
+			result[1] = "Error Message"
 
 		#Stop VeriFlow
 		if self._stop_veriflow(veriflow) == False:
@@ -398,3 +396,9 @@ class SDNTester:
 		while '' in self.msg_types:
 			self.msg_types.remove('')
 		return True
+
+	def _check_for_error_msgs(self):
+		for t in self.msg_types:
+			if "error_msg" in t:
+				return True
+		return False

@@ -137,8 +137,8 @@ def coordinated_tests(tester, instance,lg, addr):
 			num+=1
 
 			#Return Result
-			print "[%s] Test Result: %s, reason %s" %(str(datetime.today()),str(res[0]), res[1])
-			lg.write("[%s] Test Result: %s , reason %s\n" %(str(datetime.today()),str(res[0]), res[1]))
+			print "[%s] Test Result: %s, Reason: %s" %(str(datetime.today()),str(res[0]), res[1])
+			lg.write("[%s] Test Result: %s , Reason: %s\n" %(str(datetime.today()),str(res[0]), res[1]))
 			try:
 				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res[0], 'reason':res[1]}
 				sock.send("%s\n" %(repr(msg)))

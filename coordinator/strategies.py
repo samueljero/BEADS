@@ -17,11 +17,15 @@ class StrategyGenerator:
 	def __init__(self, lg, res_lg):
 		self.lg = lg
 		self.results = res_lg
+		self.ck_file = None
+		self.do_ckpt = False
+
 		self.strat_lst = []
 		self.strat_ptr = 0
 		self.failed_lst = []
 		self.failed_ptr = 0
 		self.msg_type_fb = False
+
 
 	def next_strategy(self):
 		# Check for new failed strategies that need to be retried
@@ -41,6 +45,7 @@ class StrategyGenerator:
 		if self.strat_ptr % 100 == 0:
 			self.lg.write("[%s] Returning Strategy: %d\n" % (str(datetime.today()),self.strat_ptr))
 			print "[%s] Testing Strategy: %d" % (str(datetime.today()),self.strat_ptr)
+			self.checkpoint()
 		return strat
 
 	def return_strategy(self, strat):
@@ -162,4 +167,61 @@ class StrategyGenerator:
 		if full[len(full)-1]=='.':
 			full = full[0:len(full)-1]
 		return full
+
+	def enable_checkpointing(self, f):
+		self.ck_file = f
+		self.do_ckpt = True
+		self.checkpoint()
+
+	def checkpoint(self):
+		if self.do_ckpt and self.ck_file is not None:
+			self.lg.write("[%s] Making Checkpoint\n" % (str(datetime.today())))
+			print "[%s] Making Checkpoint" % (str(datetime.today()))
+
+			#Create backup
+			bkup = {}
+			bkup['version'] = 1
+			bkup['strat_lst'] = self.strat_lst
+			bkup['strat_ptr'] = self.strat_ptr
+			bkup['failed_lst'] = self.failed_lst
+			bkup['failed_ptr'] = self.failed_ptr
+			bkup['msg_type_fb'] = self.msg_type_fb
+
+			#Write backup
+			try:
+				self.ck_file.seek(0)
+				self.ck_file.truncate()
+				self.ck_file.writelines(repr(bkup))
+				self.ck_file.flush()
+			except Exception as e:
+				print "[%s] Checkpoint Failed: %s" % (str(datetime.today()),str(e))
+				return
+			self.lg.write("[%s] Checkpoint Finished\n" % (str(datetime.today())))
+			print "[%s] Checkpoint Finished" % (str(datetime.today()))
+
+	def restore(self, f):
+		#Read backup
+		try:
+			inp = f.readline()
+			bkup = eval(inp)
+		except Exception as e:
+			print "[%s] Failed to read checkpoint: %s" % (str(datetime.today()),str(e))
+			f.close()
+			return False
+
+		#Restore Backup
+		if bkup['version'] != 1:
+			print "Warning: Checkpoint is incompatable!!!"
+			f.close()
+			return False
+		self.strat_lst = bkup['strat_lst']
+		self.strat_ptr = bkup['strat_ptr']
+		self.failed_lst = bkup['failed_lst']
+		self.failed_ptr = bkup['failed_ptr']
+		self.msg_type_fb = bkup['msg_type_fb']
+
+		f.close()
+		self.lg.write("[%s] Restore Finished\n" % (str(datetime.today())))
+		print "[%s] Restore Finished" % (str(datetime.today()))
+		return True
 
