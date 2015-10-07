@@ -55,7 +55,7 @@ class SDNTester:
 			proxyports.append(str(config.proxy_base_port + c))
 
 		#Start Proxy
-		proxy = self._start_proxy(controlleraddrs, proxyaddrs)
+		proxy = self._start_proxy(controlleraddrs, proxyports)
 		if proxy is None:
 			return (False, "System Failure")
 
@@ -283,7 +283,7 @@ class SDNTester:
 
 	def _cleanup(self):
 		ts = time.time()
-		shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
+		shell = spur.SshShell(hostname=mv.vm2ip(self.mininet[0]), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 		res = shell.run(["/bin/bash","-i" ,"-c", config.mininet_cleanup_cmd])
 		if config.enable_stat:
 			self.log.write('[timer] Clean up mininet: %d sec.\n' % (time.time() - ts))

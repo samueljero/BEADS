@@ -52,7 +52,7 @@ class StrategyGenerator:
 			if strat not in self.failed_lst:
 				self.failed_lst.append(strat)
 			else:
-				self.results.write("FAILED, %s, %s\n" %(str(strat),res[1]))
+				self.results.write("FAILED, %s, %s, %s\n" %(strat[0],str(strat[1]),res[1]))
 				self.results.flush()
 				self.lg.write("[%s] Strategy HARD FAILED: %s\n" % (str(datetime.today()),str(strat)))
 				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today()),str(strat))
