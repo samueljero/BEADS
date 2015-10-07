@@ -165,6 +165,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 			elif msg['msg']=="RESULT":
 				#Testing Results
 				res = msg['value']
+				reason = msg['reason']
 
 				#Print Result
 				lg_lock.acquire()
@@ -174,7 +175,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 
 				#Process Result
 				strat_lock.acquire()
-				strat_gen.strategy_result(strat, res)
+				strat_gen.strategy_result(strat, (res,reason))
 				strat_lock.release()
 
 				#Clear Current Strategy

@@ -47,12 +47,12 @@ class StrategyGenerator:
 		self.strat_lst.insert(self.strat_ptr + 1, strat)
 
 	def strategy_result(self, strat, res):
-		if res == False:
+		if res[0] == False:
 			#Failed strategies will be retried once to remove false positives
 			if strat not in self.failed_lst:
 				self.failed_lst.append(strat)
 			else:
-				self.results.write("FAILED, %s\n" %(str(strat)))
+				self.results.write("FAILED, %s, %s\n" %(str(strat),res[1]))
 				self.results.flush()
 				self.lg.write("[%s] Strategy HARD FAILED: %s\n" % (str(datetime.today()),str(strat)))
 				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today()),str(strat))

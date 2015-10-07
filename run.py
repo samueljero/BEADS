@@ -137,10 +137,10 @@ def coordinated_tests(tester, instance,lg, addr):
 			num+=1
 
 			#Return Result
-			print "[%s] Test Result: %s" %(str(datetime.today()),str(res))
-			lg.write("[%s] Test Result: %s\n" %(str(datetime.today()),str(res)))
+			print "[%s] Test Result: %s, reason %s" %(str(datetime.today()),str(res[0]), res[1])
+			lg.write("[%s] Test Result: %s , reason %s\n" %(str(datetime.today()),str(res[0]), res[1]))
 			try:
-				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res}
+				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res[0], 'reason':res[1]}
 				sock.send("%s\n" %(repr(msg)))
 			except Exception as e:
 				print "Failed to send on socket..."
@@ -171,23 +171,23 @@ def standalone_tests(tester):
 	print "Starting Tests..."
 	print "Test 1   " + str(datetime.today())
 	res = tester.doTest("/root/test2.py {controllers}", ["*,*,*,*,*,CLEAR,*"])
-	print "Test Result: " + str(res)
+	print "Test Result: " + str(res[0])
 	print "******"
 	print "Test 2   " + str(datetime.today())
 	res = tester.doTest("/root/test2.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=2&act==&val=1"])
-	print "Test Result: " + str(res)
+	print "Test Result: " + str(res[0])
 	print "******"
 	print "Test 3   " + str(datetime.today())
 	res = tester.doTest("/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"])
-	print "Test Result: " + str(res)
+	print "Test Result: " + str(res[0])
 	print "******"
 	print "Test 4   " + str(datetime.today())
 	res = tester.doTest("/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=2&ctl={controllers[0]}","{controllers[0]},2,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=3&ctl={controllers[0]}"])
-	print "Test Result: " + str(res)
+	print "Test Result: " + str(res[0])
 	print "******"
 	print "Test 5   " + str(datetime.today())
 	res = tester.doTest("/root/test1.py {controllers}", ["{controllers[0]},3,*,of_packet_out,7.1.1,CDIVERT,mfield=7.1.1&mval=2&p=100&sw=1&ctl={controllers[0]}"])
-	print "Test Result: " + str(res)
+	print "Test Result: " + str(res[0])
 	print "******"
 
 
