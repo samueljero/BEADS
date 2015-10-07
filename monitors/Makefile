@@ -13,7 +13,7 @@ $(BUILD_DIR):
 procmon: $(BUILD_DIR)/procmon.o
 	$(G++) $(OPT_FLAGS) -o $@ $^
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c* $(SRC_DIR)/%.h
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
 	$(G++) $(OPT_FLAGS) -o $@ -c $<
 
 clean:
