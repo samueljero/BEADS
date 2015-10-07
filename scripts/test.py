@@ -1,4 +1,3 @@
-#!/bin/env python
 # Samuel Jero <sjero@purdue.edu>
 # Actual strategy test routines
 import manage_vms as mv
@@ -25,13 +24,20 @@ class SDNTester:
 		self.controllers = controllers
 		self.log = log
 		self.testnum = 1
+		self.query_msg_types = False
+		self.msg_types = []
 
 	def baseline(self, test_script):
+		self.query_msg_types = True
 		num = self.testnum
 		for i in range(0,1):
 			self.testnum = 0
 			self.doTest(test_script, ["*,*,*,*,*,CLEAR,*"])
 		self.testnum = num
+		self.query_msg_types = False
+
+	def retrieve_feedback(self):
+		return self.msg_types
 
 	def doTest(self,test_script, strategy):
 		result = True
@@ -156,6 +162,10 @@ class SDNTester:
 			res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
 		if config.enable_stat:
 			self.log.write('[timer] Stop controllers: %d sec.\n' % (time.time() - ts))
+
+		#Query Message Types
+		if self.query_msg_types:
+			self._get_msg_types(("localhost",config.proxy_com_port + self.mininet[0]))
 
 		#Stop Proxy
 		ts = time.time()
@@ -293,10 +303,14 @@ class SDNTester:
 		#Close Socket
 		sock.close()
 		if wait_for_response:
-			return rsp;
+			return True, rsp
 		return True
 
-if __name__ == "__main__":
-	print "Running demo..."
-	tester = SDNTester([1],[2],sys.stdout)
-	print tester.doTest("/root/test1.py {controllers}", ["d"])
+	def _get_msg_types(self, addr):
+		res, resp = self._proxy_communicate(addr,"*,*,*,*,*,PKT_TYPES,*",wait_for_response = True)
+		if res == False:
+			return
+		print resp
+		self.msg_types = resp.split(",")
+		print self.msg_types
+		return

@@ -56,6 +56,9 @@ class StrategyGenerator:
 				self.lg.write("[%s] Strategy HARD FAILED: %s\n" % (str(datetime.today()),str(strat)))
 				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today()),str(strat))
 
+	def strategy_feedback(self, strat, feedback):
+		return
+
 	def build_strategies(self):
 		for pkt in openflow.openflow:
 			print "Creating Strategies for " + pkt[0] + "..."

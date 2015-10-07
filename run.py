@@ -140,7 +140,7 @@ def coordinated_tests(tester, instance,lg, addr):
 			print "[%s] Test Result: %s" %(str(datetime.today()),str(res))
 			lg.write("[%s] Test Result: %s\n" %(str(datetime.today()),str(res)))
 			try:
-				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res, 'data':strat}
+				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res}
 				sock.send("%s\n" %(repr(msg)))
 			except Exception as e:
 				print "Failed to send on socket..."
@@ -150,6 +150,16 @@ def coordinated_tests(tester, instance,lg, addr):
 			print "[%s] Creating Baseline..." % (str(datetime.today()))
 			lg.write("[%s] Creating Baseline...\n" % (str(datetime.today())))
 			tester.baseline(msg['test'])
+
+			#Return Feedback
+			fb = tester.retrieve_feedback()
+			try:
+				msg = {'msg':'FEEDBACK','instance':"%s:%d"%(socket.gethostname(),instance), 'data':fb}
+				sock.send("%s\n" %(repr(msg)))
+			except Exception as e:
+				print "Failed to send on socket..."
+				sock = reconnect(addr)
+				continue
 		else:
 			print "Unknown Message: %s" % (msg)
 

@@ -179,6 +179,20 @@ class ExecutorHandler(ss.StreamRequestHandler):
 
 				#Clear Current Strategy
 				strat = []
+			elif msg['msg'] == "FEEDBACK":
+				#Testing Feedback
+				data = msg['data']
+
+				#Print Result
+				lg_lock.acquire()
+				lg.write("[%s] Executor (%s) sent feedback...\n" % (str(datetime.today()),instance))
+				print "[%s] Executor (%s) sent feedback..." % (str(datetime.today()),instance)
+				lg_lock.release()
+
+				#Process Result
+				strat_lock.acquire()
+				strat_gen.strategy_feedback(strat, data)
+				strat_lock.release()
 			else:
 				print "Unknown Message: %s" % msg
 			lg_lock.acquire()
