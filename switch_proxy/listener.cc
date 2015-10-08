@@ -104,7 +104,7 @@ void Listener::cleanupConnections()
 	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
 		if( !(*it)->isRunning()) {
 			delete *it;
-			(*it)->stop();
+			//(*it)->stop();
 			connections.erase(it);
 			it = connections.begin();
 		}
