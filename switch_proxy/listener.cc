@@ -88,7 +88,6 @@ void Listener::run(){
 		}
 		if (!conn->start()) {
 			dbgprintf(0, "Error starting connection!\n");
-			//conn->stop();
 		}
 
 		cleanupConnections();
@@ -105,6 +104,7 @@ void Listener::cleanupConnections()
 	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
 		if( !(*it)->isRunning()) {
 			delete *it;
+			(*it)->stop();
 			connections.erase(it);
 			it = connections.begin();
 		}

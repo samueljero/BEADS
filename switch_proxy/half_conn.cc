@@ -95,7 +95,6 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 
 HalfConn::~HalfConn()
 {
-	stop();
 	pthread_mutex_destroy(&this->q_mutex);
 	pthread_mutex_destroy(&this->timeout_mutex);
 }
