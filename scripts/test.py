@@ -249,7 +249,13 @@ class SDNTester:
 		ts = time.time()
 		for c in self.controllers:
 			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-			res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
+			try:
+				res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
+			except Exception as e:
+				print e
+				self.log.write("Exception: " + str(e) + "\n")
+				self.log.flush()
+				return False
 		if config.enable_stat:
 			self.log.write('[timer] Stop controllers: %d sec.\n' % (time.time() - ts))
 		return True
