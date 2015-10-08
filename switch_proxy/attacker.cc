@@ -856,33 +856,29 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 	if (it5 != it4->second.end()) {
 		if (listeners != NULL && listeners_mutex != NULL) {
 			param = it5->second;
+
 			if (rand() % 100 < param) {
 				pthread_mutex_lock(listeners_mutex);
-				/* Pick random listener */
-				i = rand() % listeners->size();
-				j = 0;
+				/* Collect all connections */
+				vector<Connection*> con_list;
 				for(list<Listener*>::iterator it = listeners->begin(); it != listeners->end(); it++) {
-					if (i == j) {
-						/* Pick random connection */
-						i = (*it)->numConnections();
-						if (i == 0) {
-							continue; /* Try next listener */
+					int j = (*it)->numConnections();
+					for(int i = 0; i < j; i++){
+						c = (*it)->getConnection(i);
+						if (c != NULL && c->getBH() != pk.snd && c->getTH() != pk.snd && c->isRunning()) {
+							con_list.push_back(c);
 						}
-						j = rand() % i;
-						c = (*it)->getConnection(j);
-						if (c == NULL || c->getBH() == pk.snd || c->getTH() == pk.snd) {
-							continue; /* Try next listener */
-						}
-
-						dbgprintf(1, "Diverting packet!\n");
-						if (pk.dir == STOC) {
-							pk.snd = c->getTH();
-						} else {
-							pk.snd = c->getBH();
-						}
-						break;
 					}
-					j++;
+				}
+
+				/* Pick random connection */
+				j = rand() % con_list.size();
+				c = con_list[j];
+				dbgprintf(1, "Diverting packet!\n");
+				if (pk.dir == STOC) {
+					pk.snd = c->getTH();
+				} else {
+					pk.snd = c->getBH();
 				}
 				pthread_mutex_unlock(listeners_mutex);
 			}

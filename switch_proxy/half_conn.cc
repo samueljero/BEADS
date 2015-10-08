@@ -20,7 +20,7 @@ bool HalfConn::sendm(Message m)
 	
 	if ((len = send(sock, m.buff, m.len, MSG_NOSIGNAL)) < 0) {
 		dbgprintf(0, "Send Failed: %s\n", strerror(errno));
-		stop();
+		_stop();
 		return false;
 	}
 
@@ -47,6 +47,9 @@ HalfConn::HalfConn() {
 	this->cid = 0;
 	this->print_messages = false;
 	this->rcv_thread_running = false;
+	this->rcv_thread_cleanup = false;
+	this->q_thread_running = false;
+	this->q_thread_cleanup = false;
 	this->running = false;
 	this->rport = 0;
 	pthread_mutex_init(&this->q_mutex, NULL);
@@ -62,6 +65,9 @@ HalfConn::HalfConn(int fsock, int cid, HalfConn *other)
 	this->cid = cid;
 	this->print_messages = false;
 	this->rcv_thread_running = false;
+	this->rcv_thread_cleanup = false;
+	this->q_thread_running = false;
+	this->q_thread_cleanup = false;
 	this->running = false;
 	this->rport = 0;
 	pthread_mutex_init(&this->q_mutex, NULL);
@@ -78,6 +84,9 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 	this->cid = cid;
 	this->print_messages = false;
 	this->rcv_thread_running = false;
+	this->rcv_thread_cleanup = false;
+	this->q_thread_running = false;
+	this->q_thread_cleanup = false;
 	this->running = false;
 	memcpy(&this->addr, raddr, sizeof(struct sockaddr_in));
 	pthread_mutex_init(&this->q_mutex, NULL);
@@ -86,6 +95,7 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 
 HalfConn::~HalfConn()
 {
+	stop();
 	pthread_mutex_destroy(&this->q_mutex);
 	pthread_mutex_destroy(&this->timeout_mutex);
 }
@@ -121,6 +131,7 @@ bool HalfConn::start()
 		return false;
 	}
 	rcv_thread_running = true;
+	rcv_thread_cleanup =true;
 
 	if (pthread_create(&q_thread, NULL, queue_thread_run, this) < 0) {
 		dbgprintf(0, "Error: Failed to start queue thread!: %s\n", strerror(errno));
@@ -130,33 +141,23 @@ bool HalfConn::start()
 		return false;
 	}
 	q_thread_running = true;
+	q_thread_cleanup = true;
 
 	return true;
 }
 
 bool HalfConn::stop()
 {
-	if (running) {
-			running = false;
-	}
-	if (sock > 0) {
-		close(sock);
-		sock = 0;
-	}
+	_stop();
 
-	/* Unlocking an unlocked mutex is undefined.
-	 * Do this instead. */
-	if (pthread_mutex_trylock(&timeout_mutex)) {
-		pthread_mutex_unlock(&timeout_mutex);
-	} else {
-		pthread_mutex_unlock(&timeout_mutex);
-	}
-
-	if (rcv_thread_running) {
+	if (rcv_thread_cleanup) {
+		rcv_thread_cleanup = false;
 		pthread_join(rcv_thread, NULL);
+
 	}
 
-	if (q_thread_running) {
+	if (q_thread_cleanup) {
+		q_thread_cleanup = false;
 		pthread_join(q_thread, NULL);
 	}
 	return true;
@@ -260,13 +261,13 @@ Message HalfConn::recvMsg()
 		if ((len = recv(sock,hdrbuff,32,MSG_PEEK)) < 0) {
 			if (running) {
 				dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
-				stop();
+				_stop();
 			}
 			m.buff = NULL;
 			return m;
 		}
 		if (len == 0) {
-			stop();
+			_stop();
 			m.buff = NULL;
 			return m;
 		}
@@ -290,7 +291,7 @@ Message HalfConn::recvMsg()
 		if ((len = recv(sock,buff,blen,0)) < 0) {
 			if (running) {
 				dbgprintf(0, "Error: recv() failed: %s\n", strerror(errno));
-				stop();
+				_stop();
 			}
 			free(m.buff);
 			m.buff = NULL;

@@ -82,6 +82,7 @@ class HalfConn{
 		int cid;
 		bool running;
 		bool rcv_thread_running;
+		bool rcv_thread_cleanup;
 		bool print_messages;
 		enum direction dir;
 		uint64_t dpid;
@@ -92,6 +93,7 @@ class HalfConn{
 		pthread_mutex_t timeout_mutex;
 		pthread_t q_thread;
 		bool q_thread_running;
+		bool q_thread_cleanup;
 };
 
 #endif
