@@ -2,7 +2,7 @@
 # Author: Samuel Jero <sjero@purdue.edu>
 ###############################################################################
 
-all: logs VeriFlow Proxy Message Monitors
+all: logs VeriFlow Proxy Message
 
 logs:
 	mkdir -p logs
@@ -13,6 +13,7 @@ VeriFlow:
 Proxy:
 	cd switch_proxy/; make
 
+# Do not make monitors outside VM
 Monitors:
 	cd monitors; make
 
