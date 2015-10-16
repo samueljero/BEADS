@@ -61,3 +61,10 @@ vm_cores = "2"
 vm_telnet_base = 10100
 vm_vnc_base = 1
 vm_ssh_key = system_home + "/config/ssh.key"
+
+#Process Monitor Integration
+pm_poll_delay = 500 # In ms.
+pm_controller_log_file = "controller_res.log"
+pm_switch_log_file = "switch_res.log"
+
+

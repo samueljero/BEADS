@@ -10,11 +10,12 @@ import socket
 import struct
 
 
-from . import system_home, lib_path, config_path, config
+from . import system_home, lib_path, config_path, log_path, config
 import spur
 
 
 mininet_config_path = os.path.abspath(os.path.join(system_home, 'mininet_scripts'))
+monitor_tools_path = os.path.abspath(os.path.join(system_home, 'monitors'))
 
 
 class SDNTester:
@@ -148,16 +149,25 @@ class SDNTester:
 			mv.startvm(m)
 		for c in self.controllers:
 			if(self._waitListening(mv.vm2ip(c),22,240,True)==False):
-				print "Error: Controller %d not started!" % (c)
+				print "Error: Controller VM %d not started!" % (c)
+			else:
+				os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s %s@%s:~\n" % (config.vm_ssh_key, monitor_tools_path, config.controller_user, mv.vm2ip(c)))
+				os.system("ssh -i %s %s@%s 'cd monitors && make'\n" % (config.vm_ssh_key, config.controller_user, mv.vm2ip(c)))
 		for m in self.mininet:
 			if(self._waitListening(mv.vm2ip(m),22,240,True)==False):
 				print "Error: Mininet %d not started!" % (c)
 			else:
 				if config.mininet_replace_scripts:
-					os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s/* %s@%s:~\n" % (config.vm_ssh_key,mininet_config_path, config.mininet_user, mv.vm2ip(m)))
+					os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s/* %s@%s:~\n" % (config.vm_ssh_key, mininet_config_path, config.mininet_user, mv.vm2ip(m)))
+					os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s %s@%s:~\n" % (config.vm_ssh_key, monitor_tools_path, config.mininet_user, mv.vm2ip(m)))
+					os.system("ssh -i %s %s@%s 'cd monitors && make'\n" % (config.vm_ssh_key, config.mininet_user, mv.vm2ip(m)))
 
 	def stopVms(self):
 		for c in self.controllers:
+			if(self._waitListening(mv.vm2ip(c), 22, 240, True)==False):
+				print "Error: Controller VM %d not started!" % (c)
+			else:
+				os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s:~/%s %s\n" % (config.vm_ssh_key, config.controller_user, mv.vm2ip(c), config.pm_controller_log_file, log_path + '/' + config.pm_controller_log_file.replace('.', '_' + str(c) + '.')))
 			mv.stopvm(c)
 		for m in self.mininet:
 			mv.stopvm(m)
@@ -213,7 +223,7 @@ class SDNTester:
 		ts = time.time()
 		for c in self.controllers:
 			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-			res = shell.run(["/bin/bash","-i" ,"-c", config.controller_start_cmd])
+			res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_procmon.sh {0} {1} {2}".format(config.pm_poll_delay, config.pm_controller_log_file, config.controller_start_cmd)])
 			self.log.write("Starting Controller (" + mv.vm2ip(c) + ")... " + res.output + "\n")
 			self.log.flush()
 		for c in self.controllers:
@@ -221,6 +231,9 @@ class SDNTester:
 				self.log.write("Controller %s failed to start after %d seconds" % (mv.vm2ip(c),60))
 				self.log.flush()
 				return False
+			# else:
+			# 	# Controller starts.
+			# 	pass
 		if config.enable_stat:
 			self.log.write('[timer] Start controllers: %d sec.\n' % (time.time() - ts))
 		return True
