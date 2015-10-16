@@ -14,7 +14,10 @@
 RESMON_POLL_MS=$1
 RESMON_LOG_FILE=$2
 
+# TODO: for these two lines, we may use stdout as the pid
+# to get better flexibility. I'll keep it for now.
 eval "${@:3} &"
 pid=$!
-~/procmon $pid $RESMON_POLL_MS >> $RESMON_LOG_FILE
+
+~/monitors/procmon $pid $RESMON_POLL_MS >> ~/$RESMON_LOG_FILE
 
