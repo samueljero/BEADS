@@ -52,35 +52,33 @@ class SDNTester:
 			proxyaddrs.append(config.proxy_addr + ":" + str(config.proxy_base_port + c))
 			proxyports.append(str(config.proxy_base_port + c))
 
+		#Start Controllers
+		if self._start_controllers() == False:
+			return (False,"System Failure")
+
 		#Start Proxy
 		proxy = self._start_proxy(controlleraddrs, proxyports)
 		if proxy is None:
+			self._stop_controllers()
+			return (False, "System Failure")
+		
+		#Send Proxy Strategy
+		if self._send_proxy_strategy(strategy, proxyports) == False:
+			self._stop_controllers()
+			proxy.terminate()
 			return (False, "System Failure")
 
 		#VeriFlow
 		veriflow = None
-		if config.veriflow_enabled:
+		if config.veriflow_enabled == True:
 			vf_port = config.veriflow_base_port + self.controllers[0]
 			veriflow = self._start_veriflow(test_script, proxyports, vf_port)
 			proxyaddrs = list()
 			proxyaddrs.append(config.proxy_addr + ":" + str(vf_port))
 			if veriflow is None:
+				self._stop_controllers()
 				proxy.terminate()
 				return(False, "System Failure")
-
-		#Send Proxy Strategy
-		if self._send_proxy_strategy(strategy, proxyports) == False:
-			if veriflow is not None:
-				veriflow.terminate()
-			proxy.terminate()
-			return (False, "System Failure")
-
-		#Start Controllers
-		if self._start_controllers() == False:
-			if veriflow is not None:
-				veriflow.terminate()
-			proxy.terminate()
-			return (False,"System Failure")
 
 		#Do Test
 		test_std_err = None
@@ -102,15 +100,12 @@ class SDNTester:
 			result[0] = False
 			result[1] = "System Failure"
 		
-		#Stop Controllers
-		self._stop_controllers()
-
 		#Check Message Types
 		if self._get_msg_types(("localhost",config.proxy_com_port + self.mininet[0])) == False:
-			self._stop_controllers()
 			if veriflow is not None:
 				veriflow.terminate()
 			proxy.terminate()
+			self._stop_controllers()
 			return (False, "System Failure")
 		if self._check_for_error_msgs():
 			result[1] = "Error Message"
@@ -118,11 +113,16 @@ class SDNTester:
 		#Stop VeriFlow
 		if self._stop_veriflow(veriflow) == False:
 			proxy.terminate()
+			self._stop_controllers()
 			return (False, "System Failure")
 
 		#Stop Proxy
 		if self._stop_proxy(proxy) == False:
+			self._stop_controllers()
 			return (False, "System Failure")
+
+		#Stop Controllers
+		self._stop_controllers()
 
 		#Cleanup Any Mininet Remnants
 		self._cleanup()
@@ -133,6 +133,8 @@ class SDNTester:
 		self.log.write("********* Test Script output ********\n")
 		if test_std_err:
 			self.log.write(test_std_err)
+		self.log.write("*****************\n")
+		self.log.write("Message Types Seen: %s\n" % (str(self.msg_types)))
 		self.log.write("*****************\n")
 		self.log.write("Test Result: " + str(result[0]) + " , Reason:" + str(result[1]) + "\n")
 		self.log.write(str(datetime.today()) + "\n")
@@ -150,23 +152,32 @@ class SDNTester:
 		for c in self.controllers:
 			if(self._waitListening(mv.vm2ip(c),22,240,True)==False):
 				print "Error: Controller VM %d not started!" % (c)
+				return False
 			else:
 				os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s %s@%s:~\n" % (config.vm_ssh_key, monitor_tools_path, config.controller_user, mv.vm2ip(c)))
-				os.system("ssh -i %s %s@%s 'cd monitors && make'\n" % (config.vm_ssh_key, config.controller_user, mv.vm2ip(c)))
+				shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
+				proc = shell.run(["/bin/bash","-i" ,"-c", "cd monitors && make"])
+				if proc.return_code is not 0:
+					print "Error: Make failed!"
+					return False
 		for m in self.mininet:
 			if(self._waitListening(mv.vm2ip(m),22,240,True)==False):
 				print "Error: Mininet %d not started!" % (c)
+				return False
 			else:
 				if config.mininet_replace_scripts:
 					os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s/* %s@%s:~\n" % (config.vm_ssh_key, mininet_config_path, config.mininet_user, mv.vm2ip(m)))
 					os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s %s@%s:~\n" % (config.vm_ssh_key, monitor_tools_path, config.mininet_user, mv.vm2ip(m)))
-					os.system("ssh -i %s %s@%s 'cd monitors && make'\n" % (config.vm_ssh_key, config.mininet_user, mv.vm2ip(m)))
+					shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
+					proc = shell.run(["/bin/bash","-i" ,"-c", "cd monitors && make"])
+					if proc.return_code is not 0:
+						print "Error: Make failed!"
+						return False
+		return True
 
 	def stopVms(self):
 		for c in self.controllers:
-			if(self._waitListening(mv.vm2ip(c), 22, 240, True)==False):
-				print "Error: Controller VM %d not started!" % (c)
-			else:
+			if(self._waitListening(mv.vm2ip(c), 22, 240, True)==True):
 				os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s:~/%s %s\n" % (config.vm_ssh_key, config.controller_user, mv.vm2ip(c), config.pm_controller_log_file, log_path + '/' + config.pm_controller_log_file.replace('.', '_' + str(c) + '.')))
 			mv.stopvm(c)
 		for m in self.mininet:
@@ -264,6 +275,21 @@ class SDNTester:
 			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 			try:
 				res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
+			except Exception as e:
+				print e
+				self.log.write("Exception: " + str(e) + "\n")
+				self.log.flush()
+				return False
+		time.sleep(config.controller_stop_time)
+		for c in self.controllers:
+			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
+			try:
+				res = shell.run(["/bin/bash","-i" ,"-c", config.controller_kill_cmd], allow_error=True)
+				if res.return_code == 0:
+					print "Controller still running!"
+					self.log.write("Controller still running!\n")
+					self.log.flush()
+					return False
 			except Exception as e:
 				print e
 				self.log.write("Exception: " + str(e) + "\n")
