@@ -4059,6 +4059,10 @@ of_port_desc_properties_get(of_port_desc_t *obj) {
     of_list_port_desc_prop_t _properties;
     of_list_port_desc_prop_t *_properties_ptr;
 
+    if (obj->version < OF_VERSION_1_4) {
+	return NULL;
+    }
+
     of_port_desc_properties_bind(obj, &_properties);
     _properties_ptr = (of_list_port_desc_prop_t *)of_object_dup(&_properties);
     return _properties_ptr;

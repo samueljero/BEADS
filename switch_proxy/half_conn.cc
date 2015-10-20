@@ -216,6 +216,10 @@ void HalfConn::rcv_run()
 		/* Buffer to of_object */
 		of_message_t msg = OF_BUFFER_TO_MESSAGE(m.buff);
 		of_object_t *ofo = of_object_new_from_message(msg, m.len);
+		if (!ofo) {
+			dbgprintf(0, "Error: message parsing failed!\n");
+			continue;
+		}
 		if (dpid == DPID_MAX && ofo->object_id == OF_FEATURES_REPLY) {
 			of_features_reply_datapath_id_get(ofo, &dpid);
 			other->dpid = dpid;

@@ -10156,6 +10156,10 @@ of_flow_mod_instructions_get(of_flow_mod_t *obj) {
     of_list_instruction_t _instructions;
     of_list_instruction_t *_instructions_ptr;
 
+    	if (obj->version == OF_VERSION_1_0) {
+		return NULL;
+	}
+
     of_flow_mod_instructions_bind(obj, &_instructions);
     _instructions_ptr = (of_list_instruction_t *)of_object_dup(&_instructions);
     return _instructions_ptr;
@@ -11763,6 +11767,10 @@ of_list_instruction_t *
 of_flow_add_instructions_get(of_flow_add_t *obj) {
     of_list_instruction_t _instructions;
     of_list_instruction_t *_instructions_ptr;
+
+    if (obj->version == OF_VERSION_1_0) {
+	return NULL;
+    }
 
     of_flow_add_instructions_bind(obj, &_instructions);
     _instructions_ptr = (of_list_instruction_t *)of_object_dup(&_instructions);
@@ -13372,6 +13380,10 @@ of_flow_delete_instructions_get(of_flow_delete_t *obj) {
     of_list_instruction_t _instructions;
     of_list_instruction_t *_instructions_ptr;
 
+    if (obj->version == OF_VERSION_1_0) {
+    	return NULL;
+    }
+
     of_flow_delete_instructions_bind(obj, &_instructions);
     _instructions_ptr = (of_list_instruction_t *)of_object_dup(&_instructions);
     return _instructions_ptr;
@@ -14979,6 +14991,10 @@ of_list_instruction_t *
 of_flow_delete_strict_instructions_get(of_flow_delete_strict_t *obj) {
     of_list_instruction_t _instructions;
     of_list_instruction_t *_instructions_ptr;
+
+	if (obj->version == OF_VERSION_1_0) {
+		return NULL;
+	}
 
     of_flow_delete_strict_instructions_bind(obj, &_instructions);
     _instructions_ptr = (of_list_instruction_t *)of_object_dup(&_instructions);
