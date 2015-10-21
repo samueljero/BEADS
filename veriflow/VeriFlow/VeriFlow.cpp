@@ -297,7 +297,6 @@ void* proxyCommunicationThreadFunction(void* arg)
 						fprintf(stderr, "[proxyCommunicationThreadFunction] TCP send failure. Stopping operation.\n");
 
 						close(info.sendSocket);
-						close(info.recvSocket);
 
 						pthread_exit(NULL);
 					}
@@ -318,8 +317,9 @@ void* proxyCommunicationThreadFunction(void* arg)
 		}
 	}
 
-	close(info.sendSocket);
-	close(info.recvSocket);
+	if (bytesReceived == 0 ) {
+			close(info.recvSocket);
+	}
 
 	fprintf(stdout, "[proxyCommunicationThreadFunction] Connection closed.\n");
 
