@@ -165,33 +165,18 @@ if __name__ == '__main__':
             results.append(True)
         if enable_stat:
             lg.output('[timer] Iperf: %d sec.\n' % (time.time() - ts))
+        results.append(True)
 
-        # Test 3 -- www
-#        lg.output("\n\nTest 3 --- WWW\n")
-#        ts = time.time()
-#        network.hosts[3].sendCmd(
-#            "cd /root/web/benign; python -m SimpleHTTPServer 8080")
-#        network.hosts[1].sendCmd(
-#            "cd /root/web/evil; python -m SimpleHTTPServer 8080")
-#        network.hosts[2].sendCmd(
-#            "cd /root/web/evil; python -m SimpleHTTPServer 8080")
-#        sleep(1)
-#        res = network.hosts[0].cmd(
-#            "curl --connect-timeout 5 http://" + network.hosts[3].IP() + ":8080/")
-#        lg.output(res + "\n")
-#        if string.find(res, "HTML") > 0 and string.find(res, "Evil") == -1:
-#            results.append(True)
-#        else:
-#            results.append(False)
-#        network.hosts[1].sendInt()
-#        network.hosts[2].sendInt()
-#        network.hosts[3].sendInt()
-#        if enable_stat:
-#            lg.output('[timer] www: %d sec.\n' % (time.time() - ts))
-	results.append(True)
 
-        print repr(results)
-        lg.output(str(results) + "\n")
+        #Pull Rules
+        raw = []
+        for s in network.switches:
+            raw.append(s.name + "," + s.dpctl("dump-flows"))
+
+        #Write Output
+        d = {"results":results, "rules": raw}
+        print repr(d)
+        lg.output(str(d) + "\n")
 
         # Cleanup Network
         ts = time.time()
@@ -200,6 +185,6 @@ if __name__ == '__main__':
             lg.output('[timer] Stop network: %d sec.\n' % (time.time() - ts))
 
     except Exception as e:
-        print repr([False, False, False])
+        print repr({"results":[False, False, False]})
         lg.output(e)
         os.system("mn -c > /dev/null 2>/dev/null")

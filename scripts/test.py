@@ -27,7 +27,11 @@ class SDNTester:
 		self.testnum = 1
 		self.msg_types = []
 		self.creating_baseline = False
-		self.veriflow_flips = 10
+		self.veriflow_flips_threshold = 10
+		self.veriflow_flips = 0
+		self.veriflow_output = []
+		self.rule_state = []
+		self.rule_state_baseline = []
 
 	def baseline(self, test_script):
 		self.creating_baseline = True
@@ -35,16 +39,25 @@ class SDNTester:
 		self.veriflow_flips = []
 
 		#Do Baseline
-		for i in range(0,1):
+		for i in range(0,3):
 			self.testnum = 0
 			res = self.doTest(test_script, ["*,*,*,*,*,CLEAR,*"])
 			if res[0] == False:
 				print "Warning!!! Baseline failed!!!"
 
 		#Process Results
-		self.veriflow_flips = (sum(self.veriflow_flips)/len(self.veriflow_flips))*2	#VeriFlow Flip Threshold
+		self.veriflow_flips_threshold = (sum(self.veriflow_flips)/len(self.veriflow_flips))*2	#VeriFlow Flip Threshold
 		self.testnum = num
 		self.creating_baseline = False
+
+		#Log Thresholds
+		self.log.write("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Thresholds $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
+		self.log.write("Veriflow Flips: %i\n" % (self.veriflow_flips_threshold))
+		self.log.write("Rule State: (%i)\n" % (len(self.rule_state_baseline)))
+		for r in self.rule_state_baseline:
+			self.log.write(r + "\n")
+		self.log.write("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Thresholds $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
+		self.log.flush()
 
 	def retrieve_feedback(self):
 		return {'msg_types':self.msg_types}
@@ -101,11 +114,18 @@ class SDNTester:
 			return (False, "System Failure")
 
 		#Evaluate Results
-		if  isinstance(res, (list,tuple)):
-			for r in res:
+		if  isinstance(res, (dict)) and "results" in res:
+			res_list = res["results"]
+			for r in res_list:
 				if r == False:
 					result[0] = False
 					result[1] = "Network Tests"
+
+			#Check Rules
+			if "rules" in res:
+				if self._check_rule_dump(res["rules"]) == False:
+					result[0] = False
+					result[1] = "Network State"
 		else:
 			result[0] = False
 			result[1] = "System Failure"
@@ -118,6 +138,7 @@ class SDNTester:
 			self._stop_controllers()
 			return (False, "System Failure")
 		if self._check_for_error_msgs():
+			result[0] = False
 			result[1] = "Error Message"
 
 		#Check and Stop VeriFlow
@@ -147,6 +168,13 @@ class SDNTester:
 		self.log.write("********* Test Script output ********\n")
 		if test_std_err:
 			self.log.write(test_std_err)
+		self.log.write("*****************\n")
+		self.log.write("Veriflow Flips: %s\n" %(str(self.veriflow_flips)))
+		self.log.write("*****************\n")
+		self.log.write("Rule State:\n")
+		for r in self.rule_state:
+			self.log.write(r + "\n")
+		self.log.write("Num: %d\n" % (len(self.rule_state)))
 		self.log.write("*****************\n")
 		self.log.write("Message Types Seen: %s\n" % (str(self.msg_types)))
 		self.log.write("*****************\n")
@@ -475,6 +503,7 @@ class SDNTester:
 			return (False, "System Error")
 		log = f.readlines()
 		f.close()
+		self.veriflow_output = log
 
 		#Process Log
 		working = True
@@ -486,9 +515,6 @@ class SDNTester:
 			if line.find("Network Fixed!") > 0:
 				working = True
 		
-		self.log.write("*****************\n")
-		self.log.write("Veriflow Flips: %d\n" %(flips))
-		self.log.write("*****************\n")
 		
 		#Determine Results
 		if working is not True:
@@ -496,7 +522,68 @@ class SDNTester:
 		if self.creating_baseline:
 			self.veriflow_flips.append(flips)
 		else:
-			if (flips > self.veriflow_flips):
+			self.veriflow_flips = flips
+			if (flips > self.veriflow_flips_threshold):
 				return (False, "VeriFlow")
 		return (True, "Success!")
-		
+
+	def _check_rule_dump(self,raw):
+		state = []
+
+		if isinstance(raw, (list,tuple)) == False:
+			return False
+		for sw in raw:
+				if isinstance(sw, (str)) == False:
+					return False
+				sw_name = ""
+				lines = sw.splitlines()
+				for ln in lines:
+					#Grab Switch Name
+					if ln.find("NXST_FLOW") > 0:
+						csv = ln.split(",")
+						sw_name = csv[0]
+						continue
+					#Clean other fields
+					csv = ln.split(",")
+					cleaned = sw_name + ","
+					has_data = False
+					for v in csv:
+						if v.find("packets") > 0:
+							continue
+						if v.find("bytes") > 0:
+							continue
+						if v.find("used") > 0:
+							continue
+						if v.find("duration") > 0:
+							continue
+						if v.find("idle") > 0:
+							continue
+						if v.find("cookie") > 0:
+							continue
+						if v == "":
+							continue
+						cleaned = cleaned + v + ","
+						has_data = True
+					if has_data:
+						state.append(cleaned)
+		state.sort()
+
+		if self.creating_baseline:
+			if len(self.rule_state_baseline) == 0:
+				self.rule_state_baseline = state
+			else:
+				#Merge and remove non-deterministic config
+				new_baseline = []
+				for s in self.rule_state_baseline:
+					if s in state:
+						new_baseline.append(s)
+				self.rule_state_baseline = new_baseline
+		else:
+			#Save state
+			self.rule_state = state
+
+			#Compare State
+			for s in self.rule_state_baseline:
+				if s not in state:
+					return False
+		return True

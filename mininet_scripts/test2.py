@@ -196,8 +196,15 @@ if __name__ == '__main__':
         if enable_stat:
             lg.output('[timer] www: %d sec.\n' % (time.time() - ts))
 
-        print repr(results)
-        lg.output(str(results) + "\n")
+		#Pull Rules
+        raw = []
+        for s in network.switches:
+            raw.append(s.name + "," + s.dpctl("dump-flows"))
+
+        #Write Output
+        d = {"results": results, "rules": raw}
+        print repr(d)
+        lg.output(str(d) + "\n")
 
         # Cleanup Network
         ts = time.time()
@@ -205,6 +212,6 @@ if __name__ == '__main__':
         if enable_stat:
             lg.output('[timer] Stop network: %d sec.\n' % (time.time() - ts))
     except Exception as e:
-        print repr([False, False, False])
+        print repr({"results":[False, False, False]})
         lg.output(e)
         os.system("mn -c > /dev/null 2>/dev/null")

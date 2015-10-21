@@ -20,21 +20,28 @@ import config
 def main(args):
 	vms_per_instance = config.controllers_per_instance + 1
 	standalone = True
+	loop = False
+	mode = "w"
 
 	#Parse args
 	argp = argparse.ArgumentParser(description='Test Executor')
 	argp.add_argument('-p','--port', type=int, default=config.coordinator_port)
 	argp.add_argument('-c','--coordinator', type=str)
 	argp.add_argument('-i','--instance', type=int, default=0)
+	argp.add_argument('-l', '--loop', action='store_true')
 	args = vars(argp.parse_args(args[1:]))
 	instance = args['instance']
 	if args['coordinator'] is not None:
+		mode = "a"
+		standalone = False
+	if args['loop'] is True:
+		loop = True
 		standalone = False
 
 	print "Running Instance " + str(instance) + "..."
 
 	#Open Log file
-	lg = open(config.logs_loc.format(instance=instance), "w")
+	lg = open(config.logs_loc.format(instance=instance), mode)
 	lg.write(str(datetime.today()) + "\n")
 	lg.write("Instance: " + str(instance) + "\n")
 
@@ -50,17 +57,21 @@ def main(args):
 
 	#Start VMs
 	print "Starting VMs..."
-	tester.startVms()
+	if tester.startVms() == False:
+		return
 
 	#Do Tests
 	if standalone:
 		standalone_tests(tester)
+	elif loop:
+		infinite_loop(tester)
 	else:
 		coordinated_tests(tester, instance, lg,(args['coordinator'], args['port']))
 
 	#Stop VMs
 	print "Stopping VMs..."
-	tester.stopVms()
+	if not loop:
+		tester.stopVms()
 
 	#Close log
 	lg.write(str(datetime.today()) + "\n")
@@ -190,6 +201,15 @@ def standalone_tests(tester):
 	print "Test Result: " + str(res[0])
 	print "******"
 
+def infinite_loop(tester):
+	print "Starting Tests..."
+	i = 0
+	while True:
+		print "Test " + str(i) + "   " +  str(datetime.today())
+		res = tester.doTest("/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"])
+		print "Test Result: " + str(res[0])
+		print "******"
+		i += 1
 
 if __name__ == "__main__":
 	main(sys.argv)
