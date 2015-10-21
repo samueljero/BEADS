@@ -93,7 +93,7 @@ class VeriFlow
 {
 private:
 	Trie* primaryTrie;
-
+	size_t previousFailures;
 	unordered_map< unsigned short, uint64_t > socketPortToDatapathIdMap;
 
 public:
@@ -107,7 +107,7 @@ public:
 	void processCurrentHop(const EquivalenceClass& packetClass, ForwardingGraph* graph, const string& currentLocation, unordered_set< string >& visited, NextHopInfo& nextHopInfo, FILE* fp);
 
 	bool verifyRule(const Rule& rule, int command, double& updateTime, double& packetClassSearchTime, double& graphBuildTime, double& queryTime, unsigned long& ecCount, FILE* fp);
-	void traverseForwardingGraph(const EquivalenceClass& packetClass, ForwardingGraph* graph, const string& currentLocation, unordered_set< string > visited, FILE* fp);
+	bool traverseForwardingGraph(const EquivalenceClass& packetClass, ForwardingGraph* graph, const string& currentLocation, unordered_set< string > visited, FILE* fp);
 
 	int getTotalRuleCount() const;
 

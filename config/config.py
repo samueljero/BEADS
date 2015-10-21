@@ -49,6 +49,8 @@ controllers_per_instance = topo_controllers
 veriflow_enabled = True
 veriflow_path = system_home + "/veriflow/VeriFlow/VeriFlow"
 veriflow_topo_path = system_home + "/mininet_scripts/"
+veriflow_log_path = system_home + "/tmp/"
+veriflow_log_name = "veriflow.log.{instance}"
 veriflow_base_port = 2048
 
 #VM Section

@@ -26,15 +26,25 @@ class SDNTester:
 		self.log = log
 		self.testnum = 1
 		self.msg_types = []
+		self.creating_baseline = False
+		self.veriflow_flips = 10
 
 	def baseline(self, test_script):
+		self.creating_baseline = True
 		num = self.testnum
+		self.veriflow_flips = []
+
+		#Do Baseline
 		for i in range(0,1):
 			self.testnum = 0
 			res = self.doTest(test_script, ["*,*,*,*,*,CLEAR,*"])
 			if res[0] == False:
 				print "Warning!!! Baseline failed!!!"
+
+		#Process Results
+		self.veriflow_flips = (sum(self.veriflow_flips)/len(self.veriflow_flips))*2	#VeriFlow Flip Threshold
 		self.testnum = num
+		self.creating_baseline = False
 
 	def retrieve_feedback(self):
 		return {'msg_types':self.msg_types}
@@ -110,11 +120,15 @@ class SDNTester:
 		if self._check_for_error_msgs():
 			result[1] = "Error Message"
 
-		#Stop VeriFlow
-		if self._stop_veriflow(veriflow) == False:
-			proxy.terminate()
-			self._stop_controllers()
-			return (False, "System Failure")
+		#Check and Stop VeriFlow
+		if config.veriflow_enabled:
+			if self._stop_veriflow(veriflow) == False:
+				proxy.terminate()
+				self._stop_controllers()
+				return (False, "System Failure")
+			res = self._check_veriflow_results()
+			if result[0] == True:
+				result = res
 
 		#Stop Proxy
 		if self._stop_proxy(proxy) == False:
@@ -212,7 +226,8 @@ class SDNTester:
 		veriflow = None
 		ts = time.time()
 		topo_file = config.veriflow_topo_path + os.path.splitext(os.path.basename(test_script.format(controllers="").strip()))[0] + ".vft"
-		cmd = config.veriflow_path + " " + str(vf_port) + " 127.0.0.1  " + proxyports[0] + " " + topo_file
+		log_file = config.veriflow_log_path + config.veriflow_log_name.format(instance=self.mininet[0])
+		cmd = config.veriflow_path + " " + str(vf_port) + " 127.0.0.1  " + proxyports[0] + " " + topo_file + " " + log_file
 		self.log.write("Veriflow CMD: " + cmd + "\n")
 		self.log.flush()
 		try:
@@ -447,3 +462,41 @@ class SDNTester:
 			if "error_msg" in t:
 				return True
 		return False
+
+	def _check_veriflow_results(self):
+		log_file = config.veriflow_log_path + config.veriflow_log_name.format(instance=self.mininet[0])
+		
+		#Open Log
+		f = open(log_file, "r")
+		if not f:
+			print "Error: Failed to open VeriFlow log: %s" % (log_file)
+			self.log.write("Error: Failed to VeriFlow log: %s\n" % (log_file))
+			self.log.flush()
+			return (False, "System Error")
+		log = f.readlines()
+		f.close()
+
+		#Process Log
+		working = True
+		flips = 0
+		for line in log:
+			if line.find("Network Broken!") > 0:
+				working = False
+				flips += 1
+			if line.find("Network Fixed!") > 0:
+				working = True
+		
+		self.log.write("*****************\n")
+		self.log.write("Veriflow Flips: %d\n" %(flips))
+		self.log.write("*****************\n")
+		
+		#Determine Results
+		if working is not True:
+			return (False, "VeriFlow")
+		if self.creating_baseline:
+			self.veriflow_flips.append(flips)
+		else:
+			if (flips > self.veriflow_flips):
+				return (False, "VeriFlow")
+		return (True, "Success!")
+		

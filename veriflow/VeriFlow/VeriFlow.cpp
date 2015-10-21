@@ -68,9 +68,9 @@ int main(int argc, char** argv)
 		Test::test();
 		return EXIT_SUCCESS;
 	}
-	else if(argc < 5)
+	else if(argc < 6)
 	{
-		fprintf(stderr, "USAGE: %s <veriflow_port> <controller_address> <controller_port> <topology_file>\n", argv[0]);
+		fprintf(stderr, "USAGE: %s <veriflow_port> <controller_address> <controller_port> <topology_file> <log_file>\n", argv[0]);
 		exit(1);
 	}
 
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 	controllerPort = (unsigned short)atoi(argv[3]);
 
 	tcpServerSocket = createSocket(SOCK_STREAM);
-	logFile = fopen("log.txt", "w");
+	logFile = fopen(argv[5], "w");
 
 	struct sigaction act;
 	act.sa_handler = signalHandler;
@@ -452,6 +452,7 @@ bool compareForwardingLink(const ForwardingLink& first, const ForwardingLink& se
 VeriFlow::VeriFlow()
 {
 	this->primaryTrie = new Trie(IN_PORT);
+	this->previousFailures = 0;
 	if(this->primaryTrie == NULL)
 	{
 		fprintf(stderr, "[VeriFlow::VeriFlow] Memory allocation error (this->primaryTrie == NULL). Terminating process.\n");
@@ -1028,11 +1029,22 @@ bool VeriFlow::verifyRule(const Rule& rule, int command, double& updateTime, dou
 	// fprintf(stdout, "[VeriFlow::verifyRule] Running query...\n");
 	gettimeofday(&start, NULL);
 	// Add query code here
+	size_t currentFailures = 0;
 	for(unsigned int i = 0; i < vGraph.size(); i++)
 	{
 		unordered_set< string > visited;
-		this->traverseForwardingGraph(vFinalPacketClasses[i], vGraph[i], rule.location, visited, fp);
+		if(!this->traverseForwardingGraph(vFinalPacketClasses[i], vGraph[i], rule.location, visited, fp)) {
+			++currentFailures;
+		}
 	}
+
+	if (previousFailures > 0 && currentFailures == 0) {
+		fprintf(fp, "[Veriflow::verifyRule] Network Fixed!\n");
+	} else if (previousFailures == 0 && currentFailures > 0) {
+		fprintf(fp, "[Veriflow::verifyRule] Network Broken!\n");
+	}
+	fflush(fp);
+	previousFailures = currentFailures;
 	// fprintf(stdout, "[VeriFlow::verifyRule] Query complete.\n");
 
 	if(command == OFPFC_ADD)
@@ -1061,7 +1073,7 @@ bool VeriFlow::verifyRule(const Rule& rule, int command, double& updateTime, dou
 	return true;
 }
 
-void VeriFlow::traverseForwardingGraph(const EquivalenceClass& packetClass, ForwardingGraph* graph, const string& currentLocation, unordered_set< string > visited, FILE* fp)
+bool VeriFlow::traverseForwardingGraph(const EquivalenceClass& packetClass, ForwardingGraph* graph, const string& currentLocation, unordered_set< string > visited, FILE* fp)
 {
 	if(graph == NULL)
 	{
@@ -1069,12 +1081,12 @@ void VeriFlow::traverseForwardingGraph(const EquivalenceClass& packetClass, Forw
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] (graph == NULL) for the following packet class at node %s.\n", currentLocation.c_str());
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] PacketClass: %s\n", packetClass.toString().c_str()); */
 
-		return;
+		return true;
 	}
 
 	if(currentLocation.compare("") == 0)
 	{
-		return;
+		return true;
 	}
 
 	if(visited.find(currentLocation) != visited.end())
@@ -1084,7 +1096,7 @@ void VeriFlow::traverseForwardingGraph(const EquivalenceClass& packetClass, Forw
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] Found a LOOP for the following packet class at node %s.\n", currentLocation.c_str());
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] PacketClass: %s\n", packetClass.toString().c_str());
 
-		return;
+		return false;
 	}
 
 	visited.insert(currentLocation);
@@ -1096,7 +1108,7 @@ void VeriFlow::traverseForwardingGraph(const EquivalenceClass& packetClass, Forw
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] Found a BLACK HOLE for the following packet class as current location (%s) not found in the graph.\n", currentLocation.c_str());
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] PacketClass: %s\n", packetClass.toString().c_str());
 
-		return;
+		return false;
 	}
 
 	if(graph->links[currentLocation].empty() == true)
@@ -1106,7 +1118,7 @@ void VeriFlow::traverseForwardingGraph(const EquivalenceClass& packetClass, Forw
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] Found a BLACK HOLE for the following packet class as there is no outgoing link at current location (%s).\n", currentLocation.c_str());
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] PacketClass: %s\n", packetClass.toString().c_str());
 
-		return;
+		return false;
 	}
 
 	graph->links[currentLocation].sort(compareForwardingLink);
@@ -1121,6 +1133,7 @@ void VeriFlow::traverseForwardingGraph(const EquivalenceClass& packetClass, Forw
 		fprintf(fp, "\n");
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] The following packet class reached destination at node %s.\n", currentLocation.c_str());
 		fprintf(fp, "[VeriFlow::traverseForwardingGraph] PacketClass: %s\n", packetClass.toString().c_str());
+		return true;
 	}
 	else
 	{
@@ -1135,7 +1148,7 @@ void VeriFlow::traverseForwardingGraph(const EquivalenceClass& packetClass, Forw
 			fprintf(fp, "[VeriFlow::traverseForwardingGraph] PacketClass: %s\n", packetClass.toString().c_str()); */
 		}
 
-		this->traverseForwardingGraph(packetClass, graph, itr->rule.nextHop, visited, fp);
+		return this->traverseForwardingGraph(packetClass, graph, itr->rule.nextHop, visited, fp);
 	}
 }
 
