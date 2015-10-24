@@ -172,6 +172,9 @@ int main(int argc, char *argv[]) {
     ticks_per_sec = sysconf(_SC_CLK_TCK);
 
     if (argc != EXPECTED_ARGC) {
+        fprintf(stdout,
+            "Error: wrong number of arguments. Got %d. Expect %d.\n",
+            argc, EXPECTED_ARGC);
         print_usage(argv[0]);
         return ERR_INVALID_ARGC;
     }

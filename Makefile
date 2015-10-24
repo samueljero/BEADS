@@ -13,11 +13,12 @@ VeriFlow:
 Proxy:
 	cd switch_proxy/; make
 
-# Do not make monitors outside VM
-Monitors:
-	cd monitors; make
-
 Message:
 	@echo "System is in two parts:"
 	@echo "A Coordiator to coordinate all testing: coordinator/coordinator.py"
 	@echo "Multiple executors to do testing: run.py"
+
+clean:
+	cd veriflow/VeriFlow; make clean; cd ../..
+	cd switch_proxy/; make clean; cd ..
+	cd monitors; make clean; cd ..

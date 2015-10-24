@@ -219,8 +219,8 @@ class SDNTester:
 
 	def stopVms(self):
 		for c in self.controllers:
-			if(self._waitListening(mv.vm2ip(c), 22, 240, True)==True):
-				os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s:~/%s %s\n" % (config.vm_ssh_key, config.controller_user, mv.vm2ip(c), config.pm_controller_log_file, log_path + '/' + config.pm_controller_log_file.replace('.', '_' + str(c) + '.')))
+			# if(self._waitListening(mv.vm2ip(c), 22, 240, True)==True):
+			# 	os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s:~/%s %s\n" % (config.vm_ssh_key, config.controller_user, mv.vm2ip(c), config.pm_controller_log_file, log_path + '/' + config.pm_controller_log_file.replace('.', '_' + str(c) + '.')))
 			mv.stopvm(c)
 		for m in self.mininet:
 			mv.stopvm(m)
@@ -276,20 +276,22 @@ class SDNTester:
 	def _start_controllers(self):
 		ts = time.time()
 		for c in self.controllers:
-			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-			res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_procmon.sh {0} {1} {2}".format(config.pm_poll_delay, config.pm_controller_log_file, config.controller_start_cmd)])
-			self.log.write("Starting Controller (" + mv.vm2ip(c) + ")... " + res.output + "\n")
+			shell = spur.SshShell(hostname=mv.vm2ip(c), username=config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept, private_key_file=config.vm_ssh_key)
+			res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_controller.sh {0} {1}".format(config.controller_type, "start")])
+			self.log.write("Starting Controller (" + mv.vm2ip(c) + ")...\n" + res.output)
 			self.log.flush()
 		for c in self.controllers:
 			if(self._waitListening(mv.vm2ip(c),config.controller_port,60)==False):
 				self.log.write("Controller %s failed to start after %d seconds" % (mv.vm2ip(c),60))
 				self.log.flush()
 				return False
-			# else:
-			# 	# Controller starts.
-			# 	pass
+			else:
+				# Controller starts.
+				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_controller.sh {0} {1}".format(config.controller_type, "mon")])
+				self.log.write("Starting resource monitor for controller (" + mv.vm2ip(c) + ")...\n" + res.output)
+				self.log.flush()
 		if config.enable_stat:
-			self.log.write('[timer] Start controllers: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Start all controllers: %d sec.\n' % (time.time() - ts))
 		return True
 
 	def _call_test(self, test_script, proxyaddrs):
@@ -317,27 +319,31 @@ class SDNTester:
 		for c in self.controllers:
 			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 			try:
-				res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
+				self.log.write("Stopping controller (" + mv.vm2ip(c) + ")...\n")
+				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_controller.sh {0} {1}".format(config.controller_type, "stop")], allow_error=True)
+				# res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
+				self.log.write(res.output)
 			except Exception as e:
 				print e
 				self.log.write("Exception: " + str(e) + "\n")
 				self.log.flush()
 				return False
-		time.sleep(config.controller_stop_time)
-		for c in self.controllers:
-			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-			try:
-				res = shell.run(["/bin/bash","-i" ,"-c", config.controller_kill_cmd], allow_error=True)
-				if res.return_code == 0:
-					print "Controller still running!"
-					self.log.write("Controller still running!\n")
-					self.log.flush()
-					return False
-			except Exception as e:
-				print e
-				self.log.write("Exception: " + str(e) + "\n")
-				self.log.flush()
-				return False
+		# time.sleep(config.controller_stop_time)
+		# for c in self.controllers:
+		# 	shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
+		#	try:
+		#		res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_controller.sh {0} {1}".format(config.controller_type, "kill")], allow_error=True)
+		#		# res = shell.run(["/bin/bash","-i" ,"-c", config.controller_kill_cmd], allow_error=True)
+		#		if res.return_code == 0:
+		#			print "Controller still running!"
+		#			self.log.write("Controller still running!\n")
+		#			self.log.flush()
+		#			return False
+		#	except Exception as e:
+		#		print e
+		#		self.log.write("Exception: " + str(e) + "\n")
+		#		self.log.flush()
+		#		return False
 		if config.enable_stat:
 			self.log.write('[timer] Stop controllers: %d sec.\n' % (time.time() - ts))
 		return True
