@@ -1,5 +1,6 @@
 # Generated files
 /log.txt
+/tmp/*.log.*
 /monitors/procmon
 /switch_proxy/libloci.so
 /switch_proxy/sndcmd
