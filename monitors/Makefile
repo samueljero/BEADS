@@ -1,20 +1,13 @@
-include Makefile.in
+G++ = g++ -std=gnu++11
+GCC = gcc -std=gnu99
+OPT_FLAGS = -O3 -msse -msse2
 
 TARGETS = procmon
 
-all: $(BUILD_DIR) $(TARGETS)
+all: $(TARGETS)
 
-debug: G++ += -g -D_DEBUG
-debug: clean all
-
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-
-procmon: $(BUILD_DIR)/procmon.o
+procmon: procmon.cpp
 	$(G++) $(OPT_FLAGS) -o $@ $^
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
-	$(G++) $(OPT_FLAGS) -o $@ -c $<
-
 clean:
-	rm -rfv $(TARGETS) $(BUILD_DIR)/
+	rm -rfv $(TARGETS)

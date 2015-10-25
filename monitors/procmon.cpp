@@ -1,5 +1,5 @@
 /**
- * procmon.c
+ * procmon.cpp
  * Periodically monitor CPU usage of a given process. To exit, either terminate the monitored
  * process or issue a SIGINT to procmon.
  * 
@@ -13,9 +13,12 @@
 #include <ctime>
 #include <signal.h>
 #include <unistd.h>
-#include "constants.h"
-#include "debug.h"
-#include "procmon.h"
+
+#define EXPECTED_ARGC           3
+#define ERR_INVALID_ARGC        1
+#define ERR_SIGACTION           2
+#define RETURN_OK               0
+#define RETURN_ERR              (-1)
 
 long ticks_per_sec;
 bool continue_loop = true;
@@ -26,12 +29,9 @@ double uptime;
 double total_seconds = 0;
 double avg_cpu_percentage = 0;
 double peak_cpu_percentage = 0;
-double avg_vsize = 0;
-unsigned long peak_vsize = 0;
+double avg_rss = 0;
+unsigned long peak_rss = 0;
 
-/**
- * Break infinite loop if SIGINT is received.
- */
 void on_interrupted(int sig, siginfo_t *siginfo, void *context) {
     continue_loop = false;
 }
@@ -132,6 +132,8 @@ int pollstat() {
         &cpu, &rt_priority, &policy,
         &delayacct_blkio_ticks, &guest_time, &cguest_time);    
     
+    fclose(f);
+
     time(&ts);
     total_time = utime + stimev + cutime + cstime;
     uptime = get_uptime();
@@ -139,16 +141,15 @@ int pollstat() {
     cpu_percentage = 100 * (total_time / ticks_per_sec) / total_seconds;
     
     // Update virtual memory size.
-    avg_vsize += vsize;
-    if (vsize > peak_vsize) peak_vsize = vsize;
+    avg_rss += rss;
+    if (rss > peak_rss) peak_rss = rss;
 
     // Update CPU usage.
     avg_cpu_percentage += cpu_percentage;
     if (cpu_percentage > peak_cpu_percentage) peak_cpu_percentage = cpu_percentage;
 
-    fprintf(stdout, "[%ld] pid=%d, utime=%lu, stime=%lu, total_time=%llu, total_seconds=%lf, cpu=%lf%%, vsize=%luB\n",
-        ts, pid, utime, stimev, total_time, total_seconds, cpu_percentage, vsize);
-    fclose(f);
+    fprintf(stdout, "%ld, %d, %lu, %lu, %llu, %lf, %lf, %lu\n",
+        ts, pid, utime, stimev, total_time, total_seconds, cpu_percentage, rss);
 
     ++counter;
 }
@@ -173,8 +174,7 @@ int main(int argc, char *argv[]) {
 
     if (argc != EXPECTED_ARGC) {
         fprintf(stdout,
-            "Error: wrong number of arguments. Got %d. Expect %d.\n",
-            argc, EXPECTED_ARGC);
+            "Error: wrong number of arguments. Got %d. Expect %d.\n", argc, EXPECTED_ARGC);
         print_usage(argv[0]);
         return ERR_INVALID_ARGC;
     }
@@ -184,7 +184,6 @@ int main(int argc, char *argv[]) {
 
     snprintf(stat_path, PATH_MAX, "/proc/%d/stat", target_pid);
 
-    // Prepare signal handler.
     memset(&act, 0, sizeof(struct sigaction));
     act.sa_sigaction = &on_interrupted;
     act.sa_flags = SA_SIGINFO;
@@ -193,6 +192,7 @@ int main(int argc, char *argv[]) {
         return ERR_SIGACTION;
     }
 
+    fprintf(stdout, "Time, PID, utime, stime, total_time, total_seconds, cpu_percentage, res_mem_bytes\n");
     while (continue_loop) {
         if (pollstat() < 0)
             break;
@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
         fprintf(stdout, "Error: no sample.\n");
     } else {
         avg_cpu_percentage /= counter;
-        avg_vsize /= counter;
+        avg_rss /= counter;
         fprintf(stdout,
             "Statistics:\n"
             "Total samples:  %llu\n"
@@ -211,9 +211,9 @@ int main(int argc, char *argv[]) {
             "Total CPU time: %lf sec\n"
             "Avg CPU usage:  %lf %%\n"
             "Peak CPU usage: %lf %%\n"
-            "Avg VM size:    %.0lf B\n"
-            "Peak VM size:   %lu B\n",
-            counter, uptime, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_vsize, peak_vsize);
+            "Avg resource set size:    %.0lf B\n"
+            "Peak resource set size:   %lu B\n",
+            counter, uptime, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_rss, peak_rss);
     }
 
     fflush(stdout);

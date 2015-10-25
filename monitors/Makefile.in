@@ -1,6 +1,0 @@
-G++ = g++ -std=gnu++11
-GCC = gcc -std=gnu99
-OPT_FLAGS = -O1 # -mtune=native -march=native
-
-BUILD_DIR = build
-SRC_DIR = src
