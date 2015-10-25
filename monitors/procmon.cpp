@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
         return ERR_SIGACTION;
     }
 
-    fprintf(stdout, "Time, PID, utime, stime, total_time, total_seconds, cpu_percentage, res_pages\n");
+    fprintf(stdout, "Time, PID, utime, stime, total_time, total_seconds, cpu_percentage, rss_kib\n");
     while (continue_loop) {
         if (pollstat() < 0)
             break;
