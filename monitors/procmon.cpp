@@ -23,6 +23,7 @@
 long ticks_per_sec;
 bool continue_loop = true;
 char stat_path[PATH_MAX];
+int page_size_kb;
 
 unsigned long long counter = 0;
 double uptime;
@@ -140,7 +141,8 @@ int pollstat() {
     total_seconds = uptime - start_time  / ticks_per_sec;
     cpu_percentage = 100 * (total_time / ticks_per_sec) / total_seconds;
     
-    // Update virtual memory size.
+    // Update resident set size.
+    rss *= page_size_kb;
     avg_rss += rss;
     if (rss > peak_rss) peak_rss = rss;
 
@@ -171,6 +173,7 @@ int main(int argc, char *argv[]) {
     struct sigaction act;
  
     ticks_per_sec = sysconf(_SC_CLK_TCK);
+    page_size_kb = sysconf(_SC_PAGESIZE) >> 10;    // To KiB.
 
     if (argc != EXPECTED_ARGC) {
         fprintf(stdout,
@@ -192,7 +195,7 @@ int main(int argc, char *argv[]) {
         return ERR_SIGACTION;
     }
 
-    fprintf(stdout, "Time, PID, utime, stime, total_time, total_seconds, cpu_percentage, res_mem_bytes\n");
+    fprintf(stdout, "Time, PID, utime, stime, total_time, total_seconds, cpu_percentage, res_pages\n");
     while (continue_loop) {
         if (pollstat() < 0)
             break;
@@ -206,13 +209,13 @@ int main(int argc, char *argv[]) {
         avg_rss /= counter;
         fprintf(stdout,
             "Statistics:\n"
-            "Total samples:  %llu\n"
-            "Total uptime:   %lf sec\n"
-            "Total CPU time: %lf sec\n"
-            "Avg CPU usage:  %lf %%\n"
-            "Peak CPU usage: %lf %%\n"
-            "Avg resource set size:    %.0lf B\n"
-            "Peak resource set size:   %lu B\n",
+            "Total samples:          %llu\n"
+            "Total uptime:           %lf sec\n"
+            "Total CPU time:         %lf sec\n"
+            "Avg CPU usage:          %lf %%\n"
+            "Peak CPU usage:         %lf %%\n"
+            "Avg resource set size:  %.0lf KiB\n"
+            "Peak resource set size: %lu KiB\n",
             counter, uptime, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_rss, peak_rss);
     }
 
