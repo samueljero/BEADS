@@ -277,7 +277,7 @@ class SDNTester:
 		ts = time.time()
 		for c in self.controllers:
 			shell = spur.SshShell(hostname=mv.vm2ip(c), username=config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept, private_key_file=config.vm_ssh_key)
-			res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_controller.sh {0} {1}".format(config.controller_type, "start")])
+			res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "start")])
 			self.log.write("Starting Controller (" + mv.vm2ip(c) + ")...\n" + res.output)
 			self.log.flush()
 		for c in self.controllers:
@@ -287,7 +287,7 @@ class SDNTester:
 				return False
 			else:
 				# Controller starts.
-				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_controller.sh {0} {1}".format(config.controller_type, "mon")])
+				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "mon")])
 				self.log.write("Starting resource monitor for controller (" + mv.vm2ip(c) + ")...\n" + res.output)
 				self.log.flush()
 		if config.enable_stat:
@@ -320,7 +320,7 @@ class SDNTester:
 			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 			try:
 				self.log.write("Stopping controller (" + mv.vm2ip(c) + ")...\n")
-				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_controller.sh {0} {1}".format(config.controller_type, "stop")], allow_error=True)
+				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "stop")], allow_error=True)
 				# res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
 				self.log.write(res.output)
 			except Exception as e:
@@ -332,7 +332,7 @@ class SDNTester:
 		# for c in self.controllers:
 		# 	shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 		#	try:
-		#		res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/start_controller.sh {0} {1}".format(config.controller_type, "kill")], allow_error=True)
+		#		res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "kill")], allow_error=True)
 		#		# res = shell.run(["/bin/bash","-i" ,"-c", config.controller_kill_cmd], allow_error=True)
 		#		if res.return_code == 0:
 		#			print "Controller still running!"
