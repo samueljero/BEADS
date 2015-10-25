@@ -150,8 +150,8 @@ int pollstat() {
     avg_cpu_percentage += cpu_percentage;
     if (cpu_percentage > peak_cpu_percentage) peak_cpu_percentage = cpu_percentage;
 
-    fprintf(stdout, "%ld, %d, %lu, %lu, %llu, %lf, %lf, %lu\n",
-        ts, pid, utime, stimev, total_time, total_seconds, cpu_percentage, rss);
+    fprintf(stdout, "%llu, %ld, %d, %lu, %lu, %llu, %lf, %lf, %lu\n",
+        counter, ts, pid, utime, stimev, total_time, total_seconds, cpu_percentage, rss);
 
     ++counter;
 }
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
         return ERR_SIGACTION;
     }
 
-    fprintf(stdout, "Time, PID, utime, stime, total_time, total_seconds, cpu_percentage, rss_kib\n");
+    fprintf(stdout, "count, time, pid, utime, stime, total_time, total_seconds, cpu_percentage, rss_kib\n");
     while (continue_loop) {
         if (pollstat() < 0)
             break;
