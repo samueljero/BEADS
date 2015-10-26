@@ -956,9 +956,11 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 	}
 
 	/* Apply to Packet */
+	pthread_rwlock_unlock(&lock);
 	for (int i =0; i < dups; i++) {
 		pk.snd->sendm(pk.ofo);
 	}
+	pthread_rwlock_rdlock(&lock);
 	of_object_delete(pk.ofo);
 	pk.ofo = NULL;
 

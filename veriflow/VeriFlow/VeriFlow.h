@@ -62,6 +62,7 @@ struct ProxyConnectionInfo
 	VeriFlow* veriflow;
 	pthread_mutex_t* networkMutex;
 	pthread_mutex_t* veriflowMutex;
+	struct ProxyConnectionInfo *other;
 };
 
 struct NextHopInfo

@@ -14,7 +14,7 @@ extern "C" {
 bool HalfConn::sendm(Message m)
 {
 	int len;
-	if (sock <= 0) {
+	if (sock < 0) {
 		return false;
 	}
 	
@@ -40,7 +40,7 @@ bool HalfConn::sendm(of_object_t *ofo)
 }
 
 HalfConn::HalfConn() {
-	this->sock = 0;
+	this->sock = -1;
 	this->other = NULL;
 	this->dpid = DPID_MAX;
 	this->dir = STOC;
@@ -78,7 +78,7 @@ HalfConn::HalfConn(int cid, struct sockaddr_in *raddr, int rport, HalfConn *othe
 {
 	this->other = other;
 	this->rport = rport;
-	this->sock = 0;
+	this->sock = -1;
 	this->dpid = DPID_MAX;
 	this->dir = CTOS;
 	this->cid = cid;
@@ -105,18 +105,18 @@ bool HalfConn::start()
 		return false;
 	}
 
-	if (sock == 0) {
+	if (sock < 0) {
 		sock = socket(AF_INET, SOCK_STREAM, 0);
 		if (sock < 0) {
 			dbgprintf(0, "Connection Failed: Could not create socket: %s\n", strerror(errno));
-			sock = 0;
+			sock = -1;
 			return false;
 		}
 
 		if (connect(sock, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0) {
 			dbgprintf(0, "Connection Failed: %s\n", strerror(errno));
 			close(sock);
-			sock = 0;
+			sock = -1;
 			return false;
 		}
 	}
@@ -125,7 +125,7 @@ bool HalfConn::start()
 	if (pthread_create(&rcv_thread, NULL, rcv_thread_run, this) < 0) {
 		dbgprintf(0, "Error: Failed to start receive thread!: %s\n", strerror(errno));
 		close(sock);
-		sock = 0;
+		sock = -1;
 		running = false;
 		return false;
 	}
@@ -135,13 +135,13 @@ bool HalfConn::start()
 	if (pthread_create(&q_thread, NULL, queue_thread_run, this) < 0) {
 		dbgprintf(0, "Error: Failed to start queue thread!: %s\n", strerror(errno));
 		close(sock);
-		sock = 0;
+		sock = -1;
 		running = false;
 		return false;
 	}
 	q_thread_running = true;
 	q_thread_cleanup = true;
-
+	
 	return true;
 }
 
@@ -167,9 +167,9 @@ bool HalfConn::_stop()
 	if (running) {
 			running = false;
 	}
-	if (sock > 0) {
+	if (sock >= 0) {
 		close(sock);
-		sock = 0;
+		sock = -1;
 	}
 
 	/* Unlocking an unlocked mutex is undefined.
@@ -208,7 +208,7 @@ void HalfConn::rcv_run()
 		if (m.buff == NULL){
 			running = false;
 			if (other->isRunning()) {
-				other->stop();
+				other->_stop();
 			}
 			break;
 		}
@@ -357,11 +357,12 @@ void HalfConn::queue_run()
 			continue;
 		}
 		q.pop();
+		pthread_mutex_unlock(&q_mutex);
+
 		for(int i=0; i < pk.dups; i++) {
 			sendm(pk.ofo);
 		}
 		of_object_delete(pk.ofo);
-		pthread_mutex_unlock(&q_mutex);
 	}
 }
 
