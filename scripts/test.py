@@ -171,6 +171,11 @@ class SDNTester:
 		self.log.write("*****************\n")
 		self.log.write("Veriflow Flips: %s\n" %(str(self.veriflow_flips)))
 		self.log.write("*****************\n")
+		if result[0] == False and result[1] == "VeriFlow":
+			self.log.write("VeriFlow Output:\n")
+			for f in self.veriflow_output:
+				self.log.write(f + "\n")
+			self.log.write("*****************\n")
 		self.log.write("Rule State:\n")
 		for r in self.rule_state:
 			self.log.write(r + "\n")
@@ -520,14 +525,14 @@ class SDNTester:
 		
 		
 		#Determine Results
-		if working is not True:
-			return (False, "VeriFlow")
 		if self.creating_baseline:
 			self.veriflow_flips.append(flips)
 		else:
 			self.veriflow_flips = flips
 			if (flips > self.veriflow_flips_threshold):
 				return (False, "VeriFlow")
+		if working is not True:
+			return (False, "VeriFlow")
 		return (True, "Success!")
 
 	def _check_rule_dump(self,raw):
