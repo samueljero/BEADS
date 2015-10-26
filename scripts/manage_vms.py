@@ -20,7 +20,7 @@ def startvm(num):
 	img=config.vm_path + config.vm_name_bases[(num-1)%len(config.vm_name_bases)] + str(num) + ".qcow2"
 	nic1="-net nic,model=virtio,macaddr=00:00:00:01:00:{:02X},vlan=0 -net tap,ifname=tap-h{:d},downscript=no,script=no,vlan=0".format(num,num)
 	nic2="-net user,vlan=1 -net nic,vlan=1"
-	vnc="-vnc :{0}".format(str(config.vm_vnc_base + num))
+	vnc="-vnc 127.0.0.1:{0}".format(str(config.vm_vnc_base + num))
 	telnet= config.vm_telnet_base + num
 	os.system("qemu-system-x86_64 -hda {0} -m {1} -smp {2} -enable-kvm -k \"en-us\" {3} {4} {5} -monitor telnet:127.0.0.1:{6},server,nowait &".format(img,config.vm_ram,config.vm_cores,nic1, nic2, vnc,str(telnet)))
 
@@ -45,7 +45,7 @@ def resumevm(num, namebase):
 	filename = namebase + str(num) + ".sav"
 	nic1="-net nic,model=virtio,macaddr=00:00:00:01:00:{:02X},vlan=0 -net tap,ifname=tap-h{:d},downscript=no,script=no,vlan=0".format(num,num)
 	nic2="-net user,vlan=1 -net nic,vlan=1"
-	vnc="-vnc {0}".format(str(config.vm_vnc_base + num))
+	vnc="-vnc 127.0.0.1:{0}".format(str(config.vm_vnc_base + num))
 	telnet= config.vm_telnet_base + num
 	os.system("qemu-system-x86_64 -hda {0} -m {1} -smp {2} -enable-kvm -k \"en-us\" {3} {4} {5} -monitor telnet:127.0.0.1:{6},server,nowait -daemonize -incoming \"exec:cat {7}\"".format(img,config.vm_ram,config.vm_cores,nic1, nic2, vnc,str(telnet),filename))
 	if Ping(config.vm_ip_base.format(num), 4) == False:
