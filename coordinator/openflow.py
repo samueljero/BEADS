@@ -2438,6 +2438,26 @@ fields_of_table_status = [
 	{'name':'table', 'type':'uint8'},
 ]
 
+fields_of_nicira_controller_role_reply = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'experimenter', 'type':'uint32'},
+	{'name':'subtype', 'type':'uint32'},
+	{'name':'role', 'type':'uint32'},
+]
+
+fields_of_nicira_controller_role_request = [
+	{'name':'version', 'type':'uint8'},
+	{'name':'type', 'type':'uint8'},
+	{'name':'length', 'type':'uint16'},
+	{'name':'xid', 'type':'uint32'},
+	{'name':'experimenter', 'type':'uint32'},
+	{'name':'subtype', 'type':'uint32'},
+	{'name':'role', 'type':'uint32'},
+]
+
 openflow = [
 	['of_aggregate_stats_reply', fields_of_aggregate_stats_reply],
 	['of_aggregate_stats_request', fields_of_aggregate_stats_request],
@@ -2530,4 +2550,6 @@ openflow = [
 	['of_table_stats_reply', fields_of_table_stats_reply],
 	['of_table_stats_request', fields_of_table_stats_request],
 	['of_table_status', fields_of_table_status],
+	['of_nicira_controller_role_reply', fields_of_nicira_controller_role_reply],
+	['of_nicira_controller_role_request', fields_of_nicira_controller_role_request],
 ]
