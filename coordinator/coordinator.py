@@ -74,7 +74,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 			if msg['msg'] == 'READY':
 				#New Strategy Request
 				instance = msg['instance']
-				strat = ""
+				strat = []
 
 				#Check if Executor is new
 				exec_lst_lock.acquire()

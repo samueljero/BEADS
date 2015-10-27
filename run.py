@@ -117,11 +117,22 @@ def coordinated_tests(tester, instance,lg, addr):
 			sock.send("%s\n" %(repr(msg)))
 		except Exception as e:
 			print "Failed to send on socket..."
+			rf.close()
+			sock.close()
 			sock = reconnect(addr)
+			rf = sock.makefile()
 			continue
 
 		#Get Reply
-		line = rf.readline()
+		try:
+			line = rf.readline()
+		except Exception as e:
+			print "Failed to send on socket..."
+			rf.close()
+			sock.close()
+			sock = reconnect(addr)
+			rf = sock.makefile()
+			continue
 		if line=="":
 			rf.close()
 			sock.close()
@@ -147,6 +158,16 @@ def coordinated_tests(tester, instance,lg, addr):
 			res = tester.doTest(strat[0],strat[1])
 			num+=1
 
+			#Return Feedback
+			fb = tester.retrieve_feedback()
+			try:
+				msg = {'msg':'FEEDBACK','instance':"%s:%d"%(socket.gethostname(),instance), 'data':fb}
+				sock.send("%s\n" %(repr(msg)))
+			except Exception as e:
+				print "Failed to send on socket..."
+				sock = reconnect(addr)
+				continue
+			
 			#Return Result
 			print "[%s] Test Result: %s, Reason: %s" %(str(datetime.today()),str(res[0]), res[1])
 			lg.write("[%s] Test Result: %s , Reason: %s\n" %(str(datetime.today()),str(res[0]), res[1]))
@@ -206,7 +227,8 @@ def infinite_loop(tester):
 	i = 0
 	while True:
 		print "Test " + str(i) + "   " +  str(datetime.today())
-		res = tester.doTest("/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"])
+		#res = tester.doTest("/root/test1.py {controllers}", ["*,*,*,*,*,CLEAR,*"])
+		res = tester.doTest("/root/test1.py {controllers}", ["{controllers[0]},1,*,of_flow_add,*,DROP,p=50"])
 		print "Test Result: " + str(res[0])
 		print "******"
 		i += 1
