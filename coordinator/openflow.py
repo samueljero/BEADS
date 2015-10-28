@@ -25,8 +25,8 @@ fields_of_aggregate_stats_request = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -371,7 +371,7 @@ fields_of_features_reply = [
 	{'name':'ports', 'fields':[
 		{'name':'list', 'fields': [
 			{'name':'element','type':'list', 'fields':[
-				{'name':'port_no', 'type':'uint32'},
+				{'name':'port_no', 'type':'port'}, #uint32
 				{'name':'hw_addr', 'type':'uint48'},
 				{'name':'name', 'impl':False},
 				{'name':'config', 'type':'uint32'},
@@ -430,8 +430,8 @@ fields_of_flow_add = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -530,7 +530,7 @@ fields_of_flow_add = [
 		##TODO: This Handling is bad
 		{'name':'list', 'fields': [
 			{'name':'element', 'type':'TLV', 'fields':[
-				{'name':'port', 'type':'uint48'},
+				{'name':'port', 'type':'port'}, #uint32
 				{'name':'max_len', 'type':'uint16'},
 			]},
 		]},
@@ -556,8 +556,8 @@ fields_of_flow_delete = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -656,7 +656,7 @@ fields_of_flow_delete = [
 		##TODO: This Handling is bad
 		{'name':'list', 'fields': [
 			{'name':'element', 'type':'TLV', 'fields':[
-				{'name':'port', 'type':'uint48'},
+				{'name':'port', 'type':'port'}, #uint32
 				{'name':'max_len', 'type':'uint16'},
 			]},
 		]},
@@ -682,8 +682,8 @@ fields_of_flow_delete_strict = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -782,7 +782,7 @@ fields_of_flow_delete_strict = [
 		##TODO: This Handling is bad
 		{'name':'list', 'fields': [
 			{'name':'element', 'type':'TLV', 'fields':[
-				{'name':'port', 'type':'uint48'},
+				{'name':'port', 'type':'port'}, #uint32
 				{'name':'max_len', 'type':'uint16'},
 			]},
 		]},
@@ -808,8 +808,8 @@ fields_of_flow_modify = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -908,7 +908,7 @@ fields_of_flow_modify = [
 		##TODO: This Handling is bad
 		{'name':'list', 'fields': [
 			{'name':'element', 'type':'TLV', 'fields':[
-				{'name':'port', 'type':'uint48'},
+				{'name':'port', 'type':'port'}, #uint32
 				{'name':'max_len', 'type':'uint16'},
 			]},
 		]},
@@ -934,8 +934,8 @@ fields_of_flow_modify_strict = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -1034,7 +1034,7 @@ fields_of_flow_modify_strict = [
 		##TODO: This Handling is bad
 		{'name':'list', 'fields': [
 			{'name':'element', 'type':'TLV', 'fields':[
-				{'name':'port', 'type':'uint48'},
+				{'name':'port', 'type':'port'}, #uint32
 				{'name':'max_len', 'type':'uint16'},
 			]},
 		]},
@@ -1077,8 +1077,8 @@ fields_of_flow_removed = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -1190,8 +1190,8 @@ fields_of_flow_stats_reply = [
 				{'name':'match', 'fields': [
 					{'name':'version', 'type':'uint8'},
 					{'name':'fields', 'fields':[
-						{'name':'in_port', 'type':'uint32'},
-						{'name':'in_phy_port', 'type':'uint32'},
+						{'name':'in_port', 'type':'port'}, #uint32
+						{'name':'in_phy_port', 'type':'port'}, #uint32
 						{'name':'metadata', 'type':'uint64'},
 						{'name':'eth_dst', 'type':'uint48'},
 						{'name':'eth_src', 'type':'uint48'},
@@ -1290,7 +1290,7 @@ fields_of_flow_stats_reply = [
 					##TODO: This Handling is bad
 					{'name':'list', 'fields': [
 						{'name':'element', 'type':'TLV', 'fields':[
-							{'name':'port', 'type':'uint48'},
+							{'name':'port', 'type':'port'}, #uint32
 							{'name':'max_len', 'type':'uint16'},
 						]},
 					]},
@@ -1314,8 +1314,8 @@ fields_of_flow_stats_request = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -1432,13 +1432,13 @@ fields_of_group_add = [
 		{'name':'list', 'fields':[
 			{'name':'element','type':'list', 'fields':[
 				{'name':'weight', 'type':'uint16'},
-				{'name':'watch_port', 'type':'uint32'},
+				{'name':'watch_port', 'type':'port'}, #uint32
 				{'name':'watch_group', 'type':'uint32'},
 				{'name':'actions','fields':[
 					##TODO: This Handling is bad
 					{'name':'list', 'fields':[
 						{'name':'element','type':'TLV', 'fields': [
-							{'name':'port', 'type':'uint32'},
+							{'name':'port', 'type':'port'}, #uint32
 							{'name':'max_len', 'type':'uint16'},
 						]},
 					]},
@@ -1460,13 +1460,13 @@ fields_of_group_delete = [
 		{'name':'list', 'fields':[
 			{'name':'element','type':'list', 'fields':[
 				{'name':'weight', 'type':'uint16'},
-				{'name':'watch_port', 'type':'uint32'},
+				{'name':'watch_port', 'type':'port'}, #uint32
 				{'name':'watch_group', 'type':'uint32'},
 				{'name':'actions','fields':[
 					##TODO: This Handling is bad
 					{'name':'list', 'fields':[
 						{'name':'element','type':'TLV', 'fields': [
-							{'name':'port', 'type':'uint32'},
+							{'name':'port', 'type':'port'}, #uint32
 							{'name':'max_len', 'type':'uint16'},
 						]},
 					]},
@@ -1491,13 +1491,13 @@ fields_of_group_desc_stats_reply = [
 					{'name':'list', 'fields':[
 						{'name':'element','type':'list', 'fields':[
 							{'name':'weight', 'type':'uint16'},
-							{'name':'watch_port', 'type':'uint32'},
+							{'name':'watch_port', 'type':'port'}, #uint32
 							{'name':'watch_group', 'type':'uint32'},
 							{'name':'actions','fields':[
 								##TODO: This Handling is bad
 								{'name':'list', 'fields':[
 									{'name':'element','type':'TLV', 'fields': [
-										{'name':'port', 'type':'uint32'},
+										{'name':'port', 'type':'port'}, #uint32
 										{'name':'max_len', 'type':'uint16'},
 									]},
 								]},
@@ -1564,13 +1564,13 @@ fields_of_group_modify = [
 		{'name':'list', 'fields':[
 			{'name':'element','type':'list', 'fields':[
 				{'name':'weight', 'type':'uint16'},
-				{'name':'watch_port', 'type':'uint32'},
+				{'name':'watch_port', 'type':'port'}, #uint32
 				{'name':'watch_group', 'type':'uint32'},
 				{'name':'actions','fields':[
 					##TODO: This Handling is bad
 					{'name':'list', 'fields':[
 						{'name':'element','type':'TLV', 'fields': [
-							{'name':'port', 'type':'uint32'},
+							{'name':'port', 'type':'port'}, #uint32
 							{'name':'max_len', 'type':'uint16'},
 						]},
 					]},
@@ -1791,8 +1791,8 @@ fields_of_packet_in = [
 	{'name':'match', 'fields': [
 		{'name':'version', 'type':'uint8'},
 		{'name':'fields', 'fields':[
-			{'name':'in_port', 'type':'uint32'},
-			{'name':'in_phy_port', 'type':'uint32'},
+			{'name':'in_port', 'type':'port'}, #uint32
+			{'name':'in_phy_port', 'type':'port'}, #uint32
 			{'name':'metadata', 'type':'uint64'},
 			{'name':'eth_dst', 'type':'uint48'},
 			{'name':'eth_src', 'type':'uint48'},
@@ -1880,8 +1880,8 @@ fields_of_packet_in = [
 		]},
 	]},
 	{'name':'data', 'impl':False},
-	{'name':'in_port', 'type':'uint32'},
-	{'name':'in_phy_port', 'type':'uint32'},
+	{'name':'in_port', 'type':'port'}, #uint32
+	{'name':'in_phy_port', 'type':'port'}, #uint32
 ]
 
 fields_of_packet_out = [
@@ -1895,7 +1895,7 @@ fields_of_packet_out = [
 		##TODO: This Handling is bad
 		{'name':'list', 'fields':[
 			{'name':'element','type':'TLV', 'fields': [
-				{'name':'port', 'type':'uint32'},
+				{'name':'port', 'type':'port'}, #uint32
 				{'name':'max_len', 'type':'uint16'},
 			]},
 		]},
@@ -1912,7 +1912,7 @@ fields_of_port_desc_stats_reply = [
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
 			{'name':'element','type':'list', 'fields':[
-				{'name':'port_no', 'type':'uint32'},
+				{'name':'port_no', 'type':'port'}, #uint32
 				{'name':'hw_addr', 'type':'uint48'},
 				{'name':'name', 'impl':False},
 				{'name':'config', 'type':'uint32'},
@@ -1957,7 +1957,7 @@ fields_of_port_mod = [
 	{'name':'type', 'type':'uint8'},
 	{'name':'length', 'type':'uint16'},
 	{'name':'xid', 'type':'uint32'},
-	{'name':'port_no', 'type':'uint32'},
+	{'name':'port_no', 'type':'port'}, #uint32
 	{'name':'hw_addr', 'impl':False},
 	{'name':'config', 'type':'uint32'},
 	{'name':'mask', 'type':'uint32'},
@@ -1994,7 +1994,7 @@ fields_of_port_stats_reply = [
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
 			{'name':'element','type':'list', 'fields':[
-				{'name':'port_no', 'type':'uint32'},
+				{'name':'port_no', 'type':'port'}, #uint32
 				{'name':'duration_sec', 'type':'uint32'},
 				{'name':'duration_nsec', 'type':'uint32'},
 				{'name':'rx_packets', 'type':'uint64'},
@@ -2038,7 +2038,7 @@ fields_of_port_stats_request = [
 	{'name':'length', 'type':'uint16'},
 	{'name':'xid', 'type':'uint32'},
 	{'name':'flags', 'type':'uint16'},
-	{'name':'port_no', 'type':'uint32'},
+	{'name':'port_no', 'type':'port'}, #uint32
 ]
 
 fields_of_port_status = [
@@ -2048,7 +2048,7 @@ fields_of_port_status = [
 	{'name':'xid', 'type':'uint32'},
 	{'name':'reason', 'type':'uint8'},
 	{'name':'desc', 'fields':[
-		{'name':'port_no', 'type':'uint32'},
+		{'name':'port_no', 'type':'port'}, #uint32
 		{'name':'hw_addr', 'type':'uint48'},
 		{'name':'name', 'impl':False},
 		{'name':'config', 'type':'uint32'},
@@ -2087,7 +2087,7 @@ fields_of_queue_desc_stats_reply = [
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
 			{'name':'element','type':'list', 'fields':[
-				{'name':'port_no', 'type':'uint32'},
+				{'name':'port_no', 'type':'port'}, #uint32
 				{'name':'queue_id', 'type':'uint32'},
 				{'name':'properties', 'fields':[
 					##TODO: This Handling is bad
@@ -2115,12 +2115,12 @@ fields_of_queue_get_config_reply = [
 	{'name':'type', 'type':'uint8'},
 	{'name':'length', 'type':'uint16'},
 	{'name':'xid', 'type':'uint32'},
-	{'name':'port', 'type':'uint32'},
+	{'name':'port', 'type':'port'}, #uint32
 	{'name':'queues', 'fields':[
 		{'name':'list', 'fields': [
 			{'name':'element','type':'list', 'fields':[
 				{'name':'queue_id', 'type':'uint32'},
-				{'name':'port', 'type':'uint32'},
+				{'name':'port', 'type':'port'}, #uint32
 				{'name':'properties', 'fields':[
 					##TODO: This Handling is bad
 					{'name':'list', 'fields': [
@@ -2139,7 +2139,7 @@ fields_of_queue_get_config_request = [
 	{'name':'type', 'type':'uint8'},
 	{'name':'length', 'type':'uint16'},
 	{'name':'xid', 'type':'uint32'},
-	{'name':'port', 'type':'uint32'},
+	{'name':'port', 'type':'port'}, #uint32
 ]
 
 fields_of_queue_op_failed_error_msg = [
@@ -2160,7 +2160,7 @@ fields_of_queue_stats_reply = [
 	{'name':'entries', 'fields':[
 		{'name':'list', 'fields': [
 			{'name':'element','type':'list', 'fields':[
-				{'name':'port_no', 'type':'uint32'},
+				{'name':'port_no', 'type':'port'}, #uint32
 				{'name':'queue_id', 'type':'uint32'},
 				{'name':'tx_bytes', 'type':'uint64'},
 				{'name':'tx_packets', 'type':'uint64'},
@@ -2185,7 +2185,7 @@ fields_of_queue_stats_request = [
 	{'name':'length', 'type':'uint16'},
 	{'name':'xid', 'type':'uint32'},
 	{'name':'flags', 'type':'uint16'},
-	{'name':'port_no', 'type':'uint32'},
+	{'name':'port_no', 'type':'port'}, #uint32
 	{'name':'queue_id', 'type':'uint32'},
 ]
 
