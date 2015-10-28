@@ -37,13 +37,13 @@ mininet_cleanup_cmd = "mn -c"
 mininet_replace_scripts = True
 
 #Controller Section
-controller_type = "onos"
+controller_type = "pox"
 controller_user = "root"
 controller_port = 6633
 controllers_per_instance = topo_controllers
 
 #VeriFlow Section
-veriflow_enabled = True
+veriflow_enabled = False
 veriflow_path = system_home + "/veriflow/VeriFlow/VeriFlow"
 veriflow_topo_path = system_home + "/mininet_scripts/"
 veriflow_log_path = system_home + "/tmp/"
@@ -52,9 +52,8 @@ veriflow_base_port = 2048
 
 #VM Section
 vm_path = system_home + "/vms/"
-master_name = "/ubuntu-1404-master.qcow2"
-#vm_name_bases = ["mininet", "onos", "onos", "onos"]
-vm_name_bases = ["mininet", "onos"]
+master_name = "ubuntu-1404-master.qcow2"
+vm_name_bases = ["mininet", "pox"]
 vm_user = "root"
 vm_ip_base = "10.0.1.{0}"
 vm_ram = "2048"
