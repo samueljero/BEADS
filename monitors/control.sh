@@ -25,6 +25,14 @@ case $CONTROLLER_ID in
         PID_CMD="pgrep java"
         STOP_CMD="stop"
         KILL_CMD="pkill java"
+        STOP_TIMEOUT_SEC=5
+        ;;
+	pox)
+        START_CMD="/root/run_pox.sh"
+        PID_CMD="pgrep python"
+        STOP_CMD="pkill -SIGINT python"
+        KILL_CMD="pkill python"
+        STOP_TIMEOUT_SEC=2
         ;;
     *)
         echo "Controller \"$CONTROLLER_ID\" not yet supported."

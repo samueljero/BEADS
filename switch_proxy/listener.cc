@@ -103,8 +103,8 @@ void Listener::cleanupConnections()
 	pthread_mutex_lock(&mutex);
 	for (list<Connection*>::iterator it = connections.begin(); it != connections.end(); it++) {
 		if( !(*it)->isRunning()) {
+			(*it)->stop();
 			delete *it;
-			//(*it)->stop();
 			connections.erase(it);
 			it = connections.begin();
 		}

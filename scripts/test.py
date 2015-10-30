@@ -171,6 +171,11 @@ class SDNTester:
 		self.log.write("*****************\n")
 		self.log.write("Veriflow Flips: %s\n" %(str(self.veriflow_flips)))
 		self.log.write("*****************\n")
+		if result[0] == False and result[1] == "VeriFlow":
+			self.log.write("VeriFlow Output:\n")
+			for f in self.veriflow_output:
+				self.log.write(f + "\n")
+			self.log.write("*****************\n")
 		self.log.write("Rule State:\n")
 		for r in self.rule_state:
 			self.log.write(r + "\n")
@@ -196,9 +201,9 @@ class SDNTester:
 				print "Error: Controller VM %d not started!" % (c)
 				return False
 			else:
-				os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s %s@%s:~\n" % (config.vm_ssh_key, monitor_tools_path, config.controller_user, mv.vm2ip(c)))
+				os.system("scp -p -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s %s@%s:~\n" % (config.vm_ssh_key, monitor_tools_path, config.controller_user, mv.vm2ip(c)))
 				shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-				proc = shell.run(["/bin/bash","-i" ,"-c", "cd monitors && make"])
+				proc = shell.run(["/bin/bash","-i" ,"-c", "cd monitors && make clean && make"])
 				if proc.return_code is not 0:
 					print "Error: Make failed!"
 					return False
@@ -208,10 +213,10 @@ class SDNTester:
 				return False
 			else:
 				if config.mininet_replace_scripts:
-					os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s/* %s@%s:~\n" % (config.vm_ssh_key, mininet_config_path, config.mininet_user, mv.vm2ip(m)))
-					os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s %s@%s:~\n" % (config.vm_ssh_key, monitor_tools_path, config.mininet_user, mv.vm2ip(m)))
+					os.system("scp -p -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s/* %s@%s:~\n" % (config.vm_ssh_key, mininet_config_path, config.mininet_user, mv.vm2ip(m)))
+					os.system("scp -p -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r %s %s@%s:~\n" % (config.vm_ssh_key, monitor_tools_path, config.mininet_user, mv.vm2ip(m)))
 					shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-					proc = shell.run(["/bin/bash","-i" ,"-c", "cd monitors && make"])
+					proc = shell.run(["/bin/bash","-i" ,"-c", "cd monitors && make clean && make"])
 					if proc.return_code is not 0:
 						print "Error: Make failed!"
 						return False
@@ -219,8 +224,6 @@ class SDNTester:
 
 	def stopVms(self):
 		for c in self.controllers:
-			# if(self._waitListening(mv.vm2ip(c), 22, 240, True)==True):
-			# 	os.system("scp -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s:~/%s %s\n" % (config.vm_ssh_key, config.controller_user, mv.vm2ip(c), config.pm_controller_log_file, log_path + '/' + config.pm_controller_log_file.replace('.', '_' + str(c) + '.')))
 			mv.stopvm(c)
 		for m in self.mininet:
 			mv.stopvm(m)
@@ -321,7 +324,6 @@ class SDNTester:
 			try:
 				self.log.write("Stopping controller (" + mv.vm2ip(c) + ")...\n")
 				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "stop")], allow_error=True)
-				# res = shell.run(["/bin/bash","-i" ,"-c", config.controller_stop_cmd])
 				self.log.write(res.output)
 			except Exception as e:
 				print e
@@ -523,14 +525,14 @@ class SDNTester:
 		
 		
 		#Determine Results
-		if working is not True:
-			return (False, "VeriFlow")
 		if self.creating_baseline:
 			self.veriflow_flips.append(flips)
 		else:
 			self.veriflow_flips = flips
 			if (flips > self.veriflow_flips_threshold):
 				return (False, "VeriFlow")
+		if working is not True:
+			return (False, "VeriFlow")
 		return (True, "Success!")
 
 	def _check_rule_dump(self,raw):

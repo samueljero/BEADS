@@ -38,10 +38,6 @@ mininet_replace_scripts = True
 
 #Controller Section
 controller_type = "onos"
-#controller_start_cmd = "start"
-#controller_stop_cmd = "stop"
-#controller_kill_cmd = "pkill java"
-#controller_stop_time = 2
 controller_user = "root"
 controller_port = 6633
 controllers_per_instance = topo_controllers

@@ -223,6 +223,9 @@ void handleVeriFlowConnection(VeriFlowConnectionInfo& info)
 	info2->networkMutex = info.networkMutex;
 	info2->veriflowMutex = info.veriflowMutex;
 
+	info1->other = info2;
+	info2->other = info1;
+
 	pthread_t controllerToNetworkCommunicationThread;
 	createThread(&controllerToNetworkCommunicationThread, proxyCommunicationThreadFunction, (void*)info1, PTHREAD_CREATE_DETACHED, NORMAL_PRIORITY);
 
@@ -234,14 +237,13 @@ void* proxyCommunicationThreadFunction(void* arg)
 {
 	setThreadAsyncCancel();
 
-	ProxyConnectionInfo info = *((ProxyConnectionInfo*)arg);
-	delete (ProxyConnectionInfo*)arg;
+	ProxyConnectionInfo *info = (ProxyConnectionInfo*)arg;
 
 	DynamicArray<char> messageBuffer;
 	char data[MAX_BUFFER_SIZE];
 	int bytesReceived = 0;
 
-	while((bytesReceived = recv(info.recvSocket, data, sizeof(data), 0)) > 0)
+	while((bytesReceived = recv(info->recvSocket, data, sizeof(data), 0)) > 0)
 	{
 /*		int bytesSent = 0, res = 0;
 
@@ -282,7 +284,7 @@ void* proxyCommunicationThreadFunction(void* arg)
 
 				// pthread_mutex_lock(info.mutex);
 				// fprintf(logFile, "[%s]\n", getIPAddress(info.clientAddress));
-				OpenFlowProtocolMessage::process(messageData, info, logFile);
+				OpenFlowProtocolMessage::process(messageData, *info, logFile);
 				// fprintf(logFile, "\n");
 				// fflush(logFile);
 				// pthread_mutex_unlock(info.mutex);
@@ -291,12 +293,15 @@ void* proxyCommunicationThreadFunction(void* arg)
 
 				while(bytesSent < bytesToSend)
 				{
-					res = send(info.sendSocket, (messageData + bytesSent), (bytesToSend - bytesSent), 0);
+					res = send(info->sendSocket, (messageData + bytesSent), (bytesToSend - bytesSent), 0);
 					if(res == -1)
 					{
 						fprintf(stderr, "[proxyCommunicationThreadFunction] TCP send failure. Stopping operation.\n");
 
-						close(info.sendSocket);
+						info->other->recvSocket = -1;
+						close(info->sendSocket);
+						info->other->sendSocket = -1;
+						close(info->recvSocket);
 
 						pthread_exit(NULL);
 					}
@@ -318,7 +323,10 @@ void* proxyCommunicationThreadFunction(void* arg)
 	}
 
 	if (bytesReceived == 0 ) {
-			close(info.recvSocket);
+			info->other->sendSocket = -1;
+			close(info->recvSocket);
+			info->other->recvSocket = -1;
+			close(info->sendSocket);
 	}
 
 	fprintf(stdout, "[proxyCommunicationThreadFunction] Connection closed.\n");
