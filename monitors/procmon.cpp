@@ -178,6 +178,9 @@ int main(int argc, char *argv[]) {
     if (argc != EXPECTED_ARGC) {
         fprintf(stdout,
             "Error: wrong number of arguments. Got %d. Expect %d.\n", argc, EXPECTED_ARGC);
+        for (int i = 0; i < argc; ++i) {
+            fprintf(stdout, " argv[%d] = \"%s\".\n", i, argv[i]);
+        }
         print_usage(argv[0]);
         return ERR_INVALID_ARGC;
     }

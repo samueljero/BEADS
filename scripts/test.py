@@ -51,12 +51,13 @@ class SDNTester:
 		self.creating_baseline = False
 
 		#Log Thresholds
-		self.log.write("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Thresholds $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
+		decor = '$' * 40 + ' Thresholds ' + '$' * 40 + '\n'
+		self.log.write(decor)
 		self.log.write("Veriflow Flips: %i\n" % (self.veriflow_flips_threshold))
 		self.log.write("Rule State: (%i)\n" % (len(self.rule_state_baseline)))
 		for r in self.rule_state_baseline:
 			self.log.write(r + "\n")
-		self.log.write("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Thresholds $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
+		self.log.write(decor)
 		self.log.flush()
 
 	def retrieve_feedback(self):

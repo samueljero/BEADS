@@ -21,9 +21,11 @@ import sys
 import re
 import time
 import threading
+import switchmon
 
 
-enable_stat = True
+ENABLE_STAT = True
+SWITCH_PNAME = 'ovs-vswitchd'
 
 
 def func_timeout():
@@ -93,7 +95,7 @@ def iperf(hosts=None, l4Type='TCP', udpBw='10M', fmt=None,
     lg.output('*** Results: %s\n' % result)
     return result
 
-    # Main
+# Main
 if __name__ == '__main__':
     try:
         # Set Log Level
@@ -122,13 +124,14 @@ if __name__ == '__main__':
             network.addController(
                 'c' + str(i + 1), controller=RemoteController, ip=ctlip[i], port=ctlport[i])
         network.start()
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] Setup network: %d sec.\n' % (time.time() - ts))
 
-        # Wait for topology discovery
-        sleep(10)
-
         results = list()
+
+        # Wait for topology discovery while starting monitor for switch.
+        monitor_id = switchmon.start(pname=SWITCH_PNAME, lg=lg)
+        sleep(10)
 
         # Test 1 -- ping
         lg.output("\n\nTest 1 --- Ping\n")
@@ -138,7 +141,7 @@ if __name__ == '__main__':
             results.append(False)
         else:
             results.append(True)
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] Pingall: %d sec.\n' % (time.time() - ts))
 
         # Test 2 -- iperf
@@ -163,7 +166,7 @@ if __name__ == '__main__':
             results.append(False)
         else:
             results.append(True)
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] Iperf: %d sec.\n' % (time.time() - ts))
 
         # Test 3 -- www
@@ -186,16 +189,19 @@ if __name__ == '__main__':
         network.hosts[1].sendInt()
         network.hosts[2].sendInt()
         network.hosts[3].sendInt()
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] www: %d sec.\n' % (time.time() - ts))
 
+        # Dump process monitor output
+        if monitor_id is not None:
+            switchmon.stop(monitor_id, lg)
 
-        #Pull Rules
+        # Pull Rules
         raw = []
         for s in network.switches:
 		    raw.append(s.name + "," + s.dpctl("dump-flows"))
 
-		#Write Output
+		# Write Output
         d = {"results":results, "rules":raw}
         print repr(d)
         lg.output(str(d) + "\n")
@@ -203,7 +209,7 @@ if __name__ == '__main__':
         # Cleanup Network
         ts = time.time()
         network.stop()
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] Stop network: %d sec.\n' % (time.time() - ts))
 
     except Exception as e:

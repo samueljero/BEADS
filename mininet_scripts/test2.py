@@ -21,9 +21,11 @@ import sys
 import re
 import time
 import threading
+import switchmon
 
 
-enable_stat = True
+ENABLE_STAT = True
+SWITCH_PNAME = 'ovs-vswitchd'
 
 
 def func_timeout():
@@ -122,7 +124,7 @@ if __name__ == '__main__':
             network.addController(
                 'c' + str(i + 1), controller=RemoteController, ip=ctlip[i], port=ctlport[i])
         network.start()
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] Setup network: %d sec.\n' % (time.time() - ts))
 
         # Setup Evil Node
@@ -131,6 +133,7 @@ if __name__ == '__main__':
         evilh.setIP(network.get("h4").IP())
 
         # Wait for topology discovery
+        monitor_id = switchmon.start(pname=SWITCH_PNAME, lg=lg)
         sleep(10)
 
         results = list()
@@ -149,7 +152,7 @@ if __name__ == '__main__':
             results.append(False)
         else:
             results.append(True)
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] Pingall: %d sec.\n' % (time.time() - ts))
 
         # Test 2 -- iperf
@@ -174,7 +177,7 @@ if __name__ == '__main__':
             results.append(False)
         else:
             results.append(True)
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] Iperf: %d sec.\n' % (time.time() - ts))
 
         # Test 3 -- www
@@ -193,8 +196,12 @@ if __name__ == '__main__':
             results.append(False)
         evilh.sendInt()
         network.get("h4").sendInt()
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] www: %d sec.\n' % (time.time() - ts))
+
+        # Dump process monitor output
+        if monitor_id is not None:
+            switchmon.stop(monitor_id, lg)
 
 		#Pull Rules
         raw = []
@@ -209,7 +216,7 @@ if __name__ == '__main__':
         # Cleanup Network
         ts = time.time()
         network.stop()
-        if enable_stat:
+        if ENABLE_STAT:
             lg.output('[timer] Stop network: %d sec.\n' % (time.time() - ts))
     except Exception as e:
         print repr({"results":[False, False, False]})

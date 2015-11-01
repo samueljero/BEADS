@@ -47,7 +47,7 @@ case $ACTION in
     mon)
         # ps aux
         pid=$($PID_CMD)
-        echo "Controller pid: $pid"
+        echo "[ctlrmon] Controller pid: $pid."
         nohup ~/monitors/procmon $pid $RESMON_POLL_MS > $LOG_PATH &
         ;;
     stop)
@@ -63,7 +63,8 @@ case $ACTION in
             sleep 1
         fi
         # Print the log back to stdout.
-        echo "[resmon] Resource usage log:"
+        echo "[ctlrmon] Resource log is as follows."
         cat $LOG_PATH
+        echo "[ctlrmon] Resource log ends."
         ;;
 esac
