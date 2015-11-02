@@ -48,7 +48,11 @@ class ExecutorHandler(ss.StreamRequestHandler):
 
 		while True:
 			#Get Message
-			msg = self.rfile.readline()
+			msg = ""
+			try:
+				msg = self.rfile.readline()
+			except Exception as e:
+				print e
 			if msg == "":
 				#Connection Error!
 				if len(strat) > 0:
