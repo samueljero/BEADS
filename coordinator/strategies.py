@@ -6,6 +6,8 @@ import time
 from datetime import datetime
 import openflow
 import manipulations
+import re
+from types import NoneType
 
 system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 config_path = os.path.abspath(os.path.join(system_home, 'config'))
@@ -184,8 +186,48 @@ class StrategyGenerator:
 			tmp.append(s1_mod[0])
 			self.strat_comb[pkt_type] = tmp
 
+	@staticmethod
+	def pretty_print_strat(strat):
+		if type(strat) != str:
+			return ""
+		flist = strat.split(",")
+		if len(flist) < 7:
+			return ""
+		
+		#Controller
+		ctlr = ""
+		mo = re.search("\{controllers\[([0-9]+)\]\}", flist[0])
+		if type(mo) is not NoneType:
+			ctlr = mo.group(1)
 
-	def _pkt_type_from_strat(self, strat):
+		#Switch
+		sw = ""
+		sw = flist[1]
+
+		#Version
+		ver = ""
+		ver = flist[2]
+		
+		#Message type
+		msgtype = ""
+		msgtype = flist[3]
+
+		#Field
+		field = ""
+		field = StrategyGenerator._pretty_print_field(msgtype, flist[4])
+
+		#Action
+		act = ""
+		act = flist[5]
+
+		#Args
+		args = ""
+		args = flist[6]
+
+		return "{0}, {1}, {2}, {3}, {4}, {5}, {6}".format(ctlr,sw,ver,msgtype,field,act,args)
+	
+	@staticmethod
+	def _pkt_type_from_strat(strat):
 		if type(strat)!=str:
 			return ""
 		flist = strat.split(",")
@@ -193,9 +235,12 @@ class StrategyGenerator:
 			return ""
 		return flist[3]
 
-	def _pretty_print_field(self, msg_type, field):
+	@staticmethod
+	def _pretty_print_field(msg_type, field):
 		if type(field)!=str or type(msg_type)!=str:
-			return
+			return ""
+		if field == "*":
+			return field
 		flist = field.split(".")
 		fdata = []
 		for i in openflow.openflow:
@@ -203,7 +248,7 @@ class StrategyGenerator:
 				fdata = i[1]
 				break
 		if len(fdata)==0:
-			return
+			return ""
 		full=""
 		for i in flist:
 			v = int(i) - 1
