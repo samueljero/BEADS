@@ -85,7 +85,7 @@ class StrategyGenerator:
 							if len(strat) > 0:
 								#New message under this strategy
 								tmp = st
-								tmp[1].append(strat[1][0])
+								tmp[1] = tmp[1] + strat[1]
 								self.strat_lst.append(tmp)
 							else:
 								#Baseline messages
