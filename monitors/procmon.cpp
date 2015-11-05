@@ -28,6 +28,7 @@ int page_size_kb;
 unsigned long long counter = 0;
 double uptime;
 double total_seconds = 0;
+double cpu_seconds = 0;
 double avg_cpu_percentage = 0;
 double peak_cpu_percentage = 0;
 double avg_rss = 0;
@@ -56,7 +57,7 @@ int pollstat() {
     time_t ts;
     FILE *f;
     int fields_read;
-    unsigned long long total_time;
+    unsigned long long cpu_ticks;
     double cpu_percentage;
 
     int pid;
@@ -136,10 +137,11 @@ int pollstat() {
     fclose(f);
 
     time(&ts);
-    total_time = utime + stimev + cutime + cstime;
+    cpu_ticks = utime + stimev + cutime + cstime;
+    cpu_seconds = cpu_ticks / ticks_per_sec;
     uptime = get_uptime();
     total_seconds = uptime - start_time  / ticks_per_sec;
-    cpu_percentage = 100 * (total_time / ticks_per_sec) / total_seconds;
+    cpu_percentage = 100 * cpu_seconds / total_seconds;
     
     // Update resident set size.
     rss *= page_size_kb;
@@ -150,8 +152,8 @@ int pollstat() {
     avg_cpu_percentage += cpu_percentage;
     if (cpu_percentage > peak_cpu_percentage) peak_cpu_percentage = cpu_percentage;
 
-    fprintf(stdout, "%llu, %ld, %d, %lu, %lu, %llu, %lf, %lf, %lu\n",
-        counter, ts, pid, utime, stimev, total_time, total_seconds, cpu_percentage, rss);
+    fprintf(stdout, "%llu, %ld, %d, %lf, %lf, %lf, %lu\n",
+        counter, ts, pid, cpu_seconds, total_seconds, cpu_percentage, rss);
 
     ++counter;
 }
@@ -198,7 +200,7 @@ int main(int argc, char *argv[]) {
         return ERR_SIGACTION;
     }
 
-    fprintf(stdout, "count, time, pid, utime, stime, total_time, total_seconds, cpu_percentage, rss_kib\n");
+    fprintf(stdout, "count, time, pid, cpu_seconds, total_seconds, cpu_percentage, rss_kib\n");
     while (continue_loop) {
         if (pollstat() < 0)
             break;
@@ -211,15 +213,16 @@ int main(int argc, char *argv[]) {
         avg_cpu_percentage /= counter;
         avg_rss /= counter;
         fprintf(stdout,
-            "Statistics:\n"
-            "Total samples:          %llu\n"
-            "Total uptime:           %lf sec\n"
-            "Total CPU time:         %lf sec\n"
-            "Avg CPU usage:          %lf %%\n"
-            "Peak CPU usage:         %lf %%\n"
-            "Avg resource set size:  %.0lf KiB\n"
-            "Peak resource set size: %lu KiB\n",
-            counter, uptime, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_rss, peak_rss);
+            "# STAT_BEGIN\n"
+            "{\"num_samples\": %llu,\n"
+            "\"cpu_sec\": %lf,\n"
+            "\"total_sec\": %lf,\n"
+            "\"avg_cpu_percent\": %lf,\n"
+            "\"peak_cpu_percent\": %lf,\n"
+            "\"avg_rss_size_kib\": %.0lf,\n"
+            "\"peak_rss_size_kib\": %lu\n"
+            "} # STAT END\n",
+            counter, cpu_seconds, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_rss, peak_rss);
     }
 
     fflush(stdout);
