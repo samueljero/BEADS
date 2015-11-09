@@ -14,9 +14,7 @@ be dumped to the logger.
 import os
 import subprocess
 import uuid
-
-
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+import procmonstat
 
 
 def get_monitor_paths(monitor_id):
@@ -37,7 +35,7 @@ def start(pname='ovs-vswitchd', lg=None, interval_ms=250):
     subp = subprocess.Popen(['pgrep', pname], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     o, e = subp.communicate()
     if subp.returncode != 0:
-        lg.output('[switchmon] Error: process "' + pname + '" was not found (code ' + str(subp.returncode) + ').\n')
+        lg.output('[procmon] Error: process "' + pname + '" was not found (code ' + str(subp.returncode) + ').\n')
         return None
     retval = os.system("""nohup ~/monitors/procmon %s %d > %s &
     echo $! > %s
@@ -50,24 +48,28 @@ def stop(monitor_id, lg):
     Stop the monitor and dump the resource log to logger.
     :param monitor_id: ID of the monitor, returned by a previous start() call.
     :param lg: The logger object.
+    :rtype None | dict[str, float]: A statistics dict.
     """
     if monitor_id is None:
-        return
+        lg.output('[procmon] Monitor ID is not set.\n')
+        return None
     log_path, pid_path = get_monitor_paths(monitor_id)
     try:
         with open(pid_path, 'r') as f:
             pid = int(f.read())
-            # lg.output('[switchmon] Monitor pid = %d.\n' % pid)
+            # lg.output('[procmon] Monitor pid = %d.\n' % pid)
     except Exception as e:
-        lg.output('[switchmon] An exception occurred reading monitor PID: ' + str(e))
-        return
+        lg.output('[procmon] An exception occurred reading monitor PID: ' + str(e) + '.\n')
+        return None
     # subp = subprocess.Popen(['ps', 'aex'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # o, e = subp.communicate()
     # lg.output(o)
     os.system("kill -s 2 {0} ; wait {0}".format(pid))
-    lg.output("[switchmon] Monitor exit.\n")
-    lg.output("[switchmon] Resource log is as follows.\n")
+    lg.output('[procmon] Monitor exit.\n')
+    # lg.output("[procmon] Resource log is as follows.\n")
     with open(log_path, 'r') as f:
-        for ln in f:
-            lg.output(ln)
-    lg.output("[switchmon] Resource log ends.\n")
+        lg.output('[procmon] Extracting statistics data from log.\n')
+        return procmonstat.ProcMonStat.extract_stat(f)
+        # for ln in f:
+        #     lg.output(ln)
+    # lg.output("[procmon] Resource log ends.\n")

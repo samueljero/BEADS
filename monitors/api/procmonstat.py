@@ -37,15 +37,16 @@ class ProcMonStat:
         self.base_stat = self.extract_stat(baseline_stdout)
         self.multipliers = multipliers
 
-    def test_stat(stdout):
+    def test_stat(stat_dict=None, stdout=None):
         """
         Test newly generated statistical data against baseline and multiplier.
         """
-        new_stat = self.extract_stat(stdout)
+        if stdout is not None:
+            stat_dict = self.extract_stat(stdout)
         errors = []
 
         for k in self.multipliers:
-            mx = new_stat[k] / self.base_stat[k]
+            mx = stat_dict[k] / self.base_stat[k]
             if mx > self.multipliers[k]:
                 errors.append((k, self.FIELD_DESC[k], mx, self.multipliers[k]))
 

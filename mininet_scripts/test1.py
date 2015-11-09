@@ -21,7 +21,12 @@ import sys
 import re
 import time
 import threading
-import switchmon
+
+
+sys.path.insert(0, '/root/monitors/api')
+
+
+import procmon
 
 
 ENABLE_STAT = True
@@ -130,7 +135,7 @@ if __name__ == '__main__':
         results = list()
 
         # Wait for topology discovery while starting monitor for switch.
-        monitor_id = switchmon.start(pname=SWITCH_PNAME, lg=lg)
+        monitor_id = procmon.start(pname=SWITCH_PNAME, lg=lg)
         sleep(10)
 
         # Test 1 -- ping
@@ -193,16 +198,15 @@ if __name__ == '__main__':
             lg.output('[timer] www: %d sec.\n' % (time.time() - ts))
 
         # Dump process monitor output
-        if monitor_id is not None:
-            switchmon.stop(monitor_id, lg)
-
+        stat_dict = procmon.stop(monitor_id, lg)
+        
         # Pull Rules
         raw = []
         for s in network.switches:
 		    raw.append(s.name + "," + s.dpctl("dump-flows"))
 
 		# Write Output
-        d = {"results":results, "rules":raw}
+        d = {"results": results, "rules": raw, "stat": stat_dict}
         print repr(d)
         lg.output(str(d) + "\n")
 
