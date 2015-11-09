@@ -387,6 +387,8 @@ class SDNTester:
 	def _send_proxy_strategy(self, strategy, proxyports):
 		ts = time.time()
 		for l in strategy:
+			if type(l) != str:
+				return False
 			cmd = l.format(controllers=proxyports)
 			self.log.write("Strategy CMD: " + cmd + "\n")
 			self.log.flush()
