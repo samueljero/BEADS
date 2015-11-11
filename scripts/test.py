@@ -46,7 +46,8 @@ class SDNTester:
 				print "Warning!!! Baseline failed!!!"
 
 		#Process Results
-		self.veriflow_flips_threshold = (sum(self.veriflow_flips)/len(self.veriflow_flips))*2	#VeriFlow Flip Threshold
+		if config.veriflow_enabled:
+			self.veriflow_flips_threshold = (sum(self.veriflow_flips)/len(self.veriflow_flips))*2	#VeriFlow Flip Threshold
 		self.testnum = num
 		self.creating_baseline = False
 
@@ -304,10 +305,10 @@ class SDNTester:
 		proc = None
 		m = self.mininet[0]
 		shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-		self.log.write("Starting Test: " + test_script.format(controllers=" ".join(proxyaddrs)) + "\n")
+		self.log.write("Starting Test: " + test_script.format(topo_delay=str(config.topo_discovery_delay), controllers=" ".join(proxyaddrs)) + "\n")
 		self.log.flush()
 		try:
-			proc = shell.run(["/bin/bash","-i" ,"-c", test_script.format(controllers=" ".join(proxyaddrs))])
+			proc = shell.run(["/bin/bash","-i" ,"-c", test_script.format(topo_delay=str(config.topo_discovery_delay), controllers=" ".join(proxyaddrs))])
 			res = eval(proc.output)
 		except Exception as e:
 			print e
@@ -325,7 +326,7 @@ class SDNTester:
 			try:
 				self.log.write("Stopping controller (" + mv.vm2ip(c) + ")...\n")
 				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "stop")], allow_error=True)
-				self.log.write(res.output)
+				#self.log.write(res.output)
 			except Exception as e:
 				print e
 				self.log.write("Exception: " + str(e) + "\n")
@@ -570,6 +571,9 @@ class SDNTester:
 						if v.find("idle") > 0:
 							continue
 						if v.find("cookie") > 0:
+							continue
+						if v.find("tp_src") >= 0 or v.find("tp_dst") >= 0:
+							#Randomized source ports :(
 							continue
 						if v == "":
 							continue
