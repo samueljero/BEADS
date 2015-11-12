@@ -30,12 +30,23 @@ class ProcMonStat:
         'peak_rss_size_kib': 3
     }
 
-    def __init__(self, baseline_stdout, multipliers=DEFAULT_MULTIPLIERS):
+    def __init__(self, multipliers=DEFAULT_MULTIPLIERS):
         """
         Initialize object with baseline data and multiplier.
         """
-        self.base_stat = self.extract_stat(baseline_stdout)
+        self.base_stat = None
+        self.base_count = 0
         self.multipliers = multipliers
+
+    def add_baseline(self, stat_dict):
+        if not isinstance(stat_dict, dict):
+            raise ValueError('Stat baseline must be a stat dict.')
+        if self.base_count == 0:
+            self.base_stat = stat_dict
+            self.base_count = 1
+        else:
+            for k in self.FIELD_DESC:
+                self.base_stat[k] = (self.base_stat[k] * self.base_count + stat_dict[k]) / (self.base_count + 1)
 
     def test_stat(stat_dict=None, stdout=None):
         """
@@ -48,7 +59,7 @@ class ProcMonStat:
         for k in self.multipliers:
             mx = stat_dict[k] / self.base_stat[k]
             if mx > self.multipliers[k]:
-                errors.append((k, self.FIELD_DESC[k], mx, self.multipliers[k]))
+                errors.append('%s exceeds limit by a factor of %f.' % (self.FIELD_DESC[k], mx - self.multipliers[k]))
 
         return len(errors) == 0, errors
 

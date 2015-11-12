@@ -10,7 +10,7 @@ import socket
 import struct
 
 
-from . import system_home, lib_path, config_path, log_path, config
+from . import system_home, lib_path, config_path, log_path, config, ProcMonStat
 import spur
 
 
@@ -32,6 +32,16 @@ class SDNTester:
 		self.veriflow_output = []
 		self.rule_state = []
 		self.rule_state_baseline = []
+		# Load switch stat multipliers from controller config.
+		self.switch_stat = self._build_stat_obj('stat_switch_multipliers')
+		self.controller_stat = self._build_stat_obj('stat_controller_multipliers')
+
+	def _build_stat_obj(self, config_key_name):
+		if hasattr(config, config_key_name):
+			mx = getattr(config, config_key_name)
+		else:
+			mx = ProcMonStat.DEFAULT_MULTIPLIERS
+		return ProcMonStat(multipliers=mx) 
 
 	def baseline(self, test_script):
 		self.creating_baseline = True
@@ -44,6 +54,11 @@ class SDNTester:
 			res = self.doTest(test_script, ["*,*,*,*,*,CLEAR,*"])
 			if res[0] == False:
 				print "Warning!!! Baseline failed!!!"
+			else:
+				if hasattr(self, 'switch_stat_dict'):
+					self.switch_stat.add_baseline(stat_dict=self.switch_stat_dict)
+				if hasattr(self, 'controller_stat_dict'):
+					self.controller_stat.add_baseline(stat_dict=self.controller_stat_dict)
 
 		#Process Results
 		self.veriflow_flips_threshold = (sum(self.veriflow_flips)/len(self.veriflow_flips))*2	#VeriFlow Flip Threshold
@@ -64,6 +79,10 @@ class SDNTester:
 		return {'msg_types':self.msg_types}
 
 	def doTest(self,test_script, strategy):
+		if hasattr(self, 'switch_stat_dict'):
+			del self.switch_stat_dict
+		if hasattr(self, 'controller_stat_dict'):
+			del self.controller_stat_dict
 		result = [True, "Sucess!"]
 		self.log.write("##############################Starting Test " + str(self.testnum) + "###################################\n")
 		self.log.write(str(datetime.today()) + "\n")
@@ -127,6 +146,10 @@ class SDNTester:
 				if self._check_rule_dump(res["rules"]) == False:
 					result[0] = False
 					result[1] = "Network State"
+
+			# Save stat dictionary for switch
+			if 'stat' in res:
+				self.switch_stat_dict = res['stat']
 		else:
 			result[0] = False
 			result[1] = "System Failure"
@@ -163,6 +186,18 @@ class SDNTester:
 		#Cleanup Any Mininet Remnants
 		self._cleanup()
 
+		if not self.creating_baseline:
+			if hasattr(self, 'switch_stat_dict'):
+				is_valid, err_msg = self._eval_stat(self.switch_stat, self.switch_stat_dict)
+				if not is_valid:
+					result[0] = False
+					result[1] = 'Switch stat: ' + err_msg
+			if hasattr(self, 'controller_stat_dict'):
+				is_valid, err_msg = self._eval_stat(self.controller_stat, self.controller_stat_dict)
+				if not is_valid:
+					result[0] = False
+					result[1] = 'Controller stat: ' + err_msg
+
 		#Log
 		self.log.flush()
 		self.log.write("*****************\n")
@@ -191,6 +226,12 @@ class SDNTester:
 		self.testnum+=1
 		return result
 
+	def _eval_stat(self, statmgr, stat_dict):
+		if statmgr.base_count == 0:
+			return (True, 'No baseline data.')
+		test_stat, err_msgs = self.switch_stat.test_stat(stat_dict=stat_dict)
+		self.log.write('Evaluating stat result: ' + str(test_stat) + '. Details: ' + str(err_msgs) + '.')
+		return (test_stat, '; '.join(err_msgs))
 
 	def startVms(self):
 		for c in self.controllers:
@@ -325,7 +366,11 @@ class SDNTester:
 			try:
 				self.log.write("Stopping controller (" + mv.vm2ip(c) + ")...\n")
 				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "stop")], allow_error=True)
-				self.log.write(res.output)
+				try:
+					self.controller_stat_dict = ProcMonStat.extract_stat(res.output)
+				except:
+					self.log.write('Could not extract controller procmon stat.\n')
+					self.log.write(res.output)
 			except Exception as e:
 				print e
 				self.log.write("Exception: " + str(e) + "\n")

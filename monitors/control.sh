@@ -65,6 +65,5 @@ case $ACTION in
         # Print the log back to stdout.
         echo "[ctlrmon] Resource log is as follows."
         cat $LOG_PATH
-        echo "[ctlrmon] Resource log ends."
         ;;
 esac

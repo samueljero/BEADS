@@ -64,6 +64,10 @@ vm_vnc_base = 1
 vm_ssh_key = system_home + "/config/ssh.key"
 
 # Proecss Monitor Config
-procmon_multipliers = {
+stat_switch_multipliers = {
     'cpu_sec': 1.5,
+}
+
+stat_controller_multipliers = {
+    'cpu_sec': 2.0,
 }

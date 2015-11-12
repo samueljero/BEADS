@@ -1,4 +1,5 @@
 # Generated files
+*.ck
 /log.txt
 /tmp/*.log.*
 /monitors/procmon
