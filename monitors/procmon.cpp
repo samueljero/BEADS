@@ -220,8 +220,8 @@ int main(int argc, char *argv[]) {
             "\"avg_cpu_percent\": %lf,\n"
             "\"peak_cpu_percent\": %lf,\n"
             "\"avg_rss_size_kib\": %.0lf,\n"
-            "\"peak_rss_size_kib\": %lu\n"
-            "} # STAT END\n",
+            "\"peak_rss_size_kib\": %lu}\n"
+            "# STAT END\n",
             counter, cpu_seconds, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_rss, peak_rss);
     }
 

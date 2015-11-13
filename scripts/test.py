@@ -187,17 +187,11 @@ class SDNTester:
 		#Cleanup Any Mininet Remnants
 		self._cleanup()
 
-		if not self.creating_baseline:
-			if hasattr(self, 'switch_stat_dict'):
-				is_valid, err_msg = self._eval_stat(self.switch_stat, self.switch_stat_dict)
-				if not is_valid:
-					result[0] = False
-					result[1] = 'Switch stat: ' + err_msg
-			if hasattr(self, 'controller_stat_dict'):
-				is_valid, err_msg = self._eval_stat(self.controller_stat, self.controller_stat_dict)
-				if not is_valid:
-					result[0] = False
-					result[1] = 'Controller stat: ' + err_msg
+		if not self.creating_baseline and result[0]:
+			# Evaluate resource usage only if things have not gone wrong till here.
+			self._validate_stat('Switch', result, self.switch_stat, 'switch_stat_dict')
+			# Note that the following stat failure can overwrite the one above.
+			self._validate_stat('Controller', result, self.controller_stat, 'controller_stat_dict')
 
 		#Log
 		self.log.flush()
@@ -224,15 +218,26 @@ class SDNTester:
 		self.log.write(str(datetime.today()) + "\n")
 		self.log.write("##############################Ending Test " + str(self.testnum) + "###################################\n")
 		self.log.flush()
-		self.testnum+=1
+		self.testnum += 1
 		return result
 
 	def _eval_stat(self, statmgr, stat_dict):
 		if statmgr.base_count == 0:
-			return (True, 'No baseline data.')
-		test_stat, err_msgs = self.switch_stat.test_stat(stat_dict=stat_dict)
-		self.log.write('Evaluating stat result: ' + str(test_stat) + '. Details: ' + str(err_msgs) + '.')
-		return (test_stat, '; '.join(err_msgs))
+			return True, 'No baseline data.'
+		test_stat, err_msgs = statmgr.test_stat(stat_dict=stat_dict)
+		return test_stat, '; '.join(err_msgs)
+
+	def _validate_stat(self, name, result, statmgr, stat_key):
+		if hasattr(self, stat_key):
+			is_valid, err_msg = self._eval_stat(statmgr, getattr(self, stat_key))
+			if not is_valid:
+				result[0] = False
+				result[1] = '%s stat: ' % name + err_msg
+				self.log.write('[procstat] %s process uses too much resource:\n' % name)
+				self.log.write(err_msg)
+				self.log.write('\n')
+			else:
+				self.log.write('[procstat] %s process uses normal amount of resource.\n' % name)
 
 	def startVms(self):
 		for c in self.controllers:
@@ -276,7 +281,7 @@ class SDNTester:
 		ts = time.time()
 		cmd = config.proxy_path + " -p " + str(config.proxy_com_port + self.mininet[0])
 		for c in range(0,len(controlleraddrs)):
-			cmd = cmd + " -c " +  proxyports[c] + ":" + controlleraddrs[c]
+			cmd = cmd + " -c " + proxyports[c] + ":" + controlleraddrs[c]
 		self.log.write("Proxy CMD: " + cmd + "\n")
 		self.log.write("********* Proxy output ********\n")
 		self.log.flush()
@@ -299,7 +304,7 @@ class SDNTester:
 		assert(len(self.controllers)==1)
 		veriflow = None
 		ts = time.time()
-		topo_file = config.veriflow_topo_path + os.path.splitext(os.path.basename(test_script.format(controllers="").strip()))[0] + ".vft"
+		topo_file = config.veriflow_topo_path + os.path.splitext(os.path.basename(test_script.format(topo_delay='', controllers="").strip()))[0] + ".vft"
 		log_file = config.veriflow_log_path + config.veriflow_log_name.format(instance=self.mininet[0])
 		cmd = config.veriflow_path + " " + str(vf_port) + " 127.0.0.1  " + proxyports[0] + " " + topo_file + " " + log_file
 		self.log.write("Veriflow CMD: " + cmd + "\n")
@@ -363,14 +368,16 @@ class SDNTester:
 	def _stop_controllers(self):
 		ts = time.time()
 		for c in self.controllers:
-			shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
+			shell = spur.SshShell(hostname=mv.vm2ip(c), username=config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 			try:
 				self.log.write("Stopping controller (" + mv.vm2ip(c) + ")...\n")
 				res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "stop")], allow_error=True)
 				try:
 					self.controller_stat_dict = ProcMonStat.extract_stat(res.output)
-				except:
-					self.log.write('Could not extract controller procmon stat.\n')
+				except Exception as e:
+					import traceback
+					self.log.write('Could not extract controller procmon stat: ' + str(e) + '.\n')
+					print(traceback.format_exc())
 					self.log.write(res.output)
 			except Exception as e:
 				print e
@@ -582,7 +589,8 @@ class SDNTester:
 				return (False, "VeriFlow")
 		if working is not True:
 			return (False, "VeriFlow")
-		return (True, "Success!")
+		# When returning true, it must be modifiable
+		return [True, "Success!"]
 
 	def _check_rule_dump(self,raw):
 		state = []

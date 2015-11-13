@@ -42,6 +42,8 @@ esac
 
 case $ACTION in
     start)
+        # Run kill before starting in case there is residual controller process.
+        eval $KILL_CMD
         eval $START_CMD
         ;;
     mon)
