@@ -107,13 +107,14 @@ if __name__ == '__main__':
         lg.setLogLevel('info')
         #lg.setLogLevel( 'error' )
 
-        if len(sys.argv) < 2:
+        if len(sys.argv) < 3:
             lg.output("No Controller!\n")
             sys.exit()
 
+        topo_discovery_sleep_time = int(sys.argv[1])
         ctlip = list()
         ctlport = list()
-        for i in range(1, len(sys.argv)):
+        for i in range(2, len(sys.argv)):
             tmp = string.split(sys.argv[i], ':')
             if len(tmp) != 2:
                 lg.output("Invalid controller format. Expect:  <host:port>")
@@ -136,7 +137,7 @@ if __name__ == '__main__':
 
         # Wait for topology discovery while starting monitor for switch.
         monitor_id = procmon.start(pname=SWITCH_PNAME, lg=lg)
-        sleep(10)
+        sleep(topo_discovery_sleep_time)
 
         # Test 1 -- ping
         lg.output("\n\nTest 1 --- Ping\n")

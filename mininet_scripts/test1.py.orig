@@ -133,28 +133,22 @@ if __name__ == '__main__':
         if ENABLE_STAT:
             lg.output('[timer] Setup network: %d sec.\n' % (time.time() - ts))
 
-        # Setup Evil Node
-        evilh = network.get("h3")
-        evilh.setMAC(network.get("h4").MAC())
-        evilh.setIP(network.get("h4").IP())
-
-        # Wait for topology discovery
-        monitor_id = procmon.start(pname=SWITCH_PNAME, lg=lg)
-        sleep(topo_discovery_sleep_time)
-
         results = list()
+
+        # Wait for topology discovery while starting monitor for switch.
+<<<<<<< HEAD
+        monitor_id = procmon.start(pname=SWITCH_PNAME, lg=lg)
+        sleep(10)
+=======
+        monitor_id = switchmon.start(pname=SWITCH_PNAME, lg=lg)
+        sleep(topo_discovery_sleep_time)
+>>>>>>> 87e60e7ab978878a7266a817871d64afb501c624
 
         # Test 1 -- ping
         lg.output("\n\nTest 1 --- Ping\n")
-        found = False
         ts = time.time()
-        for ha in network.hosts:
-            for hb in network.hosts:
-                if ha != hb and ha != evilh and hb != evilh:
-                    res = network.ping([ha, hb], timeout=3)
-                    if res > 0:
-                        found = True
-        if found:
+        res = network.pingAll(timeout=3)
+        if res > 0:
             results.append(False)
         else:
             results.append(True)
@@ -167,7 +161,7 @@ if __name__ == '__main__':
         found = False
         for ha in network.hosts:
             for hb in network.hosts:
-                if ha != hb and ha != evilh and hb != evilh:
+                if ha != hb:
                     try:
                         res = iperf([ha, hb], l4Type='TCP', seconds=2)
                         if res[0] == 0 or res[1] == 0:
@@ -189,31 +183,35 @@ if __name__ == '__main__':
         # Test 3 -- www
         lg.output("\n\nTest 3 --- WWW\n")
         ts = time.time()
-        network.get("h4").sendCmd(
+        network.hosts[3].sendCmd(
             "cd /root/web/benign; python -m SimpleHTTPServer 8080")
-        evilh.sendCmd("cd /root/web/evil; python -m SimpleHTTPServer 8080")
+        network.hosts[1].sendCmd(
+            "cd /root/web/evil; python -m SimpleHTTPServer 8080")
+        network.hosts[2].sendCmd(
+            "cd /root/web/evil; python -m SimpleHTTPServer 8080")
         sleep(1)
         res = network.hosts[0].cmd(
-            "curl --connect-timeout 5 http://" + network.get("h4").IP() + ":8080/")
+            "curl --connect-timeout 5 http://" + network.hosts[3].IP() + ":8080/")
         lg.output(res + "\n")
         if string.find(res, "HTML") > 0 and string.find(res, "Evil") == -1:
             results.append(True)
         else:
             results.append(False)
-        evilh.sendInt()
-        network.get("h4").sendInt()
+        network.hosts[1].sendInt()
+        network.hosts[2].sendInt()
+        network.hosts[3].sendInt()
         if ENABLE_STAT:
             lg.output('[timer] www: %d sec.\n' % (time.time() - ts))
 
         # Dump process monitor output
         stat_dict = procmon.stop(monitor_id, lg)
-
-		#Pull Rules
+        
+        # Pull Rules
         raw = []
         for s in network.switches:
-            raw.append(s.name + "," + s.dpctl("dump-flows"))
+		    raw.append(s.name + "," + s.dpctl("dump-flows"))
 
-        #Write Output
+		# Write Output
         d = {"results": results, "rules": raw, "stat": stat_dict}
         print repr(d)
         lg.output(str(d) + "\n")
@@ -223,6 +221,7 @@ if __name__ == '__main__':
         network.stop()
         if ENABLE_STAT:
             lg.output('[timer] Stop network: %d sec.\n' % (time.time() - ts))
+
     except Exception as e:
         print repr({"results":[False, False, False]})
         lg.output(e)

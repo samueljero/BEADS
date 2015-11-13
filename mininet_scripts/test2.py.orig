@@ -139,8 +139,13 @@ if __name__ == '__main__':
         evilh.setIP(network.get("h4").IP())
 
         # Wait for topology discovery
+<<<<<<< HEAD
         monitor_id = procmon.start(pname=SWITCH_PNAME, lg=lg)
+        sleep(10)
+=======
+        monitor_id = switchmon.start(pname=SWITCH_PNAME, lg=lg)
         sleep(topo_discovery_sleep_time)
+>>>>>>> 87e60e7ab978878a7266a817871d64afb501c624
 
         results = list()
 
