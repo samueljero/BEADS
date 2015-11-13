@@ -13,6 +13,7 @@ prior_choice = None
 prior_log_choice = "yes"
 prior_raw_choice = "yes"
 term_type = ""
+opt_break = True
 
 #https://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
 def which(program):
@@ -67,11 +68,11 @@ def query_yes_no(question, default="yes"):
                              "(or 'y' or 'n').\n")
 
 def query_next():
-	global prior_choice
+	global prior_choice, opt_break
 	valid = {"next":'n', "n": 'n', "ne":'n', "nex":'n',
 			}
 	while True:
-		sys.stdout.write("Option: [n/p/j/g/q] ")
+		sys.stdout.write("Option: [n/p/s/j/g/b/q] ")
 		choice = raw_input().lower()
 		if prior_choice is not None and choice == '':
 			return prior_choice
@@ -81,13 +82,16 @@ def query_next():
 		elif choice == "previous" or choice == "p":
 			prior_choice = ("p",0)
 			return ("p", 0)
+		elif choice == "same" or choice == "s":
+			prior_choice = ("s", 0)
+			return ("s",0)
 		elif choice.find("jump") >= 0:
-			mo = re.search("jump ([0-9]+)", choice)
+			mo = re.search("jump (\-0-9]+)", choice)
 			if type(mo) is not NoneType:
 				prior_choice = ("j", int(mo.group(1)))
 				return ("j", int(mo.group(1)))
 		elif choice.find("j") >= 0:
-			mo = re.search("j ([0-9]+)", choice)
+			mo = re.search("j ([\-0-9]+)", choice)
 			if type(mo) is not NoneType:
 				prior_choice = ("j", int(mo.group(1)))
 				return ("j", int(mo.group(1)))
@@ -103,11 +107,17 @@ def query_next():
 				return ("g", int(mo.group(1)))
 		elif choice == "quit" or choice == "q":
 			return ("q",0)
+		elif choice == "break" or choice == "b":
+			opt_break = not opt_break
+			if opt_break:
+				print "Efficiency Break On"
+			else:
+				print "Efficiency Break Off"
 		else:
 			sys.stdout.write("Invalid Response. Try Again.\n")
 
 def handle_strat(line, ln_no, instfiles):
-	global prior_log_choice, prior_raw_choice, term_type
+	global prior_log_choice, prior_raw_choice, term_type, opt_break
 	res = line[0]
 	time = line[1]
 	test = line[2]
@@ -143,7 +153,13 @@ def handle_strat(line, ln_no, instfiles):
 							thresln = 0
 						found += 1
 					if found >= 2:
-						break
+						if opt_break:
+							break
+						else:
+							if query_yes_no("More?", "no"):
+								found = 0
+							else:
+								break
 	else:
 		prior_log_choice = "no"
 	
@@ -207,8 +223,12 @@ def main(args):
 			i+=1
 		elif r[0] == "p":
 			i-=1
+		elif r[0] == "s":
+			i = i
 		elif r[0] == "j":
 			i = i + r[1]
+			if (i < 0):
+				i = 0
 		elif r[0] == "g":
 			i = r[1]
 		elif r[0] == "q":

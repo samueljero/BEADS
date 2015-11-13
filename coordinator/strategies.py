@@ -257,7 +257,7 @@ class StrategyGenerator:
 				full+="."
 				fdata = fdata[0]['fields']
 			elif len(fdata) <= v:
-				print "Error: Invalid field description"
+				full+= "..."
 				break
 			else:
 				full +=fdata[v]['name']
