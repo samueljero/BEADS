@@ -140,7 +140,7 @@ int pollstat() {
 
     time(&ts);
     cpu_ticks = utime + stimev + cutime + cstime;
-    cpu_seconds = cpu_ticks / ticks_per_sec;
+    cpu_seconds = 1.0 * cpu_ticks / ticks_per_sec;
     uptime = get_uptime();
     total_seconds = uptime - start_time  / ticks_per_sec;
     cpu_percentage = 100 * cpu_seconds / total_seconds;
