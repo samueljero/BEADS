@@ -25,6 +25,8 @@ bool continue_loop = true;
 char stat_path[PATH_MAX];
 int page_size_kb;
 
+double base_cpu_seconds = 0;
+
 unsigned long long counter = 0;
 double uptime;
 double total_seconds = 0;
@@ -142,7 +144,7 @@ int pollstat() {
     uptime = get_uptime();
     total_seconds = uptime - start_time  / ticks_per_sec;
     cpu_percentage = 100 * cpu_seconds / total_seconds;
-    
+
     // Update resident set size.
     rss *= page_size_kb;
     avg_rss += rss;
@@ -201,10 +203,16 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(stdout, "count, time, pid, cpu_seconds, total_seconds, cpu_percentage, rss_kib\n");
-    while (continue_loop) {
-        if (pollstat() < 0)
-            break;
-        usleep(poll_interval);
+    
+    if (pollstat() >= 0) {
+        base_cpu_seconds = cpu_seconds;
+        // Instead of putting baseline update in pollstat(), we
+        // put it outside to reduce unnecessary branches.
+        while (continue_loop) {
+            if (pollstat() < 0)
+                break;
+            usleep(poll_interval);
+        }
     }
 
     if (counter == 0) {
@@ -212,9 +220,12 @@ int main(int argc, char *argv[]) {
     } else {
         avg_cpu_percentage /= counter;
         avg_rss /= counter;
+        double diff_cpu_seconds = cpu_seconds - base_cpu_seconds;
         fprintf(stdout,
             "# STAT_BEGIN\n"
             "{\"num_samples\": %llu,\n"
+            "\"cpu_sec_begin\": %lf,\n"
+            "\"cpu_sec_end\": %lf,\n"
             "\"cpu_sec\": %lf,\n"
             "\"total_sec\": %lf,\n"
             "\"avg_cpu_percent\": %lf,\n"
@@ -222,7 +233,7 @@ int main(int argc, char *argv[]) {
             "\"avg_rss_size_kib\": %.0lf,\n"
             "\"peak_rss_size_kib\": %lu}\n"
             "# STAT END\n",
-            counter, cpu_seconds, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_rss, peak_rss);
+            counter, base_cpu_seconds, cpu_seconds, diff_cpu_seconds, total_seconds, avg_cpu_percentage, peak_cpu_percentage, avg_rss, peak_rss);
     }
 
     fflush(stdout);
