@@ -384,22 +384,6 @@ class SDNTester:
 				self.log.write("Exception: " + str(e) + "\n")
 				self.log.flush()
 				return False
-		# time.sleep(config.controller_stop_time)
-		# for c in self.controllers:
-		# 	shell = spur.SshShell(hostname=mv.vm2ip(c), username = config.controller_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-		#	try:
-		#		res = shell.run(["/bin/bash","-i" ,"-c", "~/monitors/control.sh {0} {1}".format(config.controller_type, "kill")], allow_error=True)
-		#		# res = shell.run(["/bin/bash","-i" ,"-c", config.controller_kill_cmd], allow_error=True)
-		#		if res.return_code == 0:
-		#			print "Controller still running!"
-		#			self.log.write("Controller still running!\n")
-		#			self.log.flush()
-		#			return False
-		#	except Exception as e:
-		#		print e
-		#		self.log.write("Exception: " + str(e) + "\n")
-		#		self.log.flush()
-		#		return False
 		if config.enable_stat:
 			self.log.write('[timer] Stop controllers: %d sec.\n' % (time.time() - ts))
 		return True

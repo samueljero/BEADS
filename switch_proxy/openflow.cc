@@ -1,4 +1,5 @@
 #include "openflow.h"
+#include <arpa/inet.h>
 
 
 void OpenFlow::do_of_match_set(of_match_t *m, unsigned long int val, std::vector<int> f, int l){
@@ -66,10 +67,20 @@ void OpenFlow::do_of_match_fields_set(of_match_fields_t *m, unsigned long int va
 			m->metadata = val;
 			break;
 		case 4: //of_mac_addr_t        eth_dst
-			memcpy(m->eth_dst.addr, &val, 6);
+			m->eth_dst.addr[0] = ((char*)&val)[5];
+			m->eth_dst.addr[1] = ((char*)&val)[4];
+			m->eth_dst.addr[2] = ((char*)&val)[3];
+			m->eth_dst.addr[3] = ((char*)&val)[2];
+			m->eth_dst.addr[4] = ((char*)&val)[1];
+			m->eth_dst.addr[5] = ((char*)&val)[0];
 			break;
 		case 5: //of_mac_addr_t        eth_src
-			memcpy(m->eth_src.addr, &val, 6);
+			m->eth_src.addr[0] = ((char*)&val)[5];
+			m->eth_src.addr[1] = ((char*)&val)[4];
+			m->eth_src.addr[2] = ((char*)&val)[3];
+			m->eth_src.addr[3] = ((char*)&val)[2];
+			m->eth_src.addr[4] = ((char*)&val)[1];
+			m->eth_src.addr[5] = ((char*)&val)[0];
 			break;
 		case 6: //uint16_t             eth_type
 			m->eth_type = val;
@@ -129,10 +140,20 @@ void OpenFlow::do_of_match_fields_set(of_match_fields_t *m, unsigned long int va
 			m->arp_tpa = val;
 			break;
     	case 25: //of_mac_addr_t        arp_sha
-			memcpy(m->arp_sha.addr,&val, 6);
+			m->arp_sha.addr[0] = ((char*)&val)[5];
+			m->arp_sha.addr[1] = ((char*)&val)[4];
+			m->arp_sha.addr[2] = ((char*)&val)[3];
+			m->arp_sha.addr[3] = ((char*)&val)[2];
+			m->arp_sha.addr[4] = ((char*)&val)[1];
+			m->arp_sha.addr[5] = ((char*)&val)[0];
 			break;
     	case 26: //of_mac_addr_t        arp_tha
-			memcpy(m->arp_tha.addr,&val,6);
+			m->arp_tha.addr[0] = ((char*)&val)[5];
+			m->arp_tha.addr[1] = ((char*)&val)[4];
+			m->arp_tha.addr[2] = ((char*)&val)[3];
+			m->arp_tha.addr[3] = ((char*)&val)[2];
+			m->arp_tha.addr[4] = ((char*)&val)[1];
+			m->arp_tha.addr[5] = ((char*)&val)[0];
 			break;
     	case 27: //of_ipv6_t            ipv6_src
 			//TODO
@@ -153,10 +174,20 @@ void OpenFlow::do_of_match_fields_set(of_match_fields_t *m, unsigned long int va
 			//TODO
 			break;
     	case 33: //of_mac_addr_t        ipv6_nd_sll
-			memcpy(m->ipv6_nd_sll.addr, &val, 6);
+			m->ipv6_nd_sll.addr[0] = ((char*)&val)[5];
+			m->ipv6_nd_sll.addr[1] = ((char*)&val)[4];
+			m->ipv6_nd_sll.addr[2] = ((char*)&val)[3];
+			m->ipv6_nd_sll.addr[3] = ((char*)&val)[2];
+			m->ipv6_nd_sll.addr[4] = ((char*)&val)[1];
+			m->ipv6_nd_sll.addr[5] = ((char*)&val)[0];
 			break;
     	case 34: //of_mac_addr_t        ipv6_nd_tll;
-			memcpy(m->ipv6_nd_tll.addr, &val, 6);
+			m->ipv6_nd_tll.addr[0] = ((char*)&val)[5];
+			m->ipv6_nd_tll.addr[1] = ((char*)&val)[4];
+			m->ipv6_nd_tll.addr[2] = ((char*)&val)[3];
+			m->ipv6_nd_tll.addr[3] = ((char*)&val)[2];
+			m->ipv6_nd_tll.addr[4] = ((char*)&val)[1];
+			m->ipv6_nd_tll.addr[5] = ((char*)&val)[0];
 			break;
     	case 35: //uint32_t             mpls_label
 			m->mpls_label = val;
@@ -265,10 +296,20 @@ void OpenFlow::do_of_match_fields_get(of_match_fields_t *m, unsigned long int *v
 			*val = m->metadata;
 			break;
 		case 4: //of_mac_addr_t        eth_dst
-			memcpy(val, m->eth_dst.addr, 6);
+			((char*)&val)[5] = m->eth_dst.addr[0];
+		    ((char*)&val)[4] = m->eth_dst.addr[1];
+			((char*)&val)[3] = m->eth_dst.addr[2];
+		 	((char*)&val)[2] = m->eth_dst.addr[3];
+			((char*)&val)[1] = m->eth_dst.addr[4];
+		    ((char*)&val)[0] = m->eth_dst.addr[5];
 			break;
 		case 5: //of_mac_addr_t        eth_src
-			memcpy(val, m->eth_src.addr, 6);
+			((char*)&val)[5] = m->eth_src.addr[0];
+		    ((char*)&val)[4] = m->eth_src.addr[1];
+			((char*)&val)[3] = m->eth_src.addr[2];
+		 	((char*)&val)[2] = m->eth_src.addr[3];
+			((char*)&val)[1] = m->eth_src.addr[4];
+		    ((char*)&val)[0] = m->eth_src.addr[5];
 			break;
 		case 6: //uint16_t             eth_type
 			*val = m->eth_type;
@@ -328,10 +369,20 @@ void OpenFlow::do_of_match_fields_get(of_match_fields_t *m, unsigned long int *v
 			*val  = m->arp_tpa;
 			break;
     	case 25: //of_mac_addr_t        arp_sha
-			memcpy(val, m->arp_sha.addr, 6);
+			((char*)&val)[5] = m->arp_sha.addr[0];
+		    ((char*)&val)[4] = m->arp_sha.addr[1];
+			((char*)&val)[3] = m->arp_sha.addr[2];
+		 	((char*)&val)[2] = m->arp_sha.addr[3];
+			((char*)&val)[1] = m->arp_sha.addr[4];
+		    ((char*)&val)[0] = m->arp_sha.addr[5];
 			break;
     	case 26: //of_mac_addr_t        arp_tha
-			memcpy(val, m->arp_tha.addr, 6);
+			((char*)&val)[5] = m->arp_tha.addr[0];
+		    ((char*)&val)[4] = m->arp_tha.addr[1];
+			((char*)&val)[3] = m->arp_tha.addr[2];
+		 	((char*)&val)[2] = m->arp_tha.addr[3];
+			((char*)&val)[1] = m->arp_tha.addr[4];
+		    ((char*)&val)[0] = m->arp_tha.addr[5];
 			break;
     	case 27: //of_ipv6_t            ipv6_src
 			//TODO
@@ -352,10 +403,20 @@ void OpenFlow::do_of_match_fields_get(of_match_fields_t *m, unsigned long int *v
 			//TODO
 			break;
     	case 33: //of_mac_addr_t        ipv6_nd_sll
-			memcpy(val, m->ipv6_nd_sll.addr, 6);
+			((char*)&val)[5] = m->ipv6_nd_sll.addr[0];
+		    ((char*)&val)[4] = m->ipv6_nd_sll.addr[1];
+			((char*)&val)[3] = m->ipv6_nd_sll.addr[2];
+		 	((char*)&val)[2] = m->ipv6_nd_sll.addr[3];
+			((char*)&val)[1] = m->ipv6_nd_sll.addr[4];
+		    ((char*)&val)[0] = m->ipv6_nd_sll.addr[5];
 			break;
     	case 34: //of_mac_addr_t        ipv6_nd_tll;
-			memcpy(val, m->ipv6_nd_tll.addr, 6);
+			((char*)&val)[5] = m->ipv6_nd_tll.addr[0];
+		    ((char*)&val)[4] = m->ipv6_nd_tll.addr[1];
+			((char*)&val)[3] = m->ipv6_nd_tll.addr[2];
+		 	((char*)&val)[2] = m->ipv6_nd_tll.addr[3];
+			((char*)&val)[1] = m->ipv6_nd_tll.addr[4];
+		    ((char*)&val)[0] = m->ipv6_nd_tll.addr[5];
 			break;
     	case 35: //uint32_t             mpls_label
 			*val = m->mpls_label;
@@ -620,7 +681,7 @@ void OpenFlow::do_of_aggregate_stats_request_match_set(of_object_t* o, unsigned 
 	if(of_aggregate_stats_request_match_get( (of_aggregate_stats_request_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_aggregate_stats_request_match_set( (of_aggregate_stats_request_t *) o, &tmp) < 0){
 		return;
 	}
@@ -2230,7 +2291,7 @@ void OpenFlow::do_of_bsn_flow_idle_match_set(of_object_t* o, unsigned long int v
 	if(of_bsn_flow_idle_match_get( (of_bsn_flow_idle_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_bsn_flow_idle_match_set( (of_bsn_flow_idle_t *) o, &tmp) < 0){
 		return;
 	}
@@ -8451,7 +8512,7 @@ void OpenFlow::do_of_flow_add_match_set(of_object_t* o, unsigned long int val, s
 	if(of_flow_add_match_get( (of_flow_add_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_flow_add_match_set( (of_flow_add_t *) o, &tmp) < 0){
 		return;
 	}
@@ -8463,7 +8524,7 @@ void OpenFlow::do_of_flow_add_match_get(of_object_t* o, unsigned long int *val, 
 	if(of_flow_add_match_get( (of_flow_add_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
@@ -8694,7 +8755,7 @@ void OpenFlow::do_of_flow_delete_match_set(of_object_t* o, unsigned long int val
 	if(of_flow_delete_match_get( (of_flow_delete_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_flow_delete_match_set( (of_flow_delete_t *) o, &tmp) < 0){
 		return;
 	}
@@ -8706,7 +8767,7 @@ void OpenFlow::do_of_flow_delete_match_get(of_object_t* o, unsigned long int *va
 	if(of_flow_delete_match_get( (of_flow_delete_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
@@ -8937,7 +8998,7 @@ void OpenFlow::do_of_flow_delete_strict_match_set(of_object_t* o, unsigned long 
 	if(of_flow_delete_strict_match_get( (of_flow_delete_strict_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_flow_delete_strict_match_set( (of_flow_delete_strict_t *) o, &tmp) < 0){
 		return;
 	}
@@ -8949,7 +9010,7 @@ void OpenFlow::do_of_flow_delete_strict_match_get(of_object_t* o, unsigned long 
 	if(of_flow_delete_strict_match_get( (of_flow_delete_strict_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
@@ -9208,7 +9269,7 @@ void OpenFlow::do_of_flow_modify_match_set(of_object_t* o, unsigned long int val
 	if(of_flow_modify_match_get( (of_flow_modify_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_flow_modify_match_set( (of_flow_modify_t *) o, &tmp) < 0){
 		return;
 	}
@@ -9220,7 +9281,7 @@ void OpenFlow::do_of_flow_modify_match_get(of_object_t* o, unsigned long int *va
 	if(of_flow_modify_match_get( (of_flow_modify_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
@@ -9451,7 +9512,7 @@ void OpenFlow::do_of_flow_modify_strict_match_set(of_object_t* o, unsigned long 
 	if(of_flow_modify_strict_match_get( (of_flow_modify_strict_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_flow_modify_strict_match_set( (of_flow_modify_strict_t *) o, &tmp) < 0){
 		return;
 	}
@@ -9463,7 +9524,7 @@ void OpenFlow::do_of_flow_modify_strict_match_get(of_object_t* o, unsigned long 
 	if(of_flow_modify_strict_match_get( (of_flow_modify_strict_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
@@ -9708,7 +9769,7 @@ void OpenFlow::do_of_flow_removed_match_set(of_object_t* o, unsigned long int va
 	if(of_flow_removed_match_get( (of_flow_removed_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_flow_removed_match_set( (of_flow_removed_t *) o, &tmp) < 0){
 		return;
 	}
@@ -9720,7 +9781,7 @@ void OpenFlow::do_of_flow_removed_match_get(of_object_t* o, unsigned long int *v
 	if(of_flow_removed_match_get( (of_flow_removed_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
@@ -9882,7 +9943,7 @@ void OpenFlow::do_of_flow_stats_request_match_set(of_object_t* o, unsigned long 
 	if(of_flow_stats_request_match_get( (of_flow_stats_request_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_flow_stats_request_match_set( (of_flow_stats_request_t *) o, &tmp) < 0){
 		return;
 	}
@@ -9894,7 +9955,7 @@ void OpenFlow::do_of_flow_stats_request_match_get(of_object_t* o, unsigned long 
 	if(of_flow_stats_request_match_get( (of_flow_stats_request_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
@@ -11228,7 +11289,7 @@ void OpenFlow::do_of_packet_in_match_set(of_object_t* o, unsigned long int val, 
 	if(of_packet_in_match_get( (of_packet_in_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_packet_in_match_set( (of_packet_in_t *) o, &tmp) < 0){
 		return;
 	}
@@ -11240,7 +11301,7 @@ void OpenFlow::do_of_packet_in_match_get(of_object_t* o, unsigned long int *val,
 	if(of_packet_in_match_get( (of_packet_in_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
@@ -15587,7 +15648,7 @@ void OpenFlow::do_of_flow_stats_entry_match_set(of_object_t* o, unsigned long in
 	if(of_flow_stats_entry_match_get( (of_flow_stats_entry_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_set(&tmp, val, f, l);
+	do_of_match_set(&tmp, val, f, l+1);
 	if(of_flow_stats_entry_match_set( (of_flow_stats_entry_t *) o, &tmp) < 0){
 		return;
 	}
@@ -15599,7 +15660,7 @@ void OpenFlow::do_of_flow_stats_entry_match_get(of_object_t* o, unsigned long in
 	if(of_flow_stats_entry_match_get( (of_flow_stats_entry_t *) o, &tmp) < 0){
 		return;
 	}
-	do_of_match_get(&tmp, val, f, l);
+	do_of_match_get(&tmp, val, f, l+1);
 	return;
 }
 
