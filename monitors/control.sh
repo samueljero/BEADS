@@ -34,6 +34,13 @@ case $CONTROLLER_ID in
         KILL_CMD="pkill python"
         STOP_TIMEOUT_SEC=5
         ;;
+    ryu)
+        START_CMD="/root/run_ryu.sh"
+        PID_CMD="pgrep ryu-manager"
+        STOP_CMD="pkill -SIGINT ryu-manager"
+        KILL_CMD="pkill ryu-manager"
+        STOP_TIMEOUT_SEC=5
+        ;;
     *)
         echo "Controller \"$CONTROLLER_ID\" not yet supported."
         exit 1

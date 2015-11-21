@@ -8,6 +8,7 @@
 /switch_proxy/sw_proxy
 /veriflow/VeriFlow/VeriFlow
 /config/config.py
+/vms
 
 # Temporary
 *~
