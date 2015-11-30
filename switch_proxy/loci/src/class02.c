@@ -21352,6 +21352,10 @@ of_flow_stats_entry_instructions_get(of_flow_stats_entry_t *obj) {
     of_list_instruction_t _instructions;
     of_list_instruction_t *_instructions_ptr;
 
+	if (obj->version == OF_VERSION_1_0) {
+		return NULL;
+	}
+
     of_flow_stats_entry_instructions_bind(obj, &_instructions);
     _instructions_ptr = (of_list_instruction_t *)of_object_dup(&_instructions);
     return _instructions_ptr;
