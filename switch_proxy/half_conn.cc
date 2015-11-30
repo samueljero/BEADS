@@ -34,7 +34,7 @@ bool HalfConn::sendm(of_object_t *ofo)
 
 	msg = OF_OBJECT_TO_MESSAGE(ofo);
 	m.buff = (char*)OF_MESSAGE_TO_BUFFER(msg);
-	m.len = of_message_length_get(msg);
+	m.len = WBUF_CURRENT_BYTES(OF_OBJECT_TO_WBUF(ofo));
 
 	return sendm(m);
 }

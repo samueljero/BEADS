@@ -825,7 +825,7 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 			if (mod_acts[x].type != PARAMS_TYPE_LIE) {
 				continue;
 			}
-			dbgprintf(1, "Modifying packet!\n");
+			dbgprintf(1, "Modifying packet(LIE)!\n");
 			if (!doModify(pk.ofo, mod_acts[x].field, mod_acts[x].action, mod_acts[x].value)){
 				break;
 			}
@@ -843,7 +843,7 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 			if (!isFieldValue(pk.ofo,mod_acts[x].matchfield, mod_acts[x].matchvalue)) {
 				continue;
 			}
-			dbgprintf(1, "Modifying packet!\n");
+			dbgprintf(1, "Modifying packet(CLIE)!\n");
 			if (!doModify(pk.ofo, mod_acts[x].field, mod_acts[x].action, mod_acts[x].value)){
 				break;
 			}
@@ -874,7 +874,7 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 				/* Pick random connection */
 				j = rand() % con_list.size();
 				c = con_list[j];
-				dbgprintf(1, "Diverting packet!\n");
+				dbgprintf(1, "Diverting packet(DIVERT)!\n");
 				if (pk.dir == STOC) {
 					pk.snd = c->getTH();
 				} else {
@@ -904,7 +904,7 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 								for (j = 0; j < i; j++) {
 									c = (*it)->getConnection(j);
 									if (c && c->getBH()->getDPID() == (unsigned int)mod_acts[x].sw) {
-										dbgprintf(1, "Diverting packet!\n");
+										dbgprintf(1, "Diverting packet(CDIVERT)!\n");
 										if (pk.dir == STOC) {
 											pk.snd = c->getTH();
 										} else {
