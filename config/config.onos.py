@@ -44,7 +44,7 @@ controllers_per_instance = topo_controllers
 topo_discovery_delay = 15
 
 #VeriFlow Section
-veriflow_enabled = True
+veriflow_enabled = False
 veriflow_path = system_home + "/veriflow/VeriFlow/VeriFlow"
 veriflow_topo_path = system_home + "/mininet_scripts/"
 veriflow_log_path = system_home + "/tmp/"
