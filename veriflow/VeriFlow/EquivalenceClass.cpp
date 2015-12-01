@@ -71,6 +71,22 @@ bool EquivalenceClass::operator==(const EquivalenceClass& other) const
 	return this->equals(other);
 }
 
+bool EquivalenceClass::subsumes(const EquivalenceClass &other) const
+{
+	for(int i = 0; i < ALL_FIELD_INDEX_END_MARKER; i++)
+	{
+		if((this->lowerBound[i] <= other.lowerBound[i] && this->upperBound[i] >= other.upperBound[i]))
+		{
+			//Okay
+		} else {
+			return false;
+		}
+	}
+
+	return true;
+	
+}
+
 int EquivalenceClass::operator()() const
 {
 	int retVal = 0;
