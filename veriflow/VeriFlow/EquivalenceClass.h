@@ -57,6 +57,7 @@ public:
 	bool equals(const EquivalenceClass& other) const;
 	bool operator==(const EquivalenceClass& other) const;
 	int operator()() const;
+	bool subsumes(const EquivalenceClass &other) const;
 	void clear();
 	string toString() const;
 

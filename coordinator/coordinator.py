@@ -211,6 +211,7 @@ def main(args):
 	argp.add_argument('-p','--port', type=int, default=config.coordinator_port)
 	argp.add_argument('-c','--checkpoint', default=config.coord_checkpoint_file)
 	argp.add_argument('-r','--restore', action='store_true')
+	argp.add_argument('-l','--load', default="")
 	args = vars(argp.parse_args(args[1:]))
 	if args['restore'] == True:
 		mode = "a"
@@ -230,7 +231,14 @@ def main(args):
 
 	#Create Strategy Generator
 	strat_gen = strategies.StrategyGenerator(lg, res_lg)
-	strat_gen.build_strategies()
+	if len(args['load']) > 0:
+		#Load fixed list of strategies
+		f = open(args['load'],"r")
+		strat_gen.load_from_file(f)
+		f.close()
+	else:
+		#Generate Strategies
+		strat_gen.build_strategies()
 
 	#Restore, if needed
 	if args['restore'] == True:

@@ -331,3 +331,11 @@ class StrategyGenerator:
 		print "[%s] Restore Finished" % (str(datetime.today()))
 		return True
 
+	def load_from_file(self, f):
+		strat = None
+		for line in f:
+			if line.find("#") >= 0:
+				continue
+			strat = eval(line)
+			self.strat_lst.append([config.coord_test_case, strat, 10])
+
