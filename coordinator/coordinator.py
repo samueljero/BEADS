@@ -233,11 +233,15 @@ def main(args):
 	strat_gen = strategies.StrategyGenerator(lg, res_lg)
 	if len(args['load']) > 0:
 		#Load fixed list of strategies
+		print "Loading Strategies from File..."
+		lg.write("[%s] Loading Strategies from File\n" % (str(datetime.today())))
 		f = open(args['load'],"r")
 		strat_gen.load_from_file(f)
 		f.close()
 	else:
 		#Generate Strategies
+		print "Generating Strategies..."
+		lg.write("[%s] Generating Strategies\n" % (str(datetime.today())))
 		strat_gen.build_strategies()
 
 	#Restore, if needed

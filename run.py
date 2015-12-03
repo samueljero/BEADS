@@ -39,11 +39,14 @@ def main(args):
 		standalone = False
 
 	print "Running Instance " + str(instance) + "..."
+	print "Controller: " + config.controller_type
 
 	#Open Log file
 	lg = open(config.logs_loc.format(instance=instance), mode)
 	lg.write(str(datetime.today()) + "\n")
 	lg.write("Instance: " + str(instance) + "\n")
+	lg.write("Controller: " + config.controller_type + "\n")
+
 
 	#Determine VMs
 	mininet = [instance*vms_per_instance + 1]
@@ -62,10 +65,16 @@ def main(args):
 
 	#Do Tests
 	if standalone:
+		print "Stand alone testing..."
+		lg.write("Stand alone testing\n")
 		standalone_tests(tester)
 	elif loop:
+		print "Loop testing..."
+		lg.write("Loop testing\n")
 		infinite_loop(tester)
 	else:
+		print  "Coordinated testing..."
+		lg.write("Coordinated testing\n")
 		coordinated_tests(tester, instance, lg,(args['coordinator'], args['port']))
 
 	#Stop VMs
