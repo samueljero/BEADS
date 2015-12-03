@@ -59,6 +59,8 @@ class SDNTester:
 					self.switch_stat.add_baseline(stat_dict=self.switch_stat_dict)
 				if hasattr(self, 'controller_stat_dict'):
 					self.controller_stat.add_baseline(stat_dict=self.controller_stat_dict)
+		self.log.write('Controller stat baseline:\n' + str(self.controller_stat.base_stat) + '\n')
+		self.log.write('Switch stat baseline:\n' + str(self.switch_stat.base_stat) + '\n')
 
 		#Process Results
 		if config.veriflow_enabled:

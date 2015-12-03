@@ -70,5 +70,5 @@ stat_switch_multipliers = {
 }
 
 stat_controller_multipliers = {
-    'cpu_sec': 3.0,
+    'cpu_sec': 2.5,
 }
