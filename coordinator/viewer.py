@@ -7,6 +7,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import re
+import argparse
 from types import NoneType
 
 prior_choice = None
@@ -72,7 +73,7 @@ def query_next():
 	valid = {"next":'n', "n": 'n', "ne":'n', "nex":'n',
 			}
 	while True:
-		sys.stdout.write("Option: [n/p/s/j/g/b/q] ")
+		sys.stdout.write("Option: [n/p/s/j/g/b/f/q] ")
 		choice = raw_input().lower()
 		if prior_choice is not None and choice == '':
 			return prior_choice
@@ -113,6 +114,8 @@ def query_next():
 				print "Efficiency Break On"
 			else:
 				print "Efficiency Break Off"
+		elif choice == "find" or "f":
+			return ("f",0)
 		else:
 			sys.stdout.write("Invalid Response. Try Again.\n")
 
@@ -170,11 +173,40 @@ def handle_strat(line, ln_no, instfiles):
 		prior_raw_choice = "no"
 	return
 
+def do_find_known(knownlist, alllist):
+	for k in knownlist:
+		found = False
+		for s in alllist:
+			if s[0] == "#":
+				continue
+			try:
+				fmt = eval(s)
+			except Exception as e:
+				continue
+
+			if len(fmt) == 5 and fmt[3] == k:
+				found = True
+				break
+		if not found:
+			print "Strategy Not Found: " + k
+			
+
 def main(args):
 	global term_type
-	if len(args) != 2:
-		print "usage: viewer.py <directory>"
-		sys.exit(1)
+	FilterResults = False
+	filterlist = []
+
+	#Parse Args
+	argp = argparse.ArgumentParser(description='Testing Results Viewer')
+	argp.add_argument('-k','--known', default="")
+	argp.add_argument('dir', help="Results directory")
+	args = vars(argp.parse_args(args[1:]))
+	if len(args['known']) > 0:
+		ffile = open(args['known'], "r")
+		filterlist = ffile.readlines()
+		ffile.close()
+		filterlist = [line.strip() for line in filterlist]
+		FilterResults = True
 
 	if which("gnome-terminal") is not None:
 		term_type = "gnome-terminal"
@@ -186,11 +218,11 @@ def main(args):
 		print "No Supported Terminal Available"
 		term_type = ""
 	
-	onlyfiles = [ f for f in listdir(args[1]) if isfile(join(args[1],f)) ]
+	onlyfiles = [ f for f in listdir(args['dir']) if isfile(join(args['dir'],f)) ]
 
 	resfile = None
 	try:	
-		resfile = open(join(args[1],"results.log"), "r")
+		resfile = open(join(args['dir'],"results.log"), "r")
 	except Exception as e:
 		print "Error: could not open results.log. Not a log directory."
 		sys.exit(1)
@@ -199,14 +231,14 @@ def main(args):
 	for f in onlyfiles:
 		mo = re.search("inst[0-9]+\.log", f)
 		if type(mo) is not NoneType:
-			instfiles.append(join(args[1],f))
+			instfiles.append(join(args['dir'],f))
 
 	flines = resfile.readlines()
 	resfile.close()
 	i = 0
 	fmt = ""
 	while i < len(flines):
-		if flines[i] == "#":
+		if flines[i][0] == "#":
 			i += 1
 			continue
 		try:
@@ -215,6 +247,12 @@ def main(args):
 			print e
 			i += 1
 			continue
+
+		if FilterResults:
+			if len(fmt) == 5 and fmt[3] in filterlist:
+				print "Found Known Strategy at: " + str(i)
+				i+=1
+				continue
 
 		handle_strat(fmt, i, instfiles)
 
@@ -231,6 +269,8 @@ def main(args):
 				i = 0
 		elif r[0] == "g":
 			i = r[1]
+		elif r[0] == "f":
+			do_find_known(filterlist, flines)
 		elif r[0] == "q":
 			break
 	return 0
