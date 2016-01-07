@@ -193,12 +193,15 @@ def do_find_known(knownlist, alllist):
 
 def main(args):
 	global term_type
+	fix_bad = False
+	bad = []
 	FilterResults = False
 	filterlist = []
 
 	#Parse Args
 	argp = argparse.ArgumentParser(description='Testing Results Viewer')
 	argp.add_argument('-k','--known', default="")
+	argp.add_argument('-f','--fix', action='store_true')
 	argp.add_argument('dir', help="Results directory")
 	args = vars(argp.parse_args(args[1:]))
 	if len(args['known']) > 0:
@@ -207,6 +210,8 @@ def main(args):
 		ffile.close()
 		filterlist = [line.strip() for line in filterlist]
 		FilterResults = True
+	if args['fix'] == True:
+		fix_bad = True
 
 	if which("gnome-terminal") is not None:
 		term_type = "gnome-terminal"
@@ -237,6 +242,17 @@ def main(args):
 	resfile.close()
 	i = 0
 	fmt = ""
+	if fix_bad:
+		for f in flines:
+			if f[0] == "#":
+				continue
+			try:
+				fmt = eval(f)
+			except Exception as e:
+				continue
+			if len(fmt)==5:
+				bad.append(fmt[3])
+
 	while i < len(flines):
 		if flines[i][0] == "#":
 			i += 1
@@ -253,6 +269,23 @@ def main(args):
 				print "Found Known Strategy at: " + str(i)
 				i+=1
 				continue
+			if fix_bad and len(fmt)==5:
+				if "error_msg" in fmt[3]:
+					print "Found Bad Strategy at: " + str(i)
+					i+=1
+					continue
+				else:
+					lst = eval(fmt[3])
+					t = False
+					if len(lst) > 1:
+						for l in lst:
+							if str([l]) in bad:
+								print "Found Bad Strategy at: " + str(i)
+								i+=1
+								t = True
+								break
+					if t:
+						continue				
 
 		handle_strat(fmt, i, instfiles)
 

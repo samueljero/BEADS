@@ -45,6 +45,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 	def handle(self):
 		instance = ""
 		strat = []
+		fb = None
 
 		while True:
 			#Get Message
@@ -79,6 +80,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				#New Strategy Request
 				instance = msg['instance']
 				strat = []
+				fb = None
 
 				#Check if Executor is new
 				exec_lst_lock.acquire()
@@ -179,14 +181,17 @@ class ExecutorHandler(ss.StreamRequestHandler):
 
 				#Process Result
 				strat_lock.acquire()
+				strat_gen.strategy_feedback(strat, fb, res)
 				strat_gen.strategy_result(strat, (res,reason))
 				strat_lock.release()
 
 				#Clear Current Strategy
 				strat = []
+				fb = None
 			elif msg['msg'] == "FEEDBACK":
 				#Testing Feedback
 				data = msg['data']
+				fb = data
 
 				#Print Result
 				lg_lock.acquire()

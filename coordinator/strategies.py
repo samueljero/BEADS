@@ -69,29 +69,33 @@ class StrategyGenerator:
 				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today()),str(strat))
 		else:
 			#Test Succeeded
-			self.build_combination_strategies(strat)
+			#self.build_combination_strategies(strat)
+			pass
 
-	def strategy_feedback(self, strat, feedback):
+	def strategy_feedback(self, strat, feedback, result = None):
+		if type(feedback)!=dict:
+			return
 		if 'msg_types' in feedback:
 			msg_types = feedback['msg_types']
 
 			#Prioritize Strategies with these messges types
-			changed = False
-			for st in self.single_strat:
-				for t in msg_types:
-					if t in str(st[1]):
-						if st[2] < 100:
-							st[2] = 100
-							if len(strat) > 0:
-								#New message under this strategy
-								tmp = st
-								tmp[1] = tmp[1] + strat[1]
-								self.strat_lst.append(tmp)
-							else:
-								#Baseline messages
-								self.strat_lst.append(st)
-							changed = True
-						break
+			if len(strat) == 0 or result is True: #Benign feedback or test passed				
+				changed = False
+				for st in self.single_strat:
+					for t in msg_types:
+						if t in str(st[1]):
+							if st[2] < 100:
+								st[2] = 100
+								if len(strat) > 0:
+									#New message under this strategy
+									tmp = st
+									tmp[1] = tmp[1] + strat[1]
+									self.strat_lst.append(tmp)
+								else:
+									#Baseline messages
+									self.strat_lst.append(st)
+								changed = True
+							break
 
 
 			if changed:
