@@ -41,7 +41,7 @@ controller_type = "onos"
 controller_user = "root"
 controller_port = 6633
 controllers_per_instance = topo_controllers
-topo_discovery_delay = 15
+topo_discovery_delay = 40
 
 #VeriFlow Section
 veriflow_enabled = False
@@ -70,5 +70,5 @@ stat_switch_multipliers = {
 }
 
 stat_controller_multipliers = {
-    'cpu_sec': 2.0,
+    'cpu_sec': 1.5,
 }

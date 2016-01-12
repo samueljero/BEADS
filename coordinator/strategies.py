@@ -73,14 +73,14 @@ class StrategyGenerator:
 			pass
 
 	def strategy_feedback(self, strat, feedback, result = None):
+		changed = False
 		if type(feedback)!=dict:
 			return
 		if 'msg_types' in feedback:
 			msg_types = feedback['msg_types']
 
 			#Prioritize Strategies with these messges types
-			if len(strat) == 0 or result is True: #Benign feedback or test passed				
-				changed = False
+			if len(strat) == 0 or result is True: #Benign feedback or test passed
 				for st in self.single_strat:
 					for t in msg_types:
 						if t in str(st[1]):
@@ -97,12 +97,11 @@ class StrategyGenerator:
 								changed = True
 							break
 
-
-			if changed:
-				#Sort Strategies by priority
-				remaining = self.strat_lst[self.strat_ptr:]
-				remaining.sort(reverse=True, key = lambda s: s[2])
-				self.strat_lst = self.strat_lst[0: self.strat_ptr] + remaining
+		if changed:
+			#Sort Strategies by priority
+			remaining = self.strat_lst[self.strat_ptr:]
+			remaining.sort(reverse=True, key = lambda s: s[2])
+			self.strat_lst = self.strat_lst[0: self.strat_ptr] + remaining
 		return
 
 	def build_strategies(self):
