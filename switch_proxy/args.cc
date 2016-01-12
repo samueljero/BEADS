@@ -67,9 +67,11 @@ arg_node_t *args_parse(char *str, char delim) {
 					// floating point value
 					tmp->type = ARG_VALUE_TYPE_FLOAT;
 					tmp->value.f = atof(eq_pos);
+					tmp->value.s = eq_pos;
 				} else if (type == 0) {
 					tmp->type = ARG_VALUE_TYPE_INT;
 					tmp->value.i = atoi(eq_pos);
+					tmp->value.s = eq_pos;
 				} else {
 					tmp->type = ARG_VALUE_TYPE_STR;
 					tmp->value.s = eq_pos;

@@ -17,6 +17,7 @@ extern "C" {
 #include <map>
 #include <list>
 #include <vector>
+#include <string>
 #include "openflow.h"
 using namespace std;
 
@@ -40,6 +41,7 @@ using namespace std;
 #define ACTION_ALIAS_CLIE		"CLIE"
 #define ACTION_ALIAS_CDIVERT	"CDIVERT"
 #define ACTION_ALIAS_PKT_TYPES	"PKT_TYPES"
+#define ACTION_ALIAS_INJECT		"INJECT"
 
 #define OFP_MSG_TYPE_ERR		(-2)
 #define OFP_MSG_TYPE_ALL		(-1)
@@ -171,6 +173,10 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 	}
 	if (action_type == ACTION_ID_PKT_TYPES) {
 		ret = dump_pkt_types(resp);
+		goto out;
+	}
+	if (action_type == ACTION_ID_INJECT) {
+		ret = setup_inject(cid, dpid, ofp_ver, msg_type, args);
 		goto out;
 	}
 
@@ -621,6 +627,7 @@ int Attacker::normalize_action_type(char *s)
 	if (!strcmp(ACTION_ALIAS_CLIE, s)) return ACTION_ID_CLIE;
 	if (!strcmp(ACTION_ALIAS_CDIVERT, s)) return ACTION_ID_CDIVERT;
 	if (!strcmp(ACTION_ALIAS_PKT_TYPES, s)) return ACTION_ID_PKT_TYPES;
+	if (!strcmp(ACTION_ALIAS_INJECT, s)) return ACTION_ID_INJECT;
 	return ACTION_ID_ERR;
 }
 
@@ -1207,4 +1214,75 @@ bool Attacker::dump_pkt_types(Message *m)
 
 	m->len = strlen(m->buff);
 	return true;
+}
+
+bool Attacker::setup_inject(int cid, uint64_t dpid, int ofp_ver, int msg_type, arg_node_t *args)
+{
+	pktInjection pi;
+	arg_node_t *atmp;
+
+	pi.type = INJECT_TYPE_ERR;
+	pi.cid = cid;
+	pi.dpid = dpid;
+	pi.msg_type = msg_type;
+	pi.ver = ofp_ver;
+
+	atmp = args;
+	while (!atmp) {
+		if (!strcmp(atmp->name, "rep")) {
+			pi.type = INJECT_TYPE_REP;
+			if (atmp->type == ARG_VALUE_TYPE_INT) {
+				pi.rep_ms = atmp->value.i;
+			} else {
+				dbgprintf(0,"Adding Command: unsupported rep(etition) value \"%s\".\n", atmp->value.s);
+				return false;
+			}
+		} else {
+			pi.fields[string(atmp->name)] = string(atmp->value.s);
+			atmp = atmp->next;
+		}
+	}
+
+	if (pi.type == INJECT_TYPE_ERR) {
+		dbgprintf(0,"Adding Command: No Scheduling Selection!!");
+		return false;
+	}
+
+	injection_actions.push_back(pi);
+	return true;
+}
+
+/* stupid pthreads/C++ glue */
+void* Attacker::inject_thread_run(void *arg)
+{
+	Attacker *t = (Attacker*)arg;
+	t->inject_run();
+	return NULL;
+}
+
+bool Attacker::start()
+{
+	injection_run = 1;
+	if (pthread_create(&inject_thread, NULL, inject_thread_run, this) < 0) {
+		dbgprintf(0, "Error: Failed to start inject thread!: %s\n", strerror(errno));
+		injection_run = false;
+		return false;
+	}
+	return true;
+}
+
+bool Attacker::stop()
+{
+	if (injection_run) {
+		injection_run = 0;
+		pthread_join(inject_thread,NULL);
+	}
+	return true;
+}
+
+void Attacker::inject_run()
+{
+	while(injection_run) {
+		sleep(2);
+	}
 }
