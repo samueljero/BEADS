@@ -21,12 +21,14 @@ all:
 clean:
 	rm -f $(BINARIES) *.o *~
         
-sw_proxy: $(PROXY_HEADERS) $(PROXY_SRC) libloci.so openflow.o
-	$(CPP) $(CPPFLAGS) $(PROXY_SRC) openflow.o -o sw_proxy -lpthread -Wl,-rpath,`pwd` -L`pwd` -lloci
+sw_proxy: $(PROXY_HEADERS) $(PROXY_SRC) libloci.so of_mod.o of_create.o
+	$(CPP) $(CPPFLAGS) $(PROXY_SRC) of_mod.o of_create.o -o sw_proxy -lpthread -Wl,-rpath,`pwd` -L`pwd` -lloci
 
-openflow.o: openflow.cc openflow.h
-	$(CPP) -c $(CPPFLAGS) openflow.cc -o openflow.o
-	
+of_mod.o: openflow.cc openflow.h
+	$(CPP) -c $(CPPFLAGS) openflow.cc -o of_mod.o
+
+of_create.o: create.cc openflow.h
+	$(CPP) -c $(CPPFLAGS) create.cc -o of_create.o
 
 sndcmd: $(SNDCMD_SRC)
 	$(CPP) $(CPPFLAGS) $(SNDCMD_SRC) -lpthread -o sndcmd

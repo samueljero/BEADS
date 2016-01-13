@@ -102,7 +102,9 @@ int main(int argc, char** argv)
 	}
 
 	Attacker::get().loadListeners(&listeners, &listeners_mutex);
+	Attacker::get().start();
 	control_loop(ctlport);
+	Attacker::get().stop();
 }
 
 void control_loop(int port)

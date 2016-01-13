@@ -7,6 +7,9 @@ extern "C" {
 #include <loci/loci_obj_dump.h>
 }
 #include <vector>
+#include <map>
+#include <string>
+
 class OpenFlow {
 private:
 	void do_of_match_set(of_match_t *m, unsigned long int val, std::vector<int> f, int l);
@@ -4145,8 +4148,12 @@ private:
 	void of_list_uint64_set_field(of_object_t* o, unsigned long int val, std::vector<int> f, int l);
 	void of_list_uint8_get_field(of_object_t* o, unsigned long int *val, std::vector<int> f, int l);
 	void of_list_uint8_set_field(of_object_t* o, unsigned long int val, std::vector<int> f, int l);
+	of_object_t* create_port_status(int ver, std::map<std::string,std::string> fields);
+	bool str2uint(std::string str, unsigned long long *tmp);
+
 public:
 	void set_field(of_object_t* o, unsigned long int val, std::vector<int> f, int l);
 	void get_field(of_object_t* o, unsigned long int *val, std::vector<int> f, int l);
+	of_object_t* create_message(int type, int ver, std::map<std::string,std::string> fields);
 };
 #endif

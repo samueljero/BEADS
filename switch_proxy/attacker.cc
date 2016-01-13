@@ -1376,7 +1376,7 @@ void Attacker::do_inject(pktInjection &info)
 	pk.dups = 1;
 
 	/* Create packet */
-	pk.ofo = NULL; //TODO
+	pk.ofo = modifier->create_message(info.type,info.ver,info.fields);
 
 	/* Find connection to send packet on */
 	if (listeners == NULL || listeners_mutex == NULL) {
@@ -1411,5 +1411,6 @@ void Attacker::do_inject(pktInjection &info)
 	}
 
 	pk.snd->sendm(pk.ofo);
+	of_object_delete(pk.ofo);
 	return;
 }
