@@ -55,6 +55,7 @@ Attacker::Attacker()
 {
 	pthread_rwlock_init(&lock, NULL);
 	pthread_rwlock_init(&pkt_types_lock, NULL);
+	pthread_mutex_init(&this->timeout_mutex, NULL);
 	listeners = NULL;
 	listeners_mutex = NULL;
 	nxt_param = 0;
@@ -63,6 +64,7 @@ Attacker::Attacker()
 Attacker::~Attacker()
 {
 	pthread_rwlock_destroy(&lock);
+	pthread_mutex_destroy(&this->timeout_mutex);
 	delete modifier;
 }
 
@@ -1226,6 +1228,9 @@ bool Attacker::setup_inject(int cid, uint64_t dpid, int ofp_ver, int msg_type, a
 	pi.dpid = dpid;
 	pi.msg_type = msg_type;
 	pi.ver = ofp_ver;
+	pi.next.tv_nsec = 0;
+	pi.next.tv_sec = 0;
+	pi.dir = STOC;
 
 	atmp = args;
 	while (!atmp) {
@@ -1235,6 +1240,15 @@ bool Attacker::setup_inject(int cid, uint64_t dpid, int ofp_ver, int msg_type, a
 				pi.rep_ms = atmp->value.i;
 			} else {
 				dbgprintf(0,"Adding Command: unsupported rep(etition) value \"%s\".\n", atmp->value.s);
+				return false;
+			}
+		} else if(!strcmp(atmp->name, "dir")) {
+			if (strcmp(atmp->value.s, "switch")) {
+				pi.dir = CTOS;
+			} else if(strcmp(atmp->value.s, "controller")) {
+				pi.dir = STOC;
+			} else {
+				dbgprintf(0,"Adding Command: unsupported dir(ection) value \"%s\".\n", atmp->value.s);
 				return false;
 			}
 		} else {
@@ -1249,6 +1263,14 @@ bool Attacker::setup_inject(int cid, uint64_t dpid, int ofp_ver, int msg_type, a
 	}
 
 	injection_actions.push_back(pi);
+
+	/* Unlocking an unlocked mutex is undefined.
+	 * Do this instead. */
+	if (pthread_mutex_trylock(&timeout_mutex)) {
+		pthread_mutex_unlock(&timeout_mutex);
+	} else {
+		pthread_mutex_unlock(&timeout_mutex);
+	}
 	return true;
 }
 
@@ -1262,7 +1284,7 @@ void* Attacker::inject_thread_run(void *arg)
 
 bool Attacker::start()
 {
-	injection_run = 1;
+	injection_run = true;
 	if (pthread_create(&inject_thread, NULL, inject_thread_run, this) < 0) {
 		dbgprintf(0, "Error: Failed to start inject thread!: %s\n", strerror(errno));
 		injection_run = false;
@@ -1274,7 +1296,7 @@ bool Attacker::start()
 bool Attacker::stop()
 {
 	if (injection_run) {
-		injection_run = 0;
+		injection_run = false;
 		pthread_join(inject_thread,NULL);
 	}
 	return true;
@@ -1282,7 +1304,112 @@ bool Attacker::stop()
 
 void Attacker::inject_run()
 {
+	struct timespec now;
+	struct timespec delay;
+	struct timeval tm;
+	int sec;
+	int nsec;
+	bool first;
+
+	/* Mutex used only to sleep on */
+	pthread_mutex_lock(&timeout_mutex);
+
 	while(injection_run) {
-		sleep(2);
+
+		pthread_rwlock_rdlock(&lock);
+
+		gettimeofday(&tm, NULL);
+		now.tv_nsec = tm.tv_usec * 1000;
+		now.tv_sec = tm.tv_sec;
+		delay.tv_sec = now.tv_sec + 60;
+		delay.tv_nsec = now.tv_nsec;
+
+		first = true;
+		for(std::list<pktInjection>::iterator it = injection_actions.begin(); it != injection_actions.end(); it++) {
+			if(it->type == INJECT_TYPE_REP) {
+				if (it->next.tv_sec < now.tv_sec ||
+					(it->next.tv_sec == now.tv_sec && it->next.tv_nsec <= now.tv_nsec)) {
+					/*Found event to trigger*/
+
+					/* Process this event */
+					do_inject(*it);
+
+					/*Set next occurence*/
+					sec = it->rep_ms / 1000;
+					nsec = (it->rep_ms % 1000)*1000000;
+					it->next.tv_nsec = it->next.tv_nsec + nsec;
+					if (it->next.tv_nsec > 1000000000) {
+						it->next.tv_sec += it->next.tv_sec/1000000000;
+						it->next.tv_nsec = it->next.tv_nsec%1000000000;
+					}
+					it->next.tv_sec += (it->next.tv_sec + sec);
+				}
+
+				/* Find smallest time */
+				if (first || (delay.tv_sec > it->next.tv_sec) ||
+					 (delay.tv_sec == it->next.tv_sec && delay.tv_nsec > delay.tv_nsec)) {
+					delay.tv_sec = it->next.tv_sec;
+					delay.tv_nsec = it->next.tv_nsec;
+					first = false;
+				}
+			}
+		}
+
+		pthread_rwlock_unlock(&lock);
+
+		/* Sleep */
+		pthread_mutex_timedlock(&timeout_mutex, &delay);
 	}
+}
+
+void Attacker::do_inject(pktInjection &info)
+{
+	pkt_info pk;
+	int i, j;
+	Connection *c;
+	bool found;
+
+	/* Setup basic info */
+	pk.cid = info.cid;
+	pk.dir = info.dir;
+	pk.dpid = info.dpid;
+	pk.dups = 1;
+
+	/* Create packet */
+	pk.ofo = NULL; //TODO
+
+	/* Find connection to send packet on */
+	if (listeners == NULL || listeners_mutex == NULL) {
+		dbgprintf(0, "Warning: No Listeners Registered!\n");
+		return;
+	}
+
+	pthread_mutex_lock(listeners_mutex);
+	found = false;
+	for(list<Listener*>::iterator it = listeners->begin(); it != listeners->end(); it++) {
+		if ((*it)->getLport() == info.cid) {
+			i = (*it)->numConnections();
+			for (j = 0; j < i; j++) {
+				c = (*it)->getConnection(j);
+				if (c && c->isRunning() && c->getBH()->getDPID() == info.dpid) {
+					if (pk.dir == STOC) {
+						pk.snd = c->getTH();
+					} else {
+						pk.snd = c->getBH();
+					}
+					found = true;
+					break;
+				}
+			}
+		}
+	}
+	pthread_mutex_unlock(listeners_mutex);
+
+	if (!found) {
+		dbgprintf(0, "Warning: Couldn't find a connection for CID: %i, DPID: %ul, dir: %i\n", info.cid, info.dpid, info.dir);
+		return;
+	}
+
+	pk.snd->sendm(pk.ofo);
+	return;
 }

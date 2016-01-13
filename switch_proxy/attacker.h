@@ -61,10 +61,11 @@ class pktInjection {
 		int type;
 		int rep_ms;
 		int msg_type;
+		struct timespec next;
 		int ver;
 		int cid;
 		uint64_t dpid;
-		int dir;
+		enum direction dir;
 		std::map<std::string,std::string> fields;
 };
 
@@ -116,6 +117,7 @@ class Attacker{
 		bool setup_inject(int cid, uint64_t dpid, int ofp_ver, int msg_type, arg_node_t *args);
 		static void* inject_thread_run(void *arg);
 		void inject_run();
+		void do_inject(pktInjection &info);
 
 		pthread_rwlock_t lock;
 		// <cid, <dpid, <of_version, <pkt_type, <action, ID> > > >
@@ -123,8 +125,9 @@ class Attacker{
 		// <ID, list_of_attacks>
 		std::map<int, std::vector<modAttack> > mod_params;
 		std::list<pktInjection> injection_actions;
-		int injection_run;
+		bool injection_run;
 		pthread_t inject_thread;
+		pthread_mutex_t timeout_mutex;
 		std::map<int,int> pkt_types_seen;
 		pthread_rwlock_t pkt_types_lock;
 		int nxt_param;
