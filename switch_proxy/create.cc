@@ -223,6 +223,119 @@ of_object_t* OpenFlow::create_port_status(int ver, std::map<std::string,std::str
 		tmp = 0; //OFPPR_ADD
 	}
 	of_port_status_reason_set((of_port_status_t*)msg,tmp);
+
+	/*Port Description*/
+	of_port_desc_t *desc;
+	desc = of_port_status_desc_get((of_port_status_t*)msg);
+	if (!desc) {
+		return NULL;
+	}
+
+	/*Port Number*/
+	it = fields.find("port");
+	if (it != fields.end()) {
+		str2uint(it->second,&tmp);
+	} else {
+		tmp = 1;
+	}
+	of_port_desc_port_no_set(desc,tmp);
+
+	/*MAC Address*/
+	of_mac_addr_t m;
+	it = fields.find("mac");
+	if (it != fields.end()) {
+		str2uint(it->second, &tmp);
+	} else {
+		tmp = 0;
+	}
+	m.addr[0] = ((char*)&tmp)[5];
+	m.addr[1] = ((char*)&tmp)[4];
+	m.addr[2] = ((char*)&tmp)[3];
+	m.addr[3] = ((char*)&tmp)[2];
+	m.addr[4] = ((char*)&tmp)[1];
+	m.addr[5] = ((char*)&tmp)[0];
+	of_port_desc_hw_addr_set(desc,m);
+
+	/*Name*/
+	of_port_name_t n;
+	it = fields.find("name");
+	if (it != fields.end()) {
+		strncpy(n,it->second.c_str(),OF_MAX_PORT_NAME_LEN-1);
+		of_port_desc_name_set(desc,n);
+	} else {
+		memset(n,0,OF_MAX_PORT_NAME_LEN-1);
+		of_port_desc_name_set(desc,n);
+	}
+
+	/*Config*/
+	it = fields.find("config");
+	if (it != fields.end()) {
+		str2uint(it->second,&tmp);
+	}else {
+		tmp = 1; //Port Down
+	}
+	of_port_desc_config_set(desc,tmp);
+
+	/*State*/
+	it = fields.find("state");
+	if (it != fields.end()) {
+		str2uint(it->second, &tmp);
+	} else {
+		tmp = 1; //Link Down
+	}
+	of_port_desc_state_set(desc,tmp);
+
+	if (version >= OF_VERSION_1_4) {
+		of_list_port_desc_prop_t *prop = NULL;
+		of_port_desc_properties_bind(desc,prop);
+
+		if (of_port_desc_properties_set(desc,prop)) {
+			return NULL;
+		}
+		fprintf(stderr, "Warning: of_port_status version >=1.4 properties not implemented");
+	} else {
+		/*Curr*/
+		it = fields.find("curr");
+		if (it != fields.end()) {
+			str2uint(it->second,&tmp);
+		} else {
+			tmp = 0x280; //10,000 Full Duplex, auto-neg
+		}
+		of_port_desc_curr_set(desc,tmp);
+
+		/*Advertised*/
+		it = fields.find("advertised");
+		if (it != fields.end()) {
+			str2uint(it->second,&tmp);
+		} else {
+			tmp = 0x2FF; //10/100/1000/10000 Half/Full Duplex, auto-neg
+		}
+		of_port_desc_advertised_set(desc,tmp);
+
+		/*Supported*/
+		it = fields.find("supported");
+		if (it != fields.end()) {
+			str2uint(it->second,&tmp);
+		} else {
+			tmp = 0x2FF; //10/100/1000/10000 Half/Full Duplex, auto-neg
+		}
+		of_port_desc_supported_set(desc,tmp);
+
+		/*Peer*/
+		it = fields.find("peer");
+		if (it != fields.end()) {
+			str2uint(it->second,&tmp);
+		} else {
+			tmp = 0x2FF; //10/100/1000/10000 Half/Full Duplex, auto-neg
+		}
+		of_port_desc_peer_set(desc,tmp);
+	}
+
+	/*Port Description*/
+	if(of_port_status_desc_set((of_port_status_t*)msg,desc)) {
+		return NULL;
+	}
+
 	return msg;
 }
 
