@@ -12,7 +12,7 @@
 /**
  * Argument value data type.
  */
-typedef union {
+typedef struct {
 	int i;
 	float f;
 	char *s;

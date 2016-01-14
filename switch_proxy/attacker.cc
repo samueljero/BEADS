@@ -55,7 +55,7 @@ Attacker::Attacker()
 {
 	pthread_rwlock_init(&lock, NULL);
 	pthread_rwlock_init(&pkt_types_lock, NULL);
-	pthread_mutex_init(&this->timeout_mutex, NULL);
+	pthread_mutex_init(&timeout_mutex, NULL);
 	listeners = NULL;
 	listeners_mutex = NULL;
 	nxt_param = 0;
@@ -64,7 +64,7 @@ Attacker::Attacker()
 Attacker::~Attacker()
 {
 	pthread_rwlock_destroy(&lock);
-	pthread_mutex_destroy(&this->timeout_mutex);
+	pthread_mutex_destroy(&timeout_mutex);
 	delete modifier;
 }
 
@@ -1233,7 +1233,7 @@ bool Attacker::setup_inject(int cid, uint64_t dpid, int ofp_ver, int msg_type, a
 	pi.dir = STOC;
 
 	atmp = args;
-	while (!atmp) {
+	while (atmp) {
 		if (!strcmp(atmp->name, "rep")) {
 			pi.type = INJECT_TYPE_REP;
 			if (atmp->type == ARG_VALUE_TYPE_INT) {
@@ -1243,9 +1243,9 @@ bool Attacker::setup_inject(int cid, uint64_t dpid, int ofp_ver, int msg_type, a
 				return false;
 			}
 		} else if(!strcmp(atmp->name, "dir")) {
-			if (strcmp(atmp->value.s, "switch")) {
+			if (strcmp(atmp->value.s, "switch")==0) {
 				pi.dir = CTOS;
-			} else if(strcmp(atmp->value.s, "controller")) {
+			} else if(strcmp(atmp->value.s, "controller")==0) {
 				pi.dir = STOC;
 			} else {
 				dbgprintf(0,"Adding Command: unsupported dir(ection) value \"%s\".\n", atmp->value.s);
@@ -1253,12 +1253,12 @@ bool Attacker::setup_inject(int cid, uint64_t dpid, int ofp_ver, int msg_type, a
 			}
 		} else {
 			pi.fields[string(atmp->name)] = string(atmp->value.s);
-			atmp = atmp->next;
 		}
+		atmp = atmp->next;
 	}
 
 	if (pi.type == INJECT_TYPE_ERR) {
-		dbgprintf(0,"Adding Command: No Scheduling Selection!!");
+		dbgprintf(0,"Adding Command: No Scheduling Selection!!\n");
 		return false;
 	}
 
@@ -1337,17 +1337,17 @@ void Attacker::inject_run()
 					/*Set next occurence*/
 					sec = it->rep_ms / 1000;
 					nsec = (it->rep_ms % 1000)*1000000;
-					it->next.tv_nsec = it->next.tv_nsec + nsec;
+					it->next.tv_nsec = now.tv_nsec + nsec;
 					if (it->next.tv_nsec > 1000000000) {
-						it->next.tv_sec += it->next.tv_sec/1000000000;
+						sec += it->next.tv_nsec/1000000000;
 						it->next.tv_nsec = it->next.tv_nsec%1000000000;
 					}
-					it->next.tv_sec += (it->next.tv_sec + sec);
+					it->next.tv_sec = now.tv_sec + sec;
 				}
 
 				/* Find smallest time */
 				if (first || (delay.tv_sec > it->next.tv_sec) ||
-					 (delay.tv_sec == it->next.tv_sec && delay.tv_nsec > delay.tv_nsec)) {
+					 (delay.tv_sec == it->next.tv_sec && delay.tv_nsec > it->next.tv_nsec)) {
 					delay.tv_sec = it->next.tv_sec;
 					delay.tv_nsec = it->next.tv_nsec;
 					first = false;
@@ -1376,7 +1376,12 @@ void Attacker::do_inject(pktInjection &info)
 	pk.dups = 1;
 
 	/* Create packet */
-	pk.ofo = modifier->create_message(info.type,info.ver,info.fields);
+	pk.ofo = modifier->create_message(info.msg_type,info.ver,info.fields);
+	if (pk.ofo == NULL) {
+		dbgprintf(0, "Error: Creating Packet to Inject Failed!\n");
+		return;
+
+	}
 
 	/* Find connection to send packet on */
 	if (listeners == NULL || listeners_mutex == NULL) {
@@ -1406,10 +1411,11 @@ void Attacker::do_inject(pktInjection &info)
 	pthread_mutex_unlock(listeners_mutex);
 
 	if (!found) {
-		dbgprintf(0, "Warning: Couldn't find a connection for CID: %i, DPID: %ul, dir: %i\n", info.cid, info.dpid, info.dir);
+		dbgprintf(0, "Warning: Couldn't find a connection for CID: %i, DPID: %lu, dir: %i\n", info.cid, info.dpid, info.dir);
 		return;
 	}
 
+	dbgprintf(0, "Injecting Packet!\n");
 	pk.snd->sendm(pk.ofo);
 	of_object_delete(pk.ofo);
 	return;
