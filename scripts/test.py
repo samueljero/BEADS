@@ -59,8 +59,6 @@ class SDNTester:
 					self.switch_stat.add_baseline(stat_dict=self.switch_stat_dict)
 				if hasattr(self, 'controller_stat_dict'):
 					self.controller_stat.add_baseline(stat_dict=self.controller_stat_dict)
-		self.log.write('Controller stat baseline:\n' + str(self.controller_stat.base_stat) + '\n')
-		self.log.write('Switch stat baseline:\n' + str(self.switch_stat.base_stat) + '\n')
 
 		#Process Results
 		if config.veriflow_enabled:
@@ -71,6 +69,8 @@ class SDNTester:
 		#Log Thresholds
 		decor = '$' * 40 + ' Thresholds ' + '$' * 40 + '\n'
 		self.log.write(decor)
+		self.log.write('Controller stat baseline:\n' + str(self.controller_stat.base_stat) + '\n')
+		self.log.write('Switch stat baseline:\n' + str(self.switch_stat.base_stat) + '\n')
 		self.log.write("Veriflow Flips: %i\n" % (self.veriflow_flips_threshold))
 		self.log.write("Rule State: (%i)\n" % (len(self.rule_state_baseline)))
 		for r in self.rule_state_baseline:
@@ -82,6 +82,7 @@ class SDNTester:
 		return {'msg_types':self.msg_types}
 
 	def doTest(self,test_script, strategy):
+		self.msg_types = [] 
 		if hasattr(self, 'switch_stat_dict'):
 			del self.switch_stat_dict
 		if hasattr(self, 'controller_stat_dict'):
@@ -189,11 +190,12 @@ class SDNTester:
 		#Cleanup Any Mininet Remnants
 		self._cleanup()
 
-		if not self.creating_baseline and result[0]:
-			# Evaluate resource usage only if things have not gone wrong till here.
-			self._validate_stat('Switch', result, self.switch_stat, 'switch_stat_dict')
-			# Note that the following stat failure can overwrite the one above.
-			self._validate_stat('Controller', result, self.controller_stat, 'controller_stat_dict')
+		#Check Performance
+		sw_perf = ""
+		ctl_perf = ""
+		if not self.creating_baseline:
+			sw_perf = self._validate_stat('Switch', result, self.switch_stat, 'switch_stat_dict')
+			ctl_perf = self._validate_stat('Controller', result, self.controller_stat, 'controller_stat_dict')
 
 		#Log
 		self.log.flush()
@@ -201,6 +203,10 @@ class SDNTester:
 		self.log.write("********* Test Script output ********\n")
 		if test_std_err:
 			self.log.write(test_std_err)
+		self.log.write("*****************\n")
+		self.log.write("Switch Performance: %s\n" % ( sw_perf if len(sw_perf)>0 else "Expected"))
+		self.log.write("*****************\n")
+		self.log.write("Controller Performance: %s\n" % ( ctl_perf if len(ctl_perf)>0 else "Expected"))
 		self.log.write("*****************\n")
 		self.log.write("Veriflow Flips: %s\n" %(str(self.veriflow_flips)))
 		self.log.write("*****************\n")
@@ -233,13 +239,16 @@ class SDNTester:
 		if hasattr(self, stat_key):
 			is_valid, err_msg = self._eval_stat(statmgr, getattr(self, stat_key))
 			if not is_valid:
-				result[0] = False
-				result[1] = '%s stat: ' % name + err_msg
-				self.log.write('[procstat] %s process uses too much resource:\n' % name)
+				if result[0]:
+					result[0] = False
+					result[1] = '%s stat: ' % name + err_msg
+				self.log.write('[procstat] %s process exceeded performance threshold:\n' % name)
 				self.log.write(err_msg)
 				self.log.write('\n')
 			else:
-				self.log.write('[procstat] %s process uses normal amount of resource.\n' % name)
+				self.log.write('[procstat] %s process is within expected performance.\n' % name)
+			return err_msg
+		return ""
 
 	def startVms(self):
 		for c in self.controllers:
