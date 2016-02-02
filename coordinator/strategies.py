@@ -57,7 +57,7 @@ class StrategyGenerator:
 
 	def strategy_result(self, strat, res):
 		if res[0] == False:	
-			if strat not in self.failed_lst and res[1] != "System Failure":
+			if strat not in self.failed_lst:
 				#Most failed strategies will be retried once, to avoid false positives
 				self.failed_lst.append(strat)
 			else:
