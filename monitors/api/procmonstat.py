@@ -12,8 +12,8 @@ class ProcMonStat:
 
     # Description for each stat field.
     FIELD_DESC = {
-        'cpu_sec': 'Total amount of CPU time (sec)',
-        'total_sec': 'Total observation time (sec)',
+        'cpu_sec': 'Total CPU time (sec)',
+        'total_sec': 'Total exec time (sec)',
         'avg_cpu_percent': 'Average CPU usage (percent)',
         'peak_cpu_percent': 'Peak CPU usage (percent)',
         'avg_rss_size_kib': 'Average RAM usage (KiB)',
@@ -22,7 +22,7 @@ class ProcMonStat:
 
     # Raise alarm if [new value] / [base value] > [multiplier].
     DEFAULT_MULTIPLIERS = {
-        'cpu_sec': 1.5,
+        'cpu_sec': 2.0,
         # Omit fields that we don't care.
         # 'total_sec': 2,
         # 'avg_cpu_percent': 1,
@@ -61,7 +61,7 @@ class ProcMonStat:
         for k in self.multipliers:
             mx = stat_dict[k] / self.base_stat[k]
             if mx > self.multipliers[k]:
-                errors.append('%s exceeds limit by %f.' % (self.FIELD_DESC[k], mx - self.multipliers[k]))
+                errors.append('%s is %.3f%% of baseline.' % (self.FIELD_DESC[k], mx * 100))
 
         return len(errors) == 0, errors
 

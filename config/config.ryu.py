@@ -66,9 +66,9 @@ vm_ssh_key = system_home + "/config/ssh.key"
 
 # Proecss Monitor Config
 stat_switch_multipliers = {
-    'cpu_sec': 2.0,
+    'cpu_sec': 3.0,
 }
 
 stat_controller_multipliers = {
-    'cpu_sec': 2.5,
+    'cpu_sec': 3.0,
 }
