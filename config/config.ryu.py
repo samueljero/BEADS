@@ -65,10 +65,13 @@ vm_vnc_base = 1
 vm_ssh_key = system_home + "/config/ssh.key"
 
 # Proecss Monitor Config
+stat_baseline_nrounds = 20  # How many times to repeat baselining.
+stat_baseline_alg = 'max'  # Either 'mean' or 'max'
+
 stat_switch_multipliers = {
-    'cpu_sec': 3.0,
+    'cpu_sec': 2.5,
 }
 
 stat_controller_multipliers = {
-    'cpu_sec': 3.0,
+    'cpu_sec': 2.5,
 }
