@@ -41,7 +41,7 @@ class SDNTester:
 			mx = getattr(config, config_key_name)
 		else:
 			mx = ProcMonStat.DEFAULT_MULTIPLIERS
-		return ProcMonStat(multipliers=mx) 
+		return ProcMonStat(multipliers=mx, alg=config.stat_baseline_alg) 
 
 	def baseline(self, test_script):
 		self.creating_baseline = True
@@ -49,7 +49,7 @@ class SDNTester:
 		self.veriflow_flips = []
 
 		#Do Baseline
-		for i in range(0,3):
+		for i in range(0, config.stat_baseline_nrounds):
 			self.testnum = 0
 			res = self.doTest(test_script, ["*,*,*,*,*,CLEAR,*"])
 			if res[0] == False:
@@ -59,6 +59,9 @@ class SDNTester:
 					self.switch_stat.add_baseline(stat_dict=self.switch_stat_dict)
 				if hasattr(self, 'controller_stat_dict'):
 					self.controller_stat.add_baseline(stat_dict=self.controller_stat_dict)
+
+		self.switch_stat.calc_baseline()
+		self.controller_stat.calc_baseline()
 
 		#Process Results
 		if config.veriflow_enabled:
@@ -87,7 +90,7 @@ class SDNTester:
 			del self.switch_stat_dict
 		if hasattr(self, 'controller_stat_dict'):
 			del self.controller_stat_dict
-		result = [True, "Sucess!"]
+		result = [True, "Success!"]
 		self.log.write("##############################Starting Test " + str(self.testnum) + "###################################\n")
 		self.log.write(str(datetime.today()) + "\n")
 		#Create Address/Port strings
@@ -191,11 +194,8 @@ class SDNTester:
 		self._cleanup()
 
 		#Check Performance
-		sw_perf = ""
-		ctl_perf = ""
-		if not self.creating_baseline:
-			sw_perf = self._validate_stat('Switch', result, self.switch_stat, 'switch_stat_dict')
-			ctl_perf = self._validate_stat('Controller', result, self.controller_stat, 'controller_stat_dict')
+		sw_perf = '' if self.creating_baseline else self._validate_stat('Switch', result, self.switch_stat, 'switch_stat_dict')
+		ctl_perf = 'Controller stat: ' + repr(self.controller_stat_dict) if self.creating_baseline else self._validate_stat('Controller', result, self.controller_stat, 'controller_stat_dict')
 
 		#Log
 		self.log.flush()
@@ -204,9 +204,9 @@ class SDNTester:
 		if test_std_err:
 			self.log.write(test_std_err)
 		self.log.write("*****************\n")
-		self.log.write("Switch Performance: %s\n" % ( sw_perf if len(sw_perf)>0 else "Expected"))
+		self.log.write("Switch Performance: %s\n" % ( sw_perf if len(sw_perf) else "Expected"))
 		self.log.write("*****************\n")
-		self.log.write("Controller Performance: %s\n" % ( ctl_perf if len(ctl_perf)>0 else "Expected"))
+		self.log.write("Controller Performance: %s\n" % ( ctl_perf if len(ctl_perf) else "Expected"))
 		self.log.write("*****************\n")
 		self.log.write("Veriflow Flips: %s\n" %(str(self.veriflow_flips)))
 		self.log.write("*****************\n")
@@ -230,25 +230,19 @@ class SDNTester:
 		return result
 
 	def _eval_stat(self, statmgr, stat_dict):
-		if statmgr.base_count == 0:
-			return True, 'No baseline data.'
+		if not statmgr.base_ready:
+			return True, 'Baseline not yet calculated.'
 		test_stat, err_msgs = statmgr.test_stat(stat_dict=stat_dict)
 		return test_stat, '; '.join(err_msgs)
 
 	def _validate_stat(self, name, result, statmgr, stat_key):
 		if hasattr(self, stat_key):
 			is_valid, err_msg = self._eval_stat(statmgr, getattr(self, stat_key))
-			if not is_valid:
-				if result[0]:
-					result[0] = False
-					result[1] = '%s stat: ' % name + err_msg
-				self.log.write('[procstat] %s process exceeded performance threshold:\n' % name)
-				self.log.write(err_msg)
-				self.log.write('\n')
-			else:
-				self.log.write('[procstat] %s process is within expected performance.\n' % name)
+			if not is_valid and result[0]:
+				result[0] = False
+				result[1] = '%s stat: ' % name + err_msg
 			return err_msg
-		return ""
+		return ''
 
 	def startVms(self):
 		for c in self.controllers:
