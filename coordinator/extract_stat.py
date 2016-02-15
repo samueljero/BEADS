@@ -39,6 +39,8 @@ def print_stat(size_key, stat_dict):
   # Print the stat of each key.
   for k, v in stat_dict.items():
     print('\033[1m\033[92m' + k + '\033[0m')
+    print('  max:    ' + str(max(v)))
+    print('  min:    ' + str(min(v)))
     print('  mean:   ' + str(statistics.mean(v)))
     print('  median: ' + str(statistics.median(v)))
     print('  stdev:  ' + str(statistics.stdev(v)))
