@@ -51,7 +51,7 @@ class SDNTester:
 		#Do Baseline
 		for i in range(0, config.stat_baseline_nrounds):
 			self.testnum = 0
-			res = self.doTest(test_script, ["*,*,*,*,*,CLEAR,*"])
+			res = self.doTest(test_script, {'switch':None,'host':None})
 			if res[0] == False:
 				print "Warning!!! Baseline failed!!!"
 			else:
@@ -96,24 +96,22 @@ class SDNTester:
 		#Create Address/Port strings
 		controlleraddrs = list()
 		proxyaddrs = list()
-		proxyports = list()
 		for c in self.controllers:
 			controlleraddrs.append(mv.vm2ip(c) + ":" + str(config.controller_port))
-			proxyaddrs.append(config.proxy_addr + ":" + str(config.proxy_base_port + c))
-			proxyports.append(str(config.proxy_base_port + c))
+			proxyaddrs.append((config.proxy_addr, config.proxy_base_port + c))
 
 		#Start Controllers
 		if self._start_controllers() == False:
 			return (False,"System Failure")
 
 		#Start Proxy
-		proxy = self._start_proxy(controlleraddrs, proxyports)
+		proxy = self._start_proxy(controlleraddrs, proxyaddrs)
 		if proxy is None:
 			self._stop_controllers()
 			return (False, "System Failure")
 		
 		#Send Proxy Strategy
-		if self._send_proxy_strategy(strategy, proxyports) == False:
+		if self._send_proxy_strategy(strategy['switch'], proxyaddrs) == False:
 			self._stop_controllers()
 			proxy.terminate()
 			return (False, "System Failure")
@@ -122,9 +120,9 @@ class SDNTester:
 		veriflow = None
 		if config.veriflow_enabled == True:
 			vf_port = config.veriflow_base_port + self.controllers[0]
-			veriflow = self._start_veriflow(test_script, proxyports, vf_port)
+			veriflow = self._start_veriflow(test_script, proxyaddrs, vf_port)
 			proxyaddrs = list()
-			proxyaddrs.append(config.proxy_addr + ":" + str(vf_port))
+			proxyaddrs.append((config.proxy_addr,vf_port,confg.proxy_base_port+1))
 			if veriflow is None:
 				self._stop_controllers()
 				proxy.terminate()
@@ -132,7 +130,7 @@ class SDNTester:
 
 		#Do Test
 		test_std_err = None
-		res, test_std_err = self._call_test(test_script, proxyaddrs)
+		res, test_std_err = self._call_test(test_script, strategy['host'],proxyaddrs)
 		if res is None:
 			self._stop_controllers()
 			if veriflow is not None:
@@ -281,12 +279,12 @@ class SDNTester:
 		for m in self.mininet:
 			mv.stopvm(m)
 
-	def _start_proxy(self, controlleraddrs, proxyports):
+	def _start_proxy(self, controlleraddrs, proxyaddrs):
 		proxy = None
 		ts = time.time()
 		cmd = config.proxy_path + " -p " + str(config.proxy_com_port + self.mininet[0])
 		for c in range(0,len(controlleraddrs)):
-			cmd = cmd + " -c " + proxyports[c] + ":" + controlleraddrs[c]
+			cmd = cmd + " -c " + str(proxyaddrs[c][1]) + ":" + controlleraddrs[c]
 		self.log.write("Proxy CMD: " + cmd + "\n")
 		self.log.write("********* Proxy output ********\n")
 		self.log.flush()
@@ -302,16 +300,16 @@ class SDNTester:
 			self.log.flush()
 			return None
 		if config.enable_stat:
-			self.log.write('[timer] Start proxy: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Start proxy: %f sec.\n' % (time.time() - ts))
 		return proxy
 
-	def _start_veriflow(self, test_script, proxyports, vf_port):
+	def _start_veriflow(self, test_script, proxyaddrs, vf_port):
 		assert(len(self.controllers)==1)
 		veriflow = None
 		ts = time.time()
 		topo_file = config.veriflow_topo_path + os.path.splitext(os.path.basename(test_script.format(topo_delay='', controllers="").strip()))[0] + ".vft"
 		log_file = config.veriflow_log_path + config.veriflow_log_name.format(instance=self.mininet[0])
-		cmd = config.veriflow_path + " " + str(vf_port) + " 127.0.0.1  " + proxyports[0] + " " + topo_file + " " + log_file
+		cmd = config.veriflow_path + " " + str(vf_port) + " 127.0.0.1  " + str(proxyaddrs[0][1]) + " " + topo_file + " " + log_file
 		self.log.write("Veriflow CMD: " + cmd + "\n")
 		self.log.flush()
 		try:
@@ -326,7 +324,7 @@ class SDNTester:
 			self.log.flush()
 			return None
 		if config.enable_stat:
-			self.log.write('[timer] Start VeriFlow: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Start VeriFlow: %f sec.\n' % (time.time() - ts))
 		return veriflow
 
 	def _start_controllers(self):
@@ -347,28 +345,40 @@ class SDNTester:
 				self.log.write("Starting resource monitor for controller (" + mv.vm2ip(c) + ")...\n" + res.output)
 				self.log.flush()
 		if config.enable_stat:
-			self.log.write('[timer] Start all controllers: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Start all controllers: %f sec.\n' % (time.time() - ts))
 		return True
 
-	def _call_test(self, test_script, proxyaddrs):
+	def _call_test(self, test_script, cmd, proxyaddrs):
+                #Build Config and default command
+                cfg = {'controllers':proxyaddrs,'topo_discovery':config.topo_discovery_delay}
+                if cmd == None:
+                    cmd = [{'cmd':'basic'}]
+
 		ts = time.time()
 		res = None
-		proc = None
+                exec_res = None
 		m = self.mininet[0]
 		shell = spur.SshShell(hostname=mv.vm2ip(m), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
-		self.log.write("Starting Test: " + test_script.format(topo_delay=str(config.topo_discovery_delay), controllers=" ".join(proxyaddrs)) + "\n")
+		self.log.write("Starting Test: " + test_script + "\n")
+		self.log.write("Test Config: %s\n" % cfg)
+                for c in cmd:
+                    self.log.write("Test Command: %s\n" % c)
 		self.log.flush()
 		try:
-			proc = shell.run(["/bin/bash","-i" ,"-c", test_script.format(topo_delay=str(config.topo_discovery_delay), controllers=" ".join(proxyaddrs))])
-			res = eval(proc.output)
+			proc = shell.spawn(["/bin/bash","-i" ,"-c", test_script])
+                        proc.stdin_write("%s\n" % repr(cfg))
+                        for c in cmd:
+                            proc.stdin_write("%s\n" % repr(c))
+                        exec_res = proc.wait_for_result()
+			res = eval(exec_res.output)
 		except Exception as e:
 			print e
 			self.log.write("Exception: " + str(e) + "\n")
 			self.log.flush()
 			return (None, None)
 		if config.enable_stat:
-			self.log.write('[timer] Do all tests: %d sec.\n' % (time.time() - ts))
-		return (res, proc.stderr_output)
+			self.log.write('[timer] Do all tests: %f sec.\n' % (time.time() - ts))
+		return (res, exec_res.stderr_output)
 
 	def _stop_controllers(self):
 		ts = time.time()
@@ -390,7 +400,7 @@ class SDNTester:
 				self.log.flush()
 				return False
 		if config.enable_stat:
-			self.log.write('[timer] Stop controllers: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Stop controllers: %f sec.\n' % (time.time() - ts))
 		return True
 
 	def _stop_proxy(self, proxy):
@@ -402,7 +412,7 @@ class SDNTester:
 			return False
 		proxy.terminate()
 		if config.enable_stat:
-			self.log.write('[timer] Stop proxy: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Stop proxy: %f sec.\n' % (time.time() - ts))
 		return True
 
 	def _stop_veriflow(self, veriflow):
@@ -415,7 +425,7 @@ class SDNTester:
 				return False
 			veriflow.send_signal(2)
 		if config.enable_stat:
-			self.log.write('[timer] Stop VeriFlow: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Stop VeriFlow: %f sec.\n' % (time.time() - ts))
 		return True
 
 	def _cleanup(self):
@@ -423,11 +433,18 @@ class SDNTester:
 		shell = spur.SshShell(hostname=mv.vm2ip(self.mininet[0]), username = config.mininet_user, missing_host_key=spur.ssh.MissingHostKey.accept,private_key_file=config.vm_ssh_key)
 		res = shell.run(["/bin/bash","-i" ,"-c", config.mininet_cleanup_cmd])
 		if config.enable_stat:
-			self.log.write('[timer] Clean up mininet: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Clean up mininet: %f sec.\n' % (time.time() - ts))
 		return True
 
-	def _send_proxy_strategy(self, strategy, proxyports):
+	def _send_proxy_strategy(self, strategy, proxyaddrs):
+                #Default strategy
+                if strategy == None:
+                    strategy = ["*,*,*,*,*,CLEAR,*"]
 		ts = time.time()
+
+                #Extract port list from address list
+                proxyports = zip(*proxyaddrs)[1]
+                proxyports = [str(i) for i in proxyports]
 		for l in strategy:
 			if type(l) != str:
 				return False
@@ -440,7 +457,7 @@ class SDNTester:
 				self.log.flush()
 				return False
 		if config.enable_stat:
-			self.log.write('[timer] Send strategy: %d sec.\n' % (time.time() - ts))
+			self.log.write('[timer] Send strategy: %f sec.\n' % (time.time() - ts))
 		return True
 
 	def _waitListening(self,host='127.0.0.1', port=80, timeout=None, output=False):
@@ -580,6 +597,7 @@ class SDNTester:
 			return (False, "VeriFlow")
 		# When returning true, it must be modifiable
 		return [True, "Success!"]
+
 
 	def _check_rule_dump(self,raw):
 		state = []

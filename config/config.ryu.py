@@ -21,7 +21,7 @@ coord_test_controllers = range(0,topo_controllers)
 #coord_test_switches = range(1,topo_switches+1)
 coord_test_switches = [1,2]
 coord_test_list_iters = topo_ports_per_sw
-coord_test_case = "/root/test1.py {topo_delay} {controllers}"
+coord_test_case = "/root/test1.py"
 coord_checkpoint_file = system_home + "/logs/checkpoint.ck"
 
 #Proxy Section
