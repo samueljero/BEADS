@@ -3,6 +3,7 @@
 import string
 import os
 import sys
+import time
 import subprocess
 
 class HostController:
@@ -20,7 +21,7 @@ class HostController:
         self._launch_hosts()
 
         if "basic" in cmd['cmd']:
-            sleep(self.conf['topo_discovery'])
+            time.sleep(self.conf['topo_discovery'])
             results.append(self._ping_test())
             results.append(self._iperf_test())
         else:

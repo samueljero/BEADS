@@ -14,9 +14,9 @@ from threeTierTree import ThreeTierTree
 from fatTree import FatTree
 from fixedTree import FixedTree
 from hostController import HostController
-from time import time, sleep
 import os
 import sys
+import time
 
 sys.path.insert(0, '/root/monitors/api')
 
