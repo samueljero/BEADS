@@ -88,7 +88,11 @@ def main():
 
 
     #Dump process monitor output
-    stat_dict = procmon.stop(monitor_id, lg)
+    try:
+        stat_dict = procmon.stop(monitor_id, lg)
+    except Exception as e:
+        lg.output(str(e))
+        stat_dict = {}
     
     # Pull Rules
     raw = []

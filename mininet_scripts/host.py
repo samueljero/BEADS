@@ -7,24 +7,17 @@ import subprocess
 import os
 import sys
 import threading
-
-class Module: #Abstract Base class for protocol modules
-    def __init__(self,myeth,myip):
-        self.name = "base"
-        self.ip = myip
-        self.eth = myeth
-    def cmd(self, cmd):
-        pass
-    def start(self):
-        pass
-    def stop(self):
-        pass
+import SimpleHTTPServer
+import SocketServer
+from arp import Arp
+from module import Module
 
 class Ping(Module):
-    def __init__(self,myeth,myip):
+    def __init__(self,myeth,myip,myif):
         self.name = "ping"
         self.ip = myip
         self.eth = myeth
+        self.iface = myif
         self.timeout = 3
 
     def cmd(self, cmd):
@@ -78,10 +71,11 @@ class Ping(Module):
         return sent, received
 
 class Iperf(Module):
-    def __init__(self,myeth,myip):
+    def __init__(self,myeth,myip,myif):
         self.name = "iperf"
         self.ip = myip
         self.eth = myeth
+        self.iface = myif
         self._server = None
         self.timeout = 2
         self.kill_timeout = 15
@@ -166,10 +160,63 @@ class Iperf(Module):
         else:
             return 0
 
+class HttpTest(Module):
+    def __init__(self,myeth,myip,myif):
+        self.name = "http"
+        self.ip = myip
+        self.eth = myeth
+        self.iface = myif
+        self._server = None
+        self.timeout = 2
+        self.kill_timeout = 15
+    
+    def cmd(self, cmd):
+        if not isinstance(cmd,dict):
+            return False, "Not dict"
+        if not 'module' in cmd:
+            return False, "no module member"
+        if cmd['module'] is not "http":
+            return False, "not http module!"
+        if not 'command' in cmd:
+            return False, "no cmd member"
+        if not isinstance(cmd['command'],dict):
+            return False, "bad cmd member"
+        if "start-good-server" in cmd['command']:
+            return self._start_good_server()
+        elif "start-mal-server" in cmd['command']:
+            return self._start_mal_server()
+        elif "start-client" in cmd['command']:
+            return self._start_client(cmd)
+        elif "stop-server" in cmd['command']:
+            return self._stop_server()
+        else:
+            return False,"Invalid Command"
+
+    def _start_good_server(self):
+        return
+
+    def _start_mal_server(self):
+        return
+
+    def _start_client(self,cmd):
+        if not "dist" in cmd:
+            return False, "No destination"
+        return
+
+    def _stop_server(self):
+        return
+
+    def start(self):
+        return
+
+    def stop(self):
+        return
+    
+
 
 def send_response(rsp):
     try:
-        print "%s\n" % repr(rsp)
+        print "%s" % repr(rsp)
         sys.stdout.flush()
     except Exception as e:
         print e
@@ -219,7 +266,7 @@ def main(args):
             if "ping" in mods:
                 m = mods['ping']
             else:
-                m = Ping(mymac, myip)
+                m = Ping(mymac, myip, myiface)
                 mods['ping'] = m
             out = response(m.cmd(msg))
             send_response(out)
@@ -227,8 +274,16 @@ def main(args):
             if "iperf" in mods:
                 m = mods['iperf']
             else:
-                m = Iperf(mymac, myip)
+                m = Iperf(mymac, myip, myiface)
                 mods['iperf'] = m
+            out = response(m.cmd(msg))
+            send_response(out)
+        elif msg['module'] is "arp":
+            if "arp" in mods:
+                m = mods['arp']
+            else:
+                m = Arp(mymac,myip,myiface)
+                mods['arp'] = m
             out = response(m.cmd(msg))
             send_response(out)
         else:

@@ -14,18 +14,31 @@ class HostController:
         self.hosts = []
 
     def do_test(self):
+        running = True
         results = []
-        cmd = self._read_cmd()
-        if cmd is None:
-            return False
+        
         self._launch_hosts()
 
-        if "basic" in cmd['cmd']:
-            time.sleep(self.conf['topo_discovery'])
-            results.append(self._ping_test())
-            results.append(self._iperf_test())
-        else:
-            results = [False]
+        while running:
+            cmd = self._read_cmd()
+            if cmd is None:
+                results = [False]
+                running = False
+                continue
+
+            if "basic" in cmd['cmd']:
+                time.sleep(self.conf['topo_discovery'])
+                results.append(self._ping_test())
+                results.append(self._iperf_test())
+                running = False
+            elif "attack" in cmd['cmd']:
+                results.append(self._do_attack(cmd))
+            elif "done" in cmd['cmd']:
+                running = False
+            else:
+                results = [False]
+                running = False
+
         self._stop_hosts()
         return results
 
@@ -36,6 +49,8 @@ class HostController:
             cmd = eval(line)
         except Exception as e:
             self.log.output(str(e))
+        if not isinstance(cmd, dict):
+            return None
         if 'cmd' not in cmd:
             return None
         return cmd
@@ -144,3 +159,51 @@ class HostController:
                     else:
                         self.log.output("Server: %s\n" % out['output'][0])
         return ret
+
+    def _do_attack(self, cmd):
+        if "mal" not in cmd:
+            return False
+        if "vict" not in cmd:
+            return False
+        if "action" not in cmd:
+            return False
+        mal = cmd["mal"]
+        vict = cmd["vict"]
+        action = cmd["action"]
+
+        if not isinstance(mal, int) or mal < 0 or mal >= len(self.mininet.hosts):
+            return False
+        if not isinstance(vict, int) or vict < 0 or vict >= len(self.mininet.hosts):
+            return False
+        if not isinstance(action,dict):
+            return False
+
+        #Replace placeholders for attacker/victim IP/MAC
+        if "ids" in action and isinstance(action["ids"],list):
+            ids = action["ids"]
+            for i in range(0,len(ids)):
+                if ids[i] == None:
+                    continue
+                if "mal-ip" in ids[i]:
+                    ids[i] = self.mininet.hosts[mal].IP()
+                if "mal-mac" in ids[i]:
+                    ids[i] = self.mininet.hosts[mal].MAC()
+                if "vict-ip" in ids[i]:
+                    ids[i] = self.mininet.hosts[vict].IP()
+                if "vict-mac" in ids[i]:
+                    ids[i] = self.mininet.hosts[vict].MAC()
+            action["ids"] = ids
+        
+        m = self.mininet.hosts[mal]
+        m.write(repr(action)+"\n")
+
+        out = self._read_eval(m)
+        if out == None:
+            return False
+        if not isinstance(out,dict):
+            return False
+        if 'output' in out:
+            self.log.output("Attack: %s\n" % out["output"])
+        if 'code' not in out or out['code'] == False:
+            return False
+        return True
