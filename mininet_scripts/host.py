@@ -9,6 +9,7 @@ import sys
 import threading
 import SimpleHTTPServer
 import SocketServer
+import httplib
 from arp import Arp
 from module import Module
 
@@ -161,6 +162,22 @@ class Iperf(Module):
             return 0
 
 class HttpTest(Module):
+    class HttpServerThread(threading.Thread):
+        def __init__(self, port):
+            threading.Thread.__init__(self)
+            self.port = port
+            self.httpd = None
+
+        def run(self):
+            Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+            self.httpd = SocketServer.TCPServer(("", self.port), Handler)
+            self.httpd.serve_forever()
+
+        def quit(self):
+            if self.httpd is not None:
+                self.httpd.shutdown()
+                self.httpd.socket.close()
+            
     def __init__(self,myeth,myip,myif):
         self.name = "http"
         self.ip = myip
@@ -168,7 +185,10 @@ class HttpTest(Module):
         self.iface = myif
         self._server = None
         self.timeout = 2
-        self.kill_timeout = 15
+        self.saved_cwd = None
+        self.good_path = "/root/web/benign/"
+        self.bad_path = "/root/web/evil/"
+        self.port = 9000
     
     def cmd(self, cmd):
         if not isinstance(cmd,dict):
@@ -179,8 +199,6 @@ class HttpTest(Module):
             return False, "not http module!"
         if not 'command' in cmd:
             return False, "no cmd member"
-        if not isinstance(cmd['command'],dict):
-            return False, "bad cmd member"
         if "start-good-server" in cmd['command']:
             return self._start_good_server()
         elif "start-mal-server" in cmd['command']:
@@ -193,18 +211,59 @@ class HttpTest(Module):
             return False,"Invalid Command"
 
     def _start_good_server(self):
-        return
+        if self._server is not None:
+            self._stop_server()
+
+        self.saved_cwd = os.getcwd()
+        os.chdir(self.good_path)
+
+        self._server = HttpTest.HttpServerThread(self.port)
+        self._server.daemon = True
+        self._server.start()
+        return True, "Server Started"
 
     def _start_mal_server(self):
-        return
+        if self._server is not None:
+            self._stop_server()
+
+        self.saved_cwd = os.getcwd()
+        os.chdir(self.bad_path)
+
+        self._server = HttpTest.HttpServerThread(self.port)
+        self._server.daemon = True
+        self._server.start()
+        return True, "Server Started"
 
     def _start_client(self,cmd):
-        if not "dist" in cmd:
+        if not "dst" in cmd:
             return False, "No destination"
-        return
+        try:
+            conn = httplib.HTTPConnection(cmd["dst"],self.port,timeout=self.timeout)
+            conn.connect()
+            conn.request("GET","/")
+            r1 = conn.getresponse()
+            if r1.status != 200:
+                conn.close()
+                return False,"Error Code: %d" % r1.status
+            body = r1.read()
+            if "Evil" in body:
+                conn.close()
+                return False,"Spoofing Suceeded"
+            conn.close()
+        except Exception as e:
+            return False, "Error: %s" % str(e)
+        return True, "Test Passed"
 
     def _stop_server(self):
-        return
+        if self._server == None:
+            return True, "Server Not Running"
+
+        if self.saved_cwd is not None:
+            os.chdir(self.saved_cwd)
+
+        self._server.quit()
+        self._server = None
+        return True, "Server Stopped"
 
     def start(self):
         return
@@ -276,6 +335,14 @@ def main(args):
             else:
                 m = Iperf(mymac, myip, myiface)
                 mods['iperf'] = m
+            out = response(m.cmd(msg))
+            send_response(out)
+        elif msg['module'] is "http":
+            if "http" in mods:
+                m = mods["http"]
+            else:
+                m = HttpTest(mymac,myip,myiface)
+                mods['http'] = m
             out = response(m.cmd(msg))
             send_response(out)
         elif msg['module'] is "arp":

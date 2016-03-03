@@ -31,6 +31,9 @@ class HostController:
                 results.append(self._ping_test())
                 results.append(self._iperf_test())
                 running = False
+            elif "http-test" in cmd['cmd']:
+                if "mal" in cmd and "vict" in cmd:
+                    results.append(self._http_test(cmd["mal"], cmd["vict"]))
             elif "attack" in cmd['cmd']:
                 results.append(self._do_attack(cmd))
             elif "done" in cmd['cmd']:
@@ -160,6 +163,65 @@ class HostController:
                         self.log.output("Server: %s\n" % out['output'][0])
         return ret
 
+    def _http_test(self, mal, vict):
+        ret = True
+        if not isinstance(mal, int) or mal < 0 or mal >= len(self.mininet.hosts):
+            return False
+        if not isinstance(vict, int) or vict < 0 or vict >= len(self.mininet.hosts):
+            return False
+        self.log.output("\n\nHttp Test:\n")
+
+        #Start Servers
+        for h in self.mininet.hosts:
+            cmd = {'module':'http','command':'start-good-server'}
+            if h == self.mininet.hosts[mal]:
+                #Malicious Host
+                cmd = {'module':'http','command':'start-mal-server'}
+            h.write(repr(cmd)+"\n")
+            out = self._read_eval(h)
+            if out == None:
+                ret = False
+                self.log.output("http server failed to start on %s\n" % str(h))
+                break
+            if 'code' not in out or  out['code'] == False:
+                ret = False
+                self.log.output("http server failed to start on %s\n" % str(h))
+                break
+
+        #Start Client
+        for h in self.mininet.hosts:
+            if h == self.mininet.hosts[mal]:
+                continue
+            if h == self.mininet.hosts[vict]:
+                continue
+            cmd = {'module':'http','command':'start-client','dst':self.mininet.hosts[vict].IP()}
+            h.write(repr(cmd)+"\n")
+            out = self._read_eval(h)
+            if out == None:
+                ret = False
+                self.log.output("http client failed on %s\n" % str(h))
+            if 'code' not in out or  out['code'] == False:
+                ret = False
+            if 'output' in out:
+                self.log.output("Client: %s\n" % out['output'])
+
+        #Stop Servers
+        for h in self.mininet.hosts:
+            cmd = {'module':'http','command':'stop-server'}
+            h.write(repr(cmd)+"\n")
+            out = self._read_eval(h)
+            if out == None:
+                ret = False
+                self.log.output("http server failed to stop on %s\n" % str(h))
+                break
+            if 'code' not in out or  out['code'] == False:
+                ret = False
+                self.log.output("http server failed to stop on %s\n" % str(h))
+                break
+        return ret
+
+
+    
     def _do_attack(self, cmd):
         if "mal" not in cmd:
             return False
