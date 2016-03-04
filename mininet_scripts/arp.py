@@ -64,7 +64,7 @@ class Arp(Module):
             self.stop()
             return True, "Sucess"
         else:
-            False, "Invalid Command"
+            return False, "Invalid Command"
 
     def inject(self, cmd):
         start = None
@@ -87,7 +87,7 @@ class Arp(Module):
             num = 1
         if 'ids' in cmd:
             ids = cmd['ids']
-        if not isinstance(ids,(list,tuple)) and len(ids)!=6:
+        if not isinstance(ids,(list,tuple)) or len(ids)!=6:
             return False, "Invalid IDs"
         if 'type' in cmd:
             ptype = cmd['type']

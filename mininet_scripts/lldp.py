@@ -65,7 +65,7 @@ class LLDPAttack(Module):
             self.stop()
             return True, "Sucess"
         else:
-            False, "Invalid Command"
+            return False, "Invalid Command"
 
     def inject(self, cmd):
         start = None
@@ -88,7 +88,7 @@ class LLDPAttack(Module):
             num = 1
         if 'ids' in cmd:
             ids = cmd['ids']
-        if not isinstance(ids,(list,tuple)) and len(ids)!=6:
+        if not isinstance(ids,(list,tuple)) or len(ids) < 4:
             return False, "Invalid IDs"
         if 'type' in cmd:
             ptype = cmd['type']
@@ -128,7 +128,7 @@ class LLDPAttack(Module):
         else:
             chassisid.macaddr = self.eth
         pkt[LLDP].tlvlist.append(chassisid)
-        portid = LLDPPortID()
+        portid = LLDPPortId()
         portid.subtype = 2
         if ids[3] is not None:
             portid.value = ids[2]
@@ -176,7 +176,7 @@ class LLDPAttack(Module):
         else:
             chassisid.macaddr = self.eth
         pkt[LLDP].tlvlist.append(chassisid)
-        portid = LLDPPortID()
+        portid = LLDPPortId()
         portid.subtype = 2
         if ids[3] is not None:
             portid.value = ids[2]
@@ -223,7 +223,7 @@ class LLDPAttack(Module):
         else:
             chassisid.value = "dpid:" + self.eth
         pkt[LLDP].tlvlist.append(chassisid)
-        portid = LLDPPortID()
+        portid = LLDPPortId()
         portid.subtype = 2
         if ids[3] is not None:
             portid.value = str(ids[2])

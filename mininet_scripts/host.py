@@ -12,6 +12,7 @@ import SocketServer
 import httplib
 from arp import Arp
 from module import Module
+from lldp import LLDPAttack
 
 class Ping(Module):
     def __init__(self,myeth,myip,myif):
@@ -351,6 +352,14 @@ def main(args):
             else:
                 m = Arp(mymac,myip,myiface)
                 mods['arp'] = m
+            out = response(m.cmd(msg))
+            send_response(out)
+        elif msg['module'] is "lldp":
+            if "lldp" in mods:
+                m = mods['lldp']
+            else:
+                m = LLDPAttack(mymac,myip,myiface)
+                mods['lldp'] = m
             out = response(m.cmd(msg))
             send_response(out)
         else:

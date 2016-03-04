@@ -16,6 +16,19 @@ from scapy.fields import *
 from scapy.layers.l2 import Ether
 from scapy.layers.inet6 import IP6Field
 
+class ThreeBytesField(ByteField):
+    def __init__(self, name, default):
+        Field.__init__(self, name, default, "!I")
+        self.sz = 3
+    def addfield(self, pkt, s, val):
+        return s+struct.pack(self.fmt, self.i2m(pkt,val))[1:4]
+    def getfield(self, pkt, s):
+        return  s[3:], self.m2i(pkt, struct.unpack(self.fmt, "\x00"+s[:3])[0])
+
+class XThreeBytesField(ThreeBytesField,XByteField):
+    def i2repr(self, pkt, x):
+        return XByteField.i2repr(self, pkt, x)
+
 _LLDP_tlv_cls = {0: "LLDPDUEnd",
                  1: "LLDPChassisId",
                  2: "LLDPPortId",
