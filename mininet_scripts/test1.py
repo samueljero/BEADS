@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # Samuel Jero <sjero@purdue.edu>
-# Testing Script
+# Mininet Test Script
+# Command Structure:
+# {'controllers':[('10.0.0.1',6633)],'topo_discovery':10}
+# List of controllers and topology discovery delay
+# Then hostController.py is called and takes commands
 from mininet.net import Mininet
 from mininet.node import UserSwitch, OVSKernelSwitch, Controller, RemoteController
 from mininet.node import CPULimitedHost

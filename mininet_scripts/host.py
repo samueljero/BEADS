@@ -2,6 +2,11 @@
 #Samuel Jero <sjero@purdue.edu>
 #(Malicious) Host Program
 #Communication is via python dicts on stdin/stdout
+#Operation is separated into multiple modules, with each command targeting a specific module
+# Command structure:
+# {'module','',
+#   ...
+# }
 import re
 import subprocess
 import os
@@ -13,7 +18,12 @@ import httplib
 from arp import Arp
 from module import Module
 from lldp import LLDPAttack
+from tunnel import Tunnel
 
+#Command structure:
+# {'module':'ping',
+#   'dst': '10.0.1.1',
+# }
 class Ping(Module):
     def __init__(self,myeth,myip,myif):
         self.name = "ping"
@@ -72,6 +82,19 @@ class Ping(Module):
         sent, received = int(m.group(1)), int(m.group(2))
         return sent, received
 
+
+# Command Structure:
+# {'module':'iperf',
+#    'command':'',
+#    'dst':'10.0.1.1',
+#    'duration',:1,
+#    'timeout':10,
+# }
+# Commands:
+#   'start-server',
+#   'stop-server',
+#   'run-client'
+# 'dst','duration','timeout' only required for 'run-client' and 'timeout' is optional.
 class Iperf(Module):
     def __init__(self,myeth,myip,myif):
         self.name = "iperf"
@@ -162,6 +185,18 @@ class Iperf(Module):
         else:
             return 0
 
+# Command Structure:
+# {'module':'http',
+#    'command':'',
+#    'dst':'10.0.1.1',
+# }
+# Commands:
+#  'start-good-server',
+#  'start-mal-server',
+#  'start-client',
+#  'stop-server',
+#
+# 'dst' is only needed for 'start-client'
 class HttpTest(Module):
     class HttpServerThread(threading.Thread):
         def __init__(self, port):
@@ -360,6 +395,14 @@ def main(args):
             else:
                 m = LLDPAttack(mymac,myip,myiface)
                 mods['lldp'] = m
+            out = response(m.cmd(msg))
+            send_response(out)
+        elif msg['module'] is "tunnel":
+            if "tunnel" in mods:
+                m = mods['tunnel']
+            else:
+                m = Tunnel(mymac,myip,myiface)
+                mods['tunnel'] = m
             out = response(m.cmd(msg))
             send_response(out)
         else:

@@ -1,5 +1,32 @@
 #Samuel Jero <sjero@purdue.edu>
 #Host ARP manipulation Module
+#Command Structure:
+#{'module':'arp',
+#  'command':'',
+#  'type':"who-is",
+#  'ids':[],
+#  'freq':0.1,
+#  'num':1,
+#  'start':unix_time,
+#}
+#Commands:
+# 'inject',
+# 'stop'
+#
+# For 'inject':
+# 'type' determines the type of ARP packet, "who-is" or "is-at", defaults to "is-at"
+# 'ids' is a list of ids as follows:
+#  ids[0] is destination MAC in ethernet header, defaults to broadcast
+#  ids[1] is source MAC in ethernet header, defaults to host MAC
+#  ids[2] is ARP hardware source address, defaults to host MAC
+#  ids[3] is ARP protocol source address, defaults to host IP
+#  ids[4] is ARP hardware dest address, defaults to 00:00:00:00:00:00
+#  ids[5] is ARP protocol dest address, defaults to 0.0.0.0
+# 'freq', 'num', and 'start' are optional and control injection frequency (in seconds), injection number (defaults to 1), and start_time (defaults to immediately)
+#
+#
+# For 'stop':
+# No other components are needed. Stops all current injections immediately.
 import threading
 import time
 from scapy.layers.l2 import Ether,ARP

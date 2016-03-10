@@ -1,10 +1,51 @@
 # Samuel Jero <sjero@purdue.edu>
 # Host Controller
+# Communication on stdin/stdout
+# Reads commands until a 'basic' or 'done' command
+# Command Structure:
+# {'cmd':'',
+#    'mal':0,
+#    'vict':3,
+#    'sw':1,
+#    'action':'',
+#    'h1':1,
+#    'h2':2,
+#    'filter':'lldp',
+# }
+# Commands:
+#  'basic',
+#  'http-test',
+#  'attack',
+#  'tunnel',
+#  'done'
+#
+# For 'basic':
+# Executes basic all pairs ping and iperf tests. No additional arguments needed
+# 
+# For 'http-test':
+# Executes a host spoofing test using http servers. Requires 'mal' argument indicating malicious host and 'vict' argument indicating target of spoofing
+# 
+# For 'attack':
+# Executes the attack command specified in 'action' on the malicious host 'mal'.
+# If an 'ids' list is present in 'action', 'mal', 'sw', and 'vict' can be used to specify the substitution of particular key-words for malicious host/switch/victim IP/MAC/DPID values
+# In particular:
+#    'mal-ip' is replaced with malicious host IP
+#    'mal-mac' is replaced with malicious host MAC
+#    'vict-ip' is replaced with victim IP
+#    'vict-mac' is replaced with victim MAC
+#    'sw-dpid' is replaced with the switches DPID
+#
+# For 'tunnel':
+# Creates a tunnel between hosts 'h1' and 'h2' to tunnel packets matching filter 'filter'. 'filter' is optional and defaults to everything.
+#
+# For 'done':
+# Terminates testing. No additional arguments needed
 import string
 import os
 import sys
 import time
 import subprocess
+import tempfile
 
 class HostController:
     def __init__(self, net, log, conf):
@@ -12,6 +53,7 @@ class HostController:
         self.log = log
         self.conf = conf
         self.hosts = []
+        self.tunnels = []
 
     def do_test(self):
         running = True
@@ -36,6 +78,8 @@ class HostController:
                     results.append(self._http_test(cmd["mal"], cmd["vict"]))
             elif "attack" in cmd['cmd']:
                 results.append(self._do_attack(cmd))
+            elif "tunnel" in cmd['cmd']:
+                results.append(self._do_tunnel(cmd))
             elif "done" in cmd['cmd']:
                 running = False
             else:
@@ -43,6 +87,7 @@ class HostController:
                 running = False
 
         self._stop_hosts()
+        self._cleanup()
         return results
 
     def _read_cmd(self):
@@ -223,19 +268,25 @@ class HostController:
 
     
     def _do_attack(self, cmd):
+        vict = 0
+        sw = 0
         if "mal" not in cmd:
-            return False
-        if "vict" not in cmd:
             return False
         if "action" not in cmd:
             return False
+        if "vict"  in cmd:
+            vict = cmd['vict']
+        if "sw" in cmd:
+            sw = cmd['sw']
         mal = cmd["mal"]
-        vict = cmd["vict"]
         action = cmd["action"]
+
 
         if not isinstance(mal, int) or mal < 0 or mal >= len(self.mininet.hosts):
             return False
         if not isinstance(vict, int) or vict < 0 or vict >= len(self.mininet.hosts):
+            return False
+        if not isinstance(sw, int) or sw < 0 or sw >= len(self.mininet.switches):
             return False
         if not isinstance(action,dict):
             return False
@@ -254,6 +305,8 @@ class HostController:
                     ids[i] = self.mininet.hosts[vict].IP()
                 if "vict-mac" in ids[i]:
                     ids[i] = self.mininet.hosts[vict].MAC()
+                if "sw-dpid" in ids[i]:
+                    ids[i] = self.mininet.switches[sw].dpid
             action["ids"] = ids
         
         m = self.mininet.hosts[mal]
@@ -269,3 +322,69 @@ class HostController:
         if 'code' not in out or out['code'] == False:
             return False
         return True
+
+    def _do_tunnel(self,cmd):
+        if "h1" not in cmd or "h2" not in cmd:
+            return False
+
+        h1 = cmd["h1"]
+        h2 = cmd["h2"]
+
+        if not isinstance(h1, int) or h1 < 0 or h1 >= len(self.mininet.hosts):
+            return False
+        if not isinstance(h2, int) or h2 < 0 or h2 >= len(self.mininet.hosts):
+            return False
+
+        filt = None
+        if 'filter' in cmd:
+            filt = cmd['filter']
+
+        fifo1 = None
+        fifo2 = None
+        try:
+            fifo1 = tempfile.mktemp()
+            os.mkfifo(fifo1)
+            fifo2 = tempfile.mktemp()
+            os.mkfifo(fifo2)
+        except Exception as e:
+            print str(e)
+            return False
+
+        self.tunnels.append((fifo1,fifo2))
+
+        action = {'module':'tunnel','command':'start','read':fifo1,'write':fifo2}
+        if filt:
+            action['filter']=filt
+        m = self.mininet.hosts[h1]
+        m.write(repr(action)+"\n")
+        out = self._read_eval(m)
+        if out == None:
+            return False
+        if not isinstance(out,dict):
+            return False
+        if 'output' in out:
+            self.log.output("Tunnel: %s\n" % out["output"])
+        if 'code' not in out or out['code'] == False:
+            return False
+        
+        action = {'module':'tunnel','command':'start','read':fifo2,'write':fifo1}
+        if filt:
+            action['filter']=filt
+        m = self.mininet.hosts[h2]
+        m.write(repr(action)+"\n")
+        out = self._read_eval(m)
+        if out == None:
+            return False
+        if not isinstance(out,dict):
+            return False
+        if 'output' in out:
+            self.log.output("Tunnel: %s\n" % out["output"])
+        if 'code' not in out or out['code'] == False:
+            return False
+
+        return True
+
+    def _cleanup(self):
+        for t in self.tunnels:
+            os.unlink(t[0])
+            os.unlink(t[1])
