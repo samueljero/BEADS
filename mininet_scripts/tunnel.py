@@ -22,10 +22,14 @@
 import threading
 import struct
 import socket
+import os
 from lldp_layer import *
 from scapy.sendrecv import sendp
 from scapy.config import conf
 from module import Module
+from scapy.layers.inet import IP
+from scapy.layers.l2 import Ether
+from new_arch import L2Socket
 
 class SendThread(threading.Thread):
     def __init__(self,iface,fifo):
@@ -34,6 +38,11 @@ class SendThread(threading.Thread):
         self.fifoname = fifo
         self.fifo = None
         self.running = True
+        self.debug = False
+        if self.debug:
+            self.log = open("/tmp/snd"+str(os.getpid())+".log","w")
+        else:
+            self.log = None
 
     def run(self):
         self.fifo = open(self.fifoname,"r")
@@ -45,6 +54,11 @@ class SendThread(threading.Thread):
             if len(pkt)==0:
                 break
 
+            pkt = Ether(pkt)
+            
+            if self.debug and self.log:
+                self.log.write("%s\n" % pkt.summary())
+            
             try:
                 sendp(pkt,iface=self.iface,verbose=False)
             except Exception as e:
@@ -56,8 +70,8 @@ class SendThread(threading.Thread):
         data = ""
         
         #Wait for Length
-        while (len(data) < 3):
-            data = self.fifo.recv(4,socket.MSG_PEEK)
+        while (len(data) < 2):
+            data = self.fifo.read(2)
             if len(data) == 0:
                 self.fifo.close()
                 return ""
@@ -74,15 +88,12 @@ class SendThread(threading.Thread):
         msg = ""
         mlen = length
         while(len(msg) < mlen):
-            data = self.fifo.recv(length)
+            data = self.fifo.read(length)
             if len(data) == 0:
                  self.fifo.close()
                  return ""
             msg += data
             length -= len(data)
-
-        #Process Message
-        msg = msg[2:]
         
         return msg
 
@@ -101,18 +112,23 @@ class RecvThread(threading.Thread):
         self.fifo = None
         self.running = True
         self.sock = None
+        self.debug = False
+        if self.debug:
+            self.log = open("/tmp/rcv"+str(os.getpid())+".log","w")
+        else:
+            self.log = None
 
     def run(self):
         self.fifo = open(self.fifoname,"w")
         if not self.fifo:
             return 1
         
-        self.sock = conf.L2sock(iface=self.iface,promisc=True,filter=self.filt)
+        self.sock = L2Socket(iface=self.iface,promisc=True,filter=self.filt)
 
         while self.running:
             pkt = None
             try:
-                pkt = self.sock.recv()
+                pkt = self.sock.recv(65535)
             except Exception as e:
                 print str(e)
             if pkt == None:
@@ -120,22 +136,27 @@ class RecvThread(threading.Thread):
             if len(pkt) == 0:
                 break
 
+            if self.debug and self.log:
+                self.log.write("%s\n" % pkt.summary())
+
             msg = str(pkt)
-            self._fifo_send(msg)
+            if not self._fifo_send(msg):
+                break
         self.fifo.close()
         self.sock.close()
         return 0
 
     def _fifo_send(self, msg):
-        snd = struct.pack("!H",len(msg) + 2)
+        snd = struct.pack("!H",len(msg))
         snd += msg
-        self.fifo.send(snd)
+        try:
+            self.fifo.write(snd)
+        except Exception as e:
+            return False
         return True
 
     def quit(self):
         self.running = False
-        if self.fifo:
-            self.fifo.close()
         if self.sock:
             self.sock.close()
         return
