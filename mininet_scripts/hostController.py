@@ -14,6 +14,9 @@
 # }
 # Commands:
 #  'basic',
+#  'iperf-test',
+#  'ping-test',
+#  'wait',
 #  'http-test',
 #  'attack',
 #  'tunnel',
@@ -21,6 +24,15 @@
 #
 # For 'basic':
 # Executes basic all pairs ping and iperf tests. No additional arguments needed
+#
+# For 'iperf-test':
+# Executes an all pairs iperf test. No additional arguments required
+#
+# For 'ping-test':
+# Executes an all pairs ping test. No additional arguments required
+#
+# For 'wait':
+# Waits for topology discovery delay to complete. No additional arguments required
 # 
 # For 'http-test':
 # Executes a host spoofing test using http servers. Requires 'mal' argument indicating malicious host and 'vict' argument indicating target of spoofing
@@ -73,6 +85,12 @@ class HostController:
                 results.append(self._ping_test())
                 results.append(self._iperf_test())
                 running = False
+            elif "wait" in cmd['cmd']:
+                time.sleep(self.conf['topo_discovery'])
+            elif "ping-test" in cmd['cmd']:
+                results.append(self._ping_test())
+            elif "iperf-test" in cmd['cmd']:
+                results.append(self._iperf_test())
             elif "http-test" in cmd['cmd']:
                 if "mal" in cmd and "vict" in cmd:
                     results.append(self._http_test(cmd["mal"], cmd["vict"]))

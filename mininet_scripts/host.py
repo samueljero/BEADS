@@ -172,6 +172,7 @@ class Iperf(Module):
     @staticmethod
     def _timeout_func():
         os.system("killall iperf")
+        os.system("killall -9 iperf")
 
     @staticmethod
     def _parseIperf(iperfOutput):
@@ -198,6 +199,10 @@ class Iperf(Module):
 #
 # 'dst' is only needed for 'start-client'
 class HttpTest(Module):
+    class handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+	def log_message(self, format, *args):
+		pass
+
     class HttpServerThread(threading.Thread):
         def __init__(self, port):
             threading.Thread.__init__(self)
@@ -205,7 +210,7 @@ class HttpTest(Module):
             self.httpd = None
 
         def run(self):
-            Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+            Handler = HttpTest.handler
             self.httpd = SocketServer.TCPServer(("", self.port), Handler)
             self.httpd.serve_forever()
 

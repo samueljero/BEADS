@@ -49,6 +49,10 @@ class SendThread(threading.Thread):
         if not self.fifo:
             return 1
 
+        if self.debug and self.log:
+            self.log.write("Ready to read\n")
+	    self.log.flush()
+
         while self.running:
             pkt = self._fifo_recv()
             if len(pkt)==0:
@@ -58,6 +62,7 @@ class SendThread(threading.Thread):
             
             if self.debug and self.log:
                 self.log.write("%s\n" % pkt.summary())
+		self.log.flush()
             
             try:
                 sendp(pkt,iface=self.iface,verbose=False)
@@ -125,6 +130,10 @@ class RecvThread(threading.Thread):
         
         self.sock = L2Socket(iface=self.iface,promisc=True,filter=self.filt)
 
+        if self.debug and self.log:
+            self.log.write("Ready to read\n")
+	    self.log.flush()
+
         while self.running:
             pkt = None
             try:
@@ -138,6 +147,7 @@ class RecvThread(threading.Thread):
 
             if self.debug and self.log:
                 self.log.write("%s\n" % pkt.summary())
+		self.log.flush()
 
             msg = str(pkt)
             if not self._fifo_send(msg):
@@ -151,6 +161,7 @@ class RecvThread(threading.Thread):
         snd += msg
         try:
             self.fifo.write(snd)
+	    self.fifo.flush()
         except Exception as e:
             return False
         return True
