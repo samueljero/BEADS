@@ -85,6 +85,8 @@ class ProcMonStat:
         errors = []
 
         for k in self.multipliers:
+            if k not in stat_dict or k not in self.base_stat:
+                continue
             mx = stat_dict[k] / self.base_stat[k]
             if mx > self.multipliers[k]:
                 errors.append('%s is %.3f%% of baseline' % (self.FIELD_DESC[k], mx * 100))
