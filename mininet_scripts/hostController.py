@@ -11,6 +11,7 @@
 #    'h1':1,
 #    'h2':2,
 #    'filter':'lldp',
+#    'layer':1,
 # }
 # Commands:
 #  'basic',
@@ -18,6 +19,7 @@
 #  'ping-test',
 #  'wait',
 #  'http-test',
+#  'magic-test',
 #  'attack',
 #  'tunnel',
 #  'done'
@@ -36,6 +38,10 @@
 # 
 # For 'http-test':
 # Executes a host spoofing test using http servers. Requires 'mal' argument indicating malicious host and 'vict' argument indicating target of spoofing
+#
+# For 'magic-test':
+# Executes a spoofing test by injecting magic packets and watching where they show up. Requires 'mal' argument indicating malicious host, 'vict' argument indicating target of spoofing, and 'layer'
+#indicating what layers to include (1=Ethernet,2=Ethernet+IP)
 # 
 # For 'attack':
 # Executes the attack command specified in 'action' on the malicious host 'mal'.
@@ -94,6 +100,9 @@ class HostController:
             elif "http-test" in cmd['cmd']:
                 if "mal" in cmd and "vict" in cmd:
                     results.append(self._http_test(cmd["mal"], cmd["vict"]))
+            elif "magic-test" in cmd['cmd']:
+                if "mal" in cmd and "vict" in cmd and "layer" in cmd:
+                    results.append(self._magic_test(cmd["mal"], cmd["vict"], cmd['layer']))
             elif "attack" in cmd['cmd']:
                 results.append(self._do_attack(cmd))
             elif "tunnel" in cmd['cmd']:
@@ -283,7 +292,77 @@ class HostController:
                 break
         return ret
 
+    def _magic_test(self, mal, vict, layer):
+        ret = True
+        if not isinstance(mal, int) or mal < 0 or mal >= len(self.mininet.hosts):
+            return False
+        if not isinstance(vict, int) or vict < 0 or vict >= len(self.mininet.hosts):
+            return False
+        if not isinstance(layer, int) or layer < 1 or layer > 2:
+            return False
+        self.log.output("\n\nMagic Packet Test:\n")
 
+        #Start Listeners
+        for h in self.mininet.hosts:
+            cmd = {'module':'magic','command':'listen'}
+            h.write(repr(cmd)+"\n")
+            out = self._read_eval(h)
+            if out == None:
+                ret = False
+                self.log.output("magic packet listener failed to start on %s\n" % str(h))
+                break
+            if 'code' not in out or  out['code'] == False:
+                ret = False
+                self.log.output("magic packet listener failed to start on %s\n" % str(h))
+                break
+
+        #Start Injections
+        for h in self.mininet.hosts:
+            if h == self.mininet.hosts[vict]:
+                continue
+            if h == self.mininet.hosts[mal]:
+                continue
+            self.log.output("Injecting packets at %s...\n" % str(h))
+            dest = None
+            if layer == 1:
+                dest = self.mininet.hosts[vict].MAC()
+            elif layer == 2:
+                dest = self.mininet.hosts[vict].IP()
+            cmd = {'module':'magic','command':'inject','layer':layer,'dest':dest}
+            h.write(repr(cmd)+"\n")
+            out = self._read_eval(h)
+            if out == None:
+                ret = False
+                self.log.output("magic packet injector failed on  %s\n" % str(h))
+                break
+            if 'code' not in out or  out['code'] == False:
+                ret = False
+                self.log.output("magic packet injector failed on %s\n" % str(h))
+                break
+
+        #Get Reports
+        for h in self.mininet.hosts:
+            cmd = {'module':'magic','command':'report'}
+            h.write(repr(cmd)+"\n")
+            out = self._read_eval(h)
+            if out == None:
+                ret = False
+                self.log.output("failed to collect report on %s\n" % str(h))
+                break
+            if 'code' not in out or  out['code'] == False:
+                ret = False
+                self.log.output("failed to collect report on %s\n" % str(h))
+                break
+            if 'output' in out:
+                if not isinstance(out['output'],int):
+                    ret = False
+                    break
+                self.log.output("Magic packets at host %s: %d\n" % (str(h),out['output']))
+                if h != self.mininet.hosts[vict] and out['output'] > 0:
+                    ret = False
+        return ret
+                    
+                
     
     def _do_attack(self, cmd):
         vict = 0

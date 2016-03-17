@@ -19,6 +19,7 @@ from arp import Arp
 from module import Module
 from lldp import LLDPAttack
 from tunnel import Tunnel
+from magic_test import Magic
 
 #Command structure:
 # {'module':'ping',
@@ -408,6 +409,14 @@ def main(args):
             else:
                 m = Tunnel(mymac,myip,myiface)
                 mods['tunnel'] = m
+            out = response(m.cmd(msg))
+            send_response(out)
+        elif msg['module'] is "magic":
+            if "magic" in mods:
+                m = mods["magic"]
+            else:
+                m = Magic(mymac,myip,myiface)
+                mods["magic"] = m
             out = response(m.cmd(msg))
             send_response(out)
         else:
