@@ -121,22 +121,43 @@ def query_next():
 
 def handle_strat(line, ln_no, instfiles):
 	global prior_log_choice, prior_raw_choice, term_type, opt_break
-	res = line[0]
-	time = line[1]
-	test = line[2]
-	try:
-		strat = eval(line[3])
-	except exception as e:
-		print e
-		return
-	reason = line[4]
-	print "\n\n\n\n"
-	print "Num: " + str(ln_no)
-	for s in strat:
-		print "Strategy: " + strategies.StrategyGenerator.pretty_print_switch_strat(s)
-	print "Time: " + time
-	print "Result: " + res
-	print "Reason: " + reason
+	strat = None
+
+	if len(line) == 5:
+		#Old Strategy representation
+		res = line[0]
+		time = line[1]
+		test = line[2]
+		try:
+			strat = eval(line[3])
+		except exception as e:
+			print e
+			return
+		reason = line[4]
+		print "\n\n\n\n"
+		print "Num: " + str(ln_no)
+		for s in strat:
+			print "Strategy: " + strategies.StrategyGenerator.pretty_print_switch_strat(s)
+		print "Time: " + time
+		print "Result: " + res
+		print "Reason: " + reason
+
+
+	if len(line) == 4:
+		#New Strategy representation
+		res = line[0]
+		time = line[1]
+		strat = line[2]
+		reason = line[3]
+		print "\n\n\n\n"
+		print "Num: " + str(ln_no)
+		for s in strat['switch']:
+			print "Strategy: " + strategies.StrategyGenerator.pretty_print_switch_strat(s)
+		for s in strat['host']:
+			print "Strategy: %s\n" % str(s)
+		print "Time: " + time
+		print "Result: " + res
+		print "Reason: " + reason
 
 	if query_yes_no("View Log?", prior_log_choice):
 		prior_log_choice = "yes"
@@ -184,9 +205,19 @@ def do_find_known(knownlist, alllist):
 			except Exception as e:
 				continue
 
-			if len(fmt) == 5 and fmt[3] == k:
-				found = True
-				break
+			if len(fmt) == 5:
+				# Old style strategies
+				if fmt[3] == k:
+					found = True
+					break
+
+			if len(fmt) == 4:
+				# New style strategies
+				strat = fmt[2]
+				sw = strat['switch']
+				if str(sw) == k:
+					found = True
+					break
 		if not found:
 			print "Strategy Not Found: " + k
 			
@@ -264,16 +295,14 @@ def main(args):
 			i += 1
 			continue
 
-		if len(fmt) != 5:
-			print "Warning: Unexpected log version!!!!\n"
-			continue
-
-		if FilterResults:
-			if len(fmt) == 5 and fmt[3] in filterlist:
-				print "Found Known Strategy at: " + str(i)
-				i+=1
-				continue
-			if fix_bad and len(fmt)==5:
+		if len(fmt) == 5:
+			#Old-style strategies
+			if FilterResults:
+				if fmt[3] in filterlist:
+					print "Found Known Strategy at: " + str(i)
+					i+=1
+					continue
+			if fix_bad:
 				if "error_msg" in fmt[3]:
 					print "Found Bad Strategy at: " + str(i)
 					i+=1
@@ -289,7 +318,16 @@ def main(args):
 								t = True
 								break
 					if t:
-						continue				
+						continue		
+
+		if len(fmt) == 4:
+			#New-style strategies
+			if FilterResults:
+				sw_strat = fmt[2]['switch']
+				if str(sw_strat) in filterlist:
+					print "Found Known Strategy at: " + str(i)
+					i+=1
+					continue
 
 		handle_strat(fmt, i, instfiles)
 
