@@ -151,10 +151,12 @@ def handle_strat(line, ln_no, instfiles):
 		reason = line[3]
 		print "\n\n\n\n"
 		print "Num: " + str(ln_no)
-		for s in strat['switch']:
-			print "Strategy: " + strategies.StrategyGenerator.pretty_print_switch_strat(s)
-		for s in strat['host']:
-			print "Strategy: %s\n" % str(s)
+		if strat['switch'] is not None:
+			for s in strat['switch']:
+				print "Strategy: " + strategies.StrategyGenerator.pretty_print_switch_strat(s)
+		if strat['host'] is not None:
+			for s in strat['host']:
+				print "Strategy: %s\n" % str(s)
 		print "Time: " + time
 		print "Result: " + res
 		print "Reason: " + reason
