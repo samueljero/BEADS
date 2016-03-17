@@ -27,8 +27,6 @@ class StrategyGenerator:
 		self.strat_ptr = 0
 		self.failed_lst = []
 		self.failed_ptr = 0
-		self.strat_comb = {}
-		self.comb_reduce = 100
 
 
 	def next_strategy(self):
@@ -40,7 +38,7 @@ class StrategyGenerator:
 
 		#Check if all strategies have been tested
 		if (self.strat_ptr >= len(self.strat_lst)):
-			return []
+			return None
 
 		#Select next strategy
 		strat = self.strat_lst[self.strat_ptr]
@@ -56,40 +54,44 @@ class StrategyGenerator:
 		self.strat_lst.insert(self.strat_ptr + 1, strat)
 
 	def strategy_result(self, strat, res):
-		if res[0] == False:	
+		if res[0] == False:
 			if strat not in self.failed_lst:
 				#Most failed strategies will be retried once, to avoid false positives
 				self.failed_lst.append(strat)
 			else:
 				#Final failure, record in result file
-				lst = ["FAILED", str(datetime.today()), strat[0], str(strat[1]), res[1]]
+				lst = ["FAILED", str(datetime.today()),strat, res[1]]
 				self.results.write("%s\n" %(str(lst)))
 				self.results.flush()
 				self.lg.write("[%s] Strategy HARD FAILED: %s\n" % (str(datetime.today()),str(strat)))
 				print "[%s] Strategy HARD FAILED: %s" % (str(datetime.today()),str(strat))
 		else:
 			#Test Succeeded
-			#self.build_combination_strategies(strat)
 			pass
 
 	def strategy_feedback(self, strat, feedback, result = None):
 		changed = False
 		if type(feedback)!=dict:
 			return
+
+		#Switch Strategies
 		if 'msg_types' in feedback:
 			msg_types = feedback['msg_types']
 
 			#Prioritize Strategies with these messges types
-			if len(strat) == 0 or result is True: #Benign feedback or test passed
+			if result is None or result is True:
 				for st in self.single_strat:
+					switch_strat = st['switch']
+					priority = st['priority']
 					for t in msg_types:
-						if t in str(st[1]):
-							if st[2] < 100:
-								st[2] = 100
-								if len(strat) > 0:
+						if t in str(switch_strat):
+							if priority < 100:
+								priority = 100
+								st['priority'] = priority
+								if strat is not None:
 									#New message under this strategy
-									tmp = st
-									tmp[1] = tmp[1] + strat[1]
+									tmp = strat
+									tmp['switch'] = strat['switch'] + switch_strat
 									self.strat_lst.append(tmp)
 								else:
 									#Baseline messages
@@ -100,11 +102,12 @@ class StrategyGenerator:
 		if changed:
 			#Sort Strategies by priority
 			remaining = self.strat_lst[self.strat_ptr:]
-			remaining.sort(reverse=True, key = lambda s: s[2])
+			remaining.sort(reverse=True, key = lambda s: s['priority'])
 			self.strat_lst = self.strat_lst[0: self.strat_ptr] + remaining
 		return
 
 	def build_strategies(self):
+		#Switch Only Strategies
 		for pkt in openflow.openflow:
 			print "Creating Strategies for " + pkt[0] + "..."
 			mtype = pkt[0]
@@ -117,7 +120,7 @@ class StrategyGenerator:
 						act = t[1]
 						for v in t[2]:
 							strat = "{controllers[" +str(c) + "]}" + ",{sw},*,{pkt_type},*,{action}".format(sw=switch, pkt_type=mtype,action=act.format(v))
-							self.single_strat.append([config.coord_test_case, [strat], 0])
+							self.single_strat.append({'topo':config.coord_test_case, 'switch':[strat], 'host':None, 'priority':0})
 
 			#Message Modification Strategies
 			flds = self.build_field_list(fields)
@@ -128,7 +131,7 @@ class StrategyGenerator:
 							for m in manipulations.field_lies:
 								for v in manipulations.field_lie_values[f['type']]:
 									strat = "{controllers[" +str(c) + "]}" + ",{sw},*,{pkt_type},{fld},{action}".format(sw=switch, pkt_type=mtype,fld=f['field'],action=a[1].format(m,v))
-									self.single_strat.append([config.coord_test_case, [strat], 0])
+									self.single_strat.append({'topo':config.coord_test_case, 'switch':[strat], 'host':None, 'priority':0})
 		self.lg.write("[%s] Single Strategies: %d\n" % (str(datetime.today()),len(self.single_strat)))
 		print "[%s] Single Strategies: %d" % (str(datetime.today()),len(self.single_strat))
 
@@ -159,38 +162,23 @@ class StrategyGenerator:
 					lst.append({'field':string, 'type':f['type']})
 		return lst
 
-	def build_combination_strategies(self, strat):
-		if type(strat)!=list:
-			return
-
-		#Break into components
-		s1_script = strat[0]
-		s1_mod = strat[1]
-		s1_pri = strat[2]
-
-		#Handling only single modification -> double modification at the moment
-		if (len(s1_mod)!=1):
-			return
-
-		pkt_type = self._pkt_type_from_strat(s1_mod[0])
-		if pkt_type in self.strat_comb:
-			#Already exists
-			self.strat_comb[pkt_type].append(s1_mod[0])
-
-			if len(self.strat_comb[pkt_type])%self.comb_reduce == 0:
-				for k in self.strat_comb.keys():
-						for s in range(0, len(self.strat_comb[k])):
-							if s%self.comb_reduce == 0 and self.strat_comb[k][s] != s1_mod[0]:
-								self.strat_lst.append([config.coord_test_case, [self.strat_comb[k][s], s1_mod[0]], 50])
-								tmp = [config.coord_test_case, [self.strat_comb[k][s], s1_mod[0]], 50]
-		else:
-			#Doesn't exist, insert
-			tmp = []
-			tmp.append(s1_mod[0])
-			self.strat_comb[pkt_type] = tmp
 
 	@staticmethod
 	def pretty_print_strat(strat):
+		if type(strat) != dict:
+			#Old style strats, 3-17-2016
+			return StrategyGenerator.pretty_print_switch_strat(strat)
+		switch = strat['switch']
+		host = strat['host']
+		topo = strat['topo']
+		priority = 0
+		if priority in strat:
+			priority = strat['priority']
+
+		return "topo: {0}, switch: {1}, priority: {3}".format(str(topo),StrategyGenerator.pretty_print_switch_strat(switch),str(host),str(priority))
+
+	@staticmethod
+	def pretty_print_switch_strat(strat):
 		if type(strat) != str:
 			return ""
 		flist = strat.split(",")
@@ -217,7 +205,7 @@ class StrategyGenerator:
 
 		#Field
 		field = ""
-		field = StrategyGenerator._pretty_print_field(msgtype, flist[4])
+		field = StrategyGenerator._pretty_print_switch_field(msgtype, flist[4])
 
 		#Action
 		act = ""
@@ -230,7 +218,7 @@ class StrategyGenerator:
 		return "{0}, {1}, {2}, {3}, {4}, {5}, {6}".format(ctlr,sw,ver,msgtype,field,act,args)
 	
 	@staticmethod
-	def _pkt_type_from_strat(strat):
+	def _pkt_type_from_switch_strat(strat):
 		if type(strat)!=str:
 			return ""
 		flist = strat.split(",")
@@ -239,7 +227,7 @@ class StrategyGenerator:
 		return flist[3]
 
 	@staticmethod
-	def _pretty_print_field(msg_type, field):
+	def _pretty_print_switch_field(msg_type, field):
 		if type(field)!=str or type(msg_type)!=str:
 			return ""
 		if field == "*":
@@ -285,14 +273,12 @@ class StrategyGenerator:
 
 			#Create backup
 			bkup = {}
-			bkup['version'] = 2
+			bkup['version'] = 3
 			bkup['strat_lst'] = self.strat_lst
 			bkup['strat_ptr'] = self.strat_ptr
 			bkup['failed_lst'] = self.failed_lst
 			bkup['failed_ptr'] = self.failed_ptr
 			bkup['single_strat'] = self.single_strat
-			bkup['strat_comb'] = self.strat_comb
-			bkup['comb_reduce'] = self.comb_reduce
 
 			#Write backup
 			try:
@@ -317,7 +303,7 @@ class StrategyGenerator:
 			return False
 
 		#Restore Backup
-		if bkup['version'] != 2:
+		if bkup['version'] != 3:
 			print "Warning: Checkpoint is incompatable!!!"
 			f.close()
 			return False
@@ -326,8 +312,6 @@ class StrategyGenerator:
 		self.failed_lst = bkup['failed_lst']
 		self.failed_ptr = bkup['failed_ptr']
 		self.single_strat = bkup['single_strat']
-		self.strat_comb = bkup['strat_comb']
-		self.comb_reduce = bkup['comb_reduce']
 
 		f.close()
 		self.lg.write("[%s] Restore Finished\n" % (str(datetime.today())))
@@ -340,5 +324,5 @@ class StrategyGenerator:
 			if line.find("#") >= 0:
 				continue
 			strat = eval(line)
-			self.strat_lst.append([config.coord_test_case, strat, 10])
+			self.strat_lst.append(strat)
 

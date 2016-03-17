@@ -44,8 +44,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 	#Called on every new TCP connection
 	def handle(self):
 		instance = ""
-		strat = []
-		fb = None
+		strat = None
 
 		while True:
 			#Get Message
@@ -56,7 +55,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				print e
 			if msg == "":
 				#Connection Error!
-				if len(strat) > 0:
+				if strat is not None:
 					strat_lock.acquire()
 					strat_gen.return_strategy(strat)
 					strat_lock.release()
@@ -79,8 +78,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 			if msg['msg'] == 'READY':
 				#New Strategy Request
 				instance = msg['instance']
-				strat = []
-				fb = None
+				strat = None
 
 				#Check if Executor is new
 				exec_lst_lock.acquire()
@@ -102,7 +100,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 						self.request.send("%s\n"%(repr(msg)))
 					except Exception as e:
 						#Connection Error!
-						if len(strat) > 0:
+						if strat is not None:
 							strat_lock.acquire()
 							strat_gen.return_strategy(strat)
 							strat_lock.release()
@@ -118,7 +116,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				exec_lst_lock.release()
 	
 				#Get Next Strategy
-				if len(strat)==0:
+				if strat is None:
 					strat_lock.acquire()
 					strat = strat_gen.next_strategy()
 					strat_lock.release()
@@ -127,7 +125,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 					pass
 
 				#Check if Finished
-				if len(strat)==0:
+				if strat is None:
 					lg_lock.acquire()
 					lg.write("[%s] Finished Testing\n" % (str(datetime.today())))
 					print "[%s] Finished Testing" % (str(datetime.today()))
@@ -156,7 +154,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 					self.request.send("%s\n"%(repr(msg)))
 				except Exception as e:
 					#Connection Error!
-					if len(strat) > 0:
+					if strat is not None:
 						strat_lock.acquire()
 						strat_gen.return_strategy(strat)
 						strat_lock.release()
@@ -172,6 +170,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				#Testing Results
 				res = msg['value']
 				reason = msg['reason']
+				feedback = msg['feedback']
 
 				#Print Result
 				lg_lock.acquire()
@@ -181,17 +180,15 @@ class ExecutorHandler(ss.StreamRequestHandler):
 
 				#Process Result
 				strat_lock.acquire()
-				strat_gen.strategy_feedback(strat, fb, res)
+				strat_gen.strategy_feedback(strat, feedback, res)
 				strat_gen.strategy_result(strat, (res,reason))
 				strat_lock.release()
 
 				#Clear Current Strategy
-				strat = []
-				fb = None
+				strat = None
 			elif msg['msg'] == "FEEDBACK":
 				#Testing Feedback
 				data = msg['data']
-				fb = data
 
 				#Print Result
 				lg_lock.acquire()

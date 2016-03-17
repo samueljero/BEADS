@@ -164,24 +164,15 @@ def coordinated_tests(tester, instance,lg, addr):
 			strat = msg['data']
 			print "[%s] Test %d: %s" % (str(datetime.today()), num, str(strat))
 			lg.write("[%s] Test %d: %s\n" % (str(datetime.today()), num, str(strat)))
-			res = tester.doTest(strat[0],{'switch':strat[1],'host':None})
+			res = tester.doTest(strat)
 			num+=1
-
-			#Return Feedback
-			fb = tester.retrieve_feedback()
-			try:
-				msg = {'msg':'FEEDBACK','instance':"%s:%d"%(socket.gethostname(),instance), 'data':fb}
-				sock.send("%s\n" %(repr(msg)))
-			except Exception as e:
-				print "Failed to send on socket..."
-				sock = reconnect(addr)
-				continue
 			
-			#Return Result
+			#Return Result and Feedback
 			print "[%s] Test Result: %s, Reason: %s" %(str(datetime.today()),str(res[0]), res[1])
 			lg.write("[%s] Test Result: %s , Reason: %s\n" %(str(datetime.today()),str(res[0]), res[1]))
+			fb = tester.retrieve_feedback()
 			try:
-				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res[0], 'reason':res[1]}
+				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res[0], 'reason':res[1], 'feedback':fb}
 				sock.send("%s\n" %(repr(msg)))
 			except Exception as e:
 				print "Failed to send on socket..."
@@ -211,23 +202,23 @@ def coordinated_tests(tester, instance,lg, addr):
 def standalone_tests(tester):
 	print "Starting Tests..."
 	print "Test 1   " + str(datetime.today())
-	res = tester.doTest("/root/test1.py", {'switch':["*,*,*,*,*,CLEAR,*"],'host':None})
+	res = tester.doTest({'topo':'"/root/test1.py','switch':["*,*,*,*,*,CLEAR,*"],'host':None})
 	print "Test Result: " + str(res[0])
 	print "******"
 	print "Test 2   " + str(datetime.today())
-	res = tester.doTest("/root/test1.py", {'switch':["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=2&act==&val=1"],'host':None})
+	res = tester.doTest({'topo':'"/root/test1.py','switch':["{controllers[0]},3,*,of_packet_in,12,CLIE,mfield=12&mval=2&act==&val=1"],'host':None})
 	print "Test Result: " + str(res[0])
 	print "******"
 	print "Test 3   " + str(datetime.today())
-	res = tester.doTest("/root/test1.py", {'switch':["*,*,*,*,*,CLEAR,*"],'host':None})
+	res = tester.doTest({'topo':'"/root/test1.py','switch':["*,*,*,*,*,CLEAR,*"],'host':None})
 	print "Test Result: " + str(res[0])
 	print "******"
 	print "Test 4   " + str(datetime.today())
-	res = tester.doTest("/root/test1.py", {'switch':["{controllers[0]},3,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=2&ctl={controllers[0]}","{controllers[0]},2,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=3&ctl={controllers[0]}"], 'host':None})
+	res = tester.doTest({'topo':'"/root/test1.py','switch':["{controllers[0]},3,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=2&ctl={controllers[0]}","{controllers[0]},2,*,of_packet_in,12,CDIVERT,mfield=12&mval=3&p=100&sw=3&ctl={controllers[0]}"], 'host':None})
 	print "Test Result: " + str(res[0])
 	print "******"
 	print "Test 5   " + str(datetime.today())
-	res = tester.doTest("/root/test1.py", {'switch':["{controllers[0]},3,*,of_packet_out,7.1.1,CDIVERT,mfield=7.1.1&mval=2&p=100&sw=1&ctl={controllers[0]}"], 'host':None})
+	res = tester.doTest({'topo':'"/root/test1.py','switch':["{controllers[0]},3,*,of_packet_out,7.1.1,CDIVERT,mfield=7.1.1&mval=2&p=100&sw=1&ctl={controllers[0]}"], 'host':None})
 	print "Test Result: " + str(res[0])
 	print "******"
 
@@ -236,7 +227,7 @@ def infinite_loop(tester):
 	i = 0
 	while True:
 		print "Test " + str(i) + "   " +  str(datetime.today())
-		res = tester.doTest("/root/test1.py", {'switch':["*,*,*,*,*,CLEAR,*"],'host':[{'cmd':'basic'}]})
+		res = tester.doTest({'topo':'"/root/test1.py','switch':["*,*,*,*,*,CLEAR,*"],'host':[{'cmd':'basic'}]})
 		print "Test Result: " + str(res[0])
 		print "******"
 		i += 1

@@ -133,7 +133,7 @@ def handle_strat(line, ln_no, instfiles):
 	print "\n\n\n\n"
 	print "Num: " + str(ln_no)
 	for s in strat:
-		print "Strategy: " + strategies.StrategyGenerator.pretty_print_strat(s)
+		print "Strategy: " + strategies.StrategyGenerator.pretty_print_switch_strat(s)
 	print "Time: " + time
 	print "Result: " + res
 	print "Reason: " + reason
@@ -262,6 +262,10 @@ def main(args):
 		except Exception as e:
 			print e
 			i += 1
+			continue
+
+		if len(fmt) != 5:
+			print "Warning: Unexpected log version!!!!\n"
 			continue
 
 		if FilterResults:

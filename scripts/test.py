@@ -51,7 +51,7 @@ class SDNTester:
 		#Do Baseline
 		for i in range(0, config.stat_baseline_nrounds):
 			self.testnum = 0
-			res = self.doTest(test_script, {'switch':None,'host':None})
+			res = self.doTest({'switch':None,'host':None,'topo':test_script})
 			if res[0] == False:
 				print "Warning!!! Baseline failed!!!"
 			else:
@@ -84,7 +84,10 @@ class SDNTester:
 	def retrieve_feedback(self):
 		return {'msg_types':self.msg_types}
 
-	def doTest(self,test_script, strategy):
+	def doTest(self,strategy):
+		if 'topo' not in strategy:
+			return (False, "System Failure")
+		test_script = strategy['topo']
 		self.msg_types = [] 
 		if hasattr(self, 'switch_stat_dict'):
 			del self.switch_stat_dict
