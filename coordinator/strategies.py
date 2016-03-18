@@ -7,6 +7,7 @@ from datetime import datetime
 import openflow
 import manipulations
 import re
+import pprint
 from types import NoneType
 
 system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
@@ -92,7 +93,11 @@ class StrategyGenerator:
 									#New message under this strategy
 									tmp = strat
 									tmp['switch'] = strat['switch'] + switch_strat
-									self.strat_lst.append(tmp)
+                                                                        if len(tmp['switch'] > 2):
+                                                                            print "Warning. Possible runaway strategy"
+                                                                            print str(tmp)
+                                                                        else:
+									    self.strat_lst.append(tmp)
 								else:
 									#Baseline messages
 									self.strat_lst.append(st)
@@ -280,11 +285,15 @@ class StrategyGenerator:
 			bkup['failed_ptr'] = self.failed_ptr
 			bkup['single_strat'] = self.single_strat
 
+                        #Format
+                        pp = pprint.PrettyPrinter()
+                        fmtbkup = pp.pformat(bkup)
+
 			#Write backup
 			try:
 				self.ck_file.seek(0)
 				self.ck_file.truncate()
-				self.ck_file.writelines(repr(bkup))
+				self.ck_file.write(fmtbkup)
 				self.ck_file.flush()
 			except Exception as e:
 				print "[%s] Checkpoint Failed: %s" % (str(datetime.today()),str(e))
@@ -295,7 +304,8 @@ class StrategyGenerator:
 	def restore(self, f):
 		#Read backup
 		try:
-			inp = f.readline()
+			inp = f.readlines()
+                        inp = "\n".join(inp)
 			bkup = eval(inp)
 		except Exception as e:
 			print "[%s] Failed to read checkpoint: %s" % (str(datetime.today()),str(e))
