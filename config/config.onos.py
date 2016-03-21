@@ -65,8 +65,9 @@ vm_vnc_base = 1
 vm_ssh_key = system_home + "/config/ssh.key"
 
 # Proecss Monitor Config
-stat_baseline_nrounds = 10
+stat_baseline_nrounds = 5
 stat_baseline_alg = 'mean'  # Either 'mean' or 'max'
+stat_rebase_threshold = 0.1 # Rebase when stat is within +/- 10% of threshold.
 
 stat_switch_multipliers = {
     'cpu_sec': 1.5,

@@ -171,6 +171,7 @@ class ExecutorHandler(ss.StreamRequestHandler):
 				res = msg['value']
 				reason = msg['reason']
 				feedback = msg['feedback']
+				# rebase = msg['rebase']
 
 				#Print Result
 				lg_lock.acquire()

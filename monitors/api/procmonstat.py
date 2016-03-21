@@ -40,15 +40,20 @@ class ProcMonStat:
         'peak_rss_size_kib': 3.0
     }
 
-    def __init__(self, multipliers=DEFAULT_MULTIPLIERS, alg='max'):
+    # Default threshold for rebaselining. +/- 5% of failure threshold value.
+    DEFAULT_REBASE_THRESHOLD = 0.05
+
+    def __init__(self, multipliers=DEFAULT_MULTIPLIERS, alg='max', rebase_threshold=DEFAULT_MULTIPLIERS):
         """
         Initialize object with baseline data and multiplier.
         :param dict[str, float] multipliers: Raise threshold when stat KEY is VALUE times baseline.
         :param str alg: Algorithm for baselining. Either 'max' or 'mean'.
+        :param float rebase_threshold:
         """
         self.multipliers = multipliers
         self.base_stat = dict()
         self.base_ready = False
+        self.rebase_threshold = rebase_threshold
         self._alg = ProcMonStatAlg.MEAN if alg == 'mean' else ProcMonStatAlg.MAX
         self._base_history = {k: [] for k in multipliers}
 
@@ -60,7 +65,10 @@ class ProcMonStat:
         if not isinstance(stat_dict, dict):
             raise ValueError('Stat baseline must be a stat dict.')
         for k in self.multipliers:  # Only save numbers that matter.
-            self._base_history[k].append(stat_dict[k])
+            try:
+                self._base_history[k].append(stat_dict[k])
+            except KeyError as e:
+                raise ValueError('Failed to add baseline: key "' + str(e) + '" is missing.')
 
     def calc_baseline(self):
         """
@@ -74,6 +82,8 @@ class ProcMonStat:
                 avg = statistics.mean(self._base_history[k])
                 dev = statistics.stdev(self._base_history[k])
                 self.base_stat[k] = avg + dev + dev
+        for k in self._base_history:
+            self._base_history[k] = []   # Clear baseline history.
         self.base_ready = True
 
     def test_stat(self, stat_dict=None, stdout=None):
@@ -83,6 +93,7 @@ class ProcMonStat:
         if stdout is not None:
             stat_dict = self.extract_stat(stdout)
         errors = []
+        suggest_rebase = 0
 
         for k in self.multipliers:
             if k not in stat_dict or k not in self.base_stat:
@@ -90,8 +101,10 @@ class ProcMonStat:
             mx = stat_dict[k] / self.base_stat[k]
             if mx > self.multipliers[k]:
                 errors.append('%s is %.3f%% of baseline' % (self.FIELD_DESC[k], mx * 100))
+            if abs(mx - self.multipliers[k]) >= self.rebase_threshold:
+                suggest_rebase += 1
 
-        return len(errors) == 0, errors
+        return len(errors) == 0, errors, suggest_rebase
 
     @classmethod
     def extract_stat(cls, stdout):

@@ -104,7 +104,7 @@ def reconnect(addr):
 # readline() properly handles waiting for a full message before delivering it. On
 # error, an empty string is returned.
 # Arbitrary python can be passed back and forth with str=repr(data) and data=eval(str)
-def coordinated_tests(tester, instance,lg, addr):
+def coordinated_tests(tester, instance, lg, addr):
 	num = 1
 
 	#Connect
@@ -116,6 +116,7 @@ def coordinated_tests(tester, instance,lg, addr):
 	rf = sock.makefile()
 
 	#Loop Testing Strategies
+	baseline_msg = None
 	while True:
 		print "****************"
 		#Ask for Next Strategy
@@ -165,14 +166,22 @@ def coordinated_tests(tester, instance,lg, addr):
 			print "[%s] Test %d: %s" % (str(datetime.today()), num, str(strat))
 			lg.write("[%s] Test %d: %s\n" % (str(datetime.today()), num, str(strat)))
 			res = tester.doTest(strat)
+			# Check if rebaseline is suggested (0=for any metric).
+			if res[2] > 0:
+				s = "[%s] Rebaseline suggested. Value=%d." % (str(datetime.today()), res[2])
+				print s
+				lg.write(s + '\n')
+				tester.baseline(baseline_msg)
+				res = tester.doTest(strat) # Override the previous result.
 			num+=1
 			
 			#Return Result and Feedback
 			print "[%s] Test Result: %s, Reason: %s" %(str(datetime.today()),str(res[0]), res[1])
 			lg.write("[%s] Test Result: %s , Reason: %s\n" %(str(datetime.today()),str(res[0]), res[1]))
+
 			fb = tester.retrieve_feedback()
 			try:
-				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res[0], 'reason':res[1], 'feedback':fb}
+				msg = {'msg':'RESULT','instance':"%s:%d"%(socket.gethostname(),instance), 'value':res[0], 'reason':res[1], 'feedback':fb, 'rebase': res[2]}
 				sock.send("%s\n" %(repr(msg)))
 			except Exception as e:
 				print "Failed to send on socket..."
@@ -181,7 +190,8 @@ def coordinated_tests(tester, instance,lg, addr):
 		elif msg['msg'] == 'BASELINE':
 			print "[%s] Creating Baseline..." % (str(datetime.today()))
 			lg.write("[%s] Creating Baseline...\n" % (str(datetime.today())))
-			tester.baseline(msg['test'])
+			baseline_msg = msg['test']
+			tester.baseline(baseline_msg)
 
 			#Return Feedback
 			fb = tester.retrieve_feedback()
