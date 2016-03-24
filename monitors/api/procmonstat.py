@@ -43,7 +43,7 @@ class ProcMonStat:
     # Default threshold for rebaselining. +/- 5% of failure threshold value.
     DEFAULT_REBASE_THRESHOLD = 0.05
 
-    def __init__(self, multipliers=DEFAULT_MULTIPLIERS, alg='max', rebase_threshold=DEFAULT_MULTIPLIERS):
+    def __init__(self, multipliers=DEFAULT_MULTIPLIERS, alg='max', rebase_threshold=DEFAULT_REBASE_THRESHOLD):
         """
         Initialize object with baseline data and multiplier.
         :param dict[str, float] multipliers: Raise threshold when stat KEY is VALUE times baseline.
@@ -56,6 +56,7 @@ class ProcMonStat:
         self.rebase_threshold = rebase_threshold
         self._alg = ProcMonStatAlg.MEAN if alg == 'mean' else ProcMonStatAlg.MAX
         self._base_history = {k: [] for k in multipliers}
+        print 'Stat created: {alg=%s, multipliers=%s, rebase=%f}' % ('mean' if alg == 'mean' else 'max', str(multipliers), rebase_threshold)
 
     def add_baseline(self, stat_dict):
         """
@@ -68,7 +69,7 @@ class ProcMonStat:
             try:
                 self._base_history[k].append(stat_dict[k])
             except KeyError as e:
-                raise ValueError('Failed to add baseline: key "' + str(e) + '" is missing.')
+                raise ValueError('Failed to add baseline: key ' + str(e) + ' is missing.')
 
     def calc_baseline(self):
         """
@@ -98,10 +99,12 @@ class ProcMonStat:
         for k in self.multipliers:
             if k not in stat_dict or k not in self.base_stat:
                 continue
+            # print k, self.multipliers[k]
             mx = stat_dict[k] / self.base_stat[k]
+            # print mx
             if mx > self.multipliers[k]:
                 errors.append('%s is %.3f%% of baseline' % (self.FIELD_DESC[k], mx * 100))
-            if abs(mx - self.multipliers[k]) >= self.rebase_threshold:
+            if abs(mx - self.multipliers[k]) <= self.rebase_threshold:
                 suggest_rebase += 1
 
         return len(errors) == 0, errors, suggest_rebase
