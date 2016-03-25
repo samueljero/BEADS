@@ -91,11 +91,14 @@ class StrategyGenerator:
 								st['priority'] = priority
 								if strat is not None:
 									#New message under this strategy
-									tmp = strat
+									tmp = dict(strat)
 									tmp['switch'] = strat['switch'] + switch_strat
-                                                                        if len(tmp['switch'] > 2):
+                                                                        if not isinstance(tmp['switch'],dict) or not isinstance(tmp['switch'],list) or len(tmp['switch'] > 2):
                                                                             print "Warning. Possible runaway strategy"
                                                                             print str(tmp)
+                                                                            self.lg.write("Warning. Possible runaway strategy\n")
+                                                                            self.lg.write(str(tmp)+"\n")
+                                                                            self.lg.flush()
                                                                         else:
 									    self.strat_lst.append(tmp)
 								else:
