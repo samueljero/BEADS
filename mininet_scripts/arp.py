@@ -45,8 +45,9 @@ class ArpInjectThread(threading.Thread):
 
     def run(self):
         if self.start_time is not None:
-            sl = time.time() - self.start_time
-            time.sleep(sl)
+            sleeptime = float(self.start_time) - time.time()
+            if (sleeptime > 0):
+                time.sleep(sleeptime)
 
         while self.running:
             if self.num == 0:

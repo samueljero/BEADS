@@ -231,12 +231,26 @@ def standalone_tests(tester):
 	res = tester.doTest({'topo':'/root/test1.py','switch':["{controllers[0]},3,*,of_packet_out,7.1.1,CDIVERT,mfield=7.1.1&mval=2&p=100&sw=1&ctl={controllers[0]}"], 'host':None})
 	print "Test Result: " + str(res[0])
 	print "******"
+	print "Test 6   " + str(datetime.today())
+	res = tester.doTest({'topo':'/root/test1.py','switch':None, 'host':[{'cmd':'tunnel','h1':1,'h2':3,'filter':'lldp'},{'cmd':'basic'}]})
+	print "Test Result: " + str(res[0])
+	print "******"
+	print "Test 7   " + str(datetime.today())
+        now = str(time.time()+30)
+	res = tester.doTest({'topo':'/root/test1.py','switch':None, 'host':[{'cmd':'attack','action':{'module':'arp','command':'inject','type':'is-at','ids':[None,None,None,'vict-ip','mal-mac','vict-ip'],'start':now, 'freq':0.1, 'num':100},'mal':1,'vict':3},{'cmd':'basic'}]})
+	print "Test Result: " + str(res[0])
+	print "******"
+	print "Test 8   " + str(datetime.today())
+	res = tester.doTest({'topo':'/root/test1.py','switch':None, 'host':None, 'controller':{'action':'kill','time':45}})
+	print "Test Result: " + str(res[0])
+	print "******"
 
 def infinite_loop(tester):
 	print "Starting Tests..."
 	i = 0
 	while True:
 		print "Test " + str(i) + "   " +  str(datetime.today())
+                now = str(time.time()+30)
 		res = tester.doTest({'topo':'/root/test1.py','switch':["*,*,*,*,*,CLEAR,*"],'host':[{'cmd':'basic'}]})
 		print "Test Result: " + str(res[0])
 		print "******"
