@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 import socket
 import struct
+import threading
 
 
 from . import system_home, lib_path, config_path, log_path, config, ProcMonStat
@@ -39,6 +40,9 @@ class SDNTester:
         self.switch_stat = self._build_stat_obj('stat_switch_multipliers')
         self.controller_stat = self._build_stat_obj(
             'stat_controller_multipliers')
+        self.controllers_running = False
+        self.proxy_running = False
+        self.timers = []
 
     def _build_stat_obj(self, config_key_name):
         if hasattr(config, config_key_name):
@@ -145,6 +149,13 @@ class SDNTester:
             self._stop_controllers()
             proxy.terminate()
             return (False, "System Failure", 0)
+
+        # Initialize Controller strategies, if any
+        if 'controller' in strategy:
+            if self._handle_controller_actions(strategy['controller'], proxy) == False:
+               self._stop_controllers()
+               proxy.terminate()
+               return (False, "System Failure", 0)
 
         # VeriFlow
         veriflow = None
@@ -271,7 +282,7 @@ class SDNTester:
 
     def _eval_stat(self, statmgr, stat_dict):
         if not statmgr.base_ready:
-            return True, 'Baseline not yet calculated.'
+            return True, 'Baseline not yet calculated.', 0
         test_stat, err_msgs, suggest_rebase = statmgr.test_stat(
             stat_dict=stat_dict)
         return test_stat, '; '.join(err_msgs), suggest_rebase
@@ -362,6 +373,7 @@ class SDNTester:
         if config.enable_stat:
             self.log.write('[timer] Start proxy: %f sec.\n' %
                            (time.time() - ts))
+        self.proxy_running = True
         return proxy
 
     def _start_veriflow(self, test_script, proxyaddrs, vf_port):
@@ -420,6 +432,7 @@ class SDNTester:
         if config.enable_stat:
             self.log.write(
                 '[timer] Start all controllers: %f sec.\n' % (time.time() - ts))
+        self.controllers_running = True
         return True
 
     def _call_test(self, test_script, cmd, proxyaddrs):
@@ -457,6 +470,8 @@ class SDNTester:
         return [res, exec_res.stderr_output]
 
     def _stop_controllers(self):
+        if self.controllers_running is False:
+            return True
         ts = time.time()
         for c in self.controllers:
             shell = spur.SshShell(hostname=mv.vm2ip(c), username=config.controller_user,
@@ -483,9 +498,12 @@ class SDNTester:
         if config.enable_stat:
             self.log.write('[timer] Stop controllers: %f sec.\n' %
                            (time.time() - ts))
+        self.controllers_running = False
         return True
 
     def _stop_proxy(self, proxy):
+        if self.proxy_running is False:
+            return True
         ts = time.time()
         if proxy.poll() is not None:
             print "Proxy has crashed!!!\n"
@@ -496,6 +514,7 @@ class SDNTester:
         if config.enable_stat:
             self.log.write('[timer] Stop proxy: %f sec.\n' %
                            (time.time() - ts))
+        self.proxy_running = False
         return True
 
     def _stop_veriflow(self, veriflow):
@@ -523,6 +542,7 @@ class SDNTester:
         return True
 
     def _send_proxy_strategy(self, strategy, proxyaddrs):
+        strat = ""
         # Default strategy
         if strategy == None:
             strategy = ["*,*,*,*,*,CLEAR,*"]
@@ -532,9 +552,22 @@ class SDNTester:
         proxyports = zip(*proxyaddrs)[1]
         proxyports = [str(i) for i in proxyports]
         for l in strategy:
-            if type(l) != str:
+            if type(l) is dict:
+                if 'action' not in l:
+                    return False
+                strat = l['action']
+                if 'time' in l and l['time'] > 0.01:
+                    strat = dict(l)
+                    strat['time'] = 0
+                    tmr = threading.Timer(l['time'], self._send_proxy_strategy, [[strat],proxyaddrs])
+                    tmr.start()
+                    self.timers.append(tmr)
+                    continue
+            elif type(l) is str:
+                strat = l
+            else:
                 return False
-            cmd = l.format(controllers=proxyports)
+            cmd = strat.format(controllers=proxyports)
             self.log.write("Strategy CMD: " + cmd + "\n")
             self.log.flush()
             res = self._proxy_communicate(
@@ -634,6 +667,9 @@ class SDNTester:
         return True
 
     def _get_msg_types(self, addr):
+        if self.proxy_running is False:
+            self.msg_types = []
+            return True
         resp = self._proxy_communicate(
             addr, "*,*,*,*,*,PKT_TYPES,*", wait_for_response=True)
         if type(resp) is bool and resp == False:
@@ -752,4 +788,26 @@ class SDNTester:
             for s in self.rule_state_baseline:
                 if s not in state:
                     return False
+        return True
+
+    def _handle_controller_actions(self, actions, proxy):
+        if type(actions) not in (list,tuple):
+            return False
+        for a in actions:
+            if type(a) is not dict:
+                return False
+            if 'action' not in a:
+                return False
+
+            if a['action'] is "kill":
+                if 'time' not in a or type(a['time']) not in (float,int):
+                    return False
+                when = a['time']
+                tmr = threading.Timer(when, self._stop_proxy, [proxy])
+                tmr.start()
+                self.timers.append(tmr)
+                self.log.write("Controller Action: kill after " + str(when) + " seconds\n")
+                self.log.flush()
+            else:
+                return False
         return True

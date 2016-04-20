@@ -49,6 +49,7 @@ def main(args):
         for f in files:
             results.append(load_results(f))
 
+
         common = []
         for s in results[0]:
             found = True
@@ -62,7 +63,7 @@ def main(args):
         #Output
         for r in common:
             print r
-        print len(r)
+        print len(common)
 
 	return 0
 
