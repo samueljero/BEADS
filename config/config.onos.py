@@ -35,13 +35,14 @@ proxy_com_port = 1100
 mininet_user = "root"
 mininet_cleanup_cmd = "mn -c"
 mininet_replace_scripts = True
+mininet_fail_mode = "secure"
 
 #Controller Section
 controller_type = "onos"
 controller_user = "root"
 controller_port = 6633
 controllers_per_instance = topo_controllers
-topo_discovery_delay = 40
+topo_discovery_delay =20
 
 #VeriFlow Section
 veriflow_enabled = False

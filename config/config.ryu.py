@@ -35,6 +35,7 @@ proxy_com_port = 1100
 mininet_user = "root"
 mininet_cleanup_cmd = "mn -c"
 mininet_replace_scripts = True
+mininet_fail_mode = "secure"
 
 #Controller Section
 controller_type = "ryu"

@@ -3,7 +3,7 @@
 #Command Structure:
 #{'module':'arp',
 #  'command':'',
-#  'type':"who-is",
+#  'type':"who-has",
 #  'ids':[],
 #  'freq':0.1,
 #  'num':1,
@@ -14,7 +14,7 @@
 # 'stop'
 #
 # For 'inject':
-# 'type' determines the type of ARP packet, "who-is" or "is-at", defaults to "is-at"
+# 'type' determines the type of ARP packet, "who-has" or "is-at", defaults to "is-at"
 # 'ids' is a list of ids as follows:
 #  ids[0] is destination MAC in ethernet header, defaults to broadcast
 #  ids[1] is source MAC in ethernet header, defaults to host MAC

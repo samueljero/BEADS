@@ -41,6 +41,8 @@ def get_config():
         return None
     if 'topo_discovery' not in conf:
         return None
+    if 'fail_mode' not in conf:
+        return None
     return conf
 
 def send_output(out):
@@ -69,7 +71,7 @@ def main():
 
     #Setup Network
     ts = time.time()
-    topo = FixedTree(depth=2, fanout=2)
+    topo = FixedTree(depth=2, fanout=2, failMode=conf['fail_mode'])
     network = Mininet(topo=topo, controller=None, switch=OVSKernelSwitch)
     for i in range(0, len(ctlip)):
         network.addController(

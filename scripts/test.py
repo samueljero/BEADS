@@ -438,7 +438,8 @@ class SDNTester:
     def _call_test(self, test_script, cmd, proxyaddrs):
         # Build Config and default command
         cfg = {'controllers': proxyaddrs,
-               'topo_discovery': config.topo_discovery_delay}
+               'topo_discovery': config.topo_discovery_delay,
+               'fail_mode': config.mininet_fail_mode}
         if cmd == None:
             cmd = [{'cmd': 'basic'}]
 
@@ -791,6 +792,8 @@ class SDNTester:
         return True
 
     def _handle_controller_actions(self, actions, proxy):
+        if actions is None:
+            return True
         if type(actions) not in (list,tuple):
             return False
         for a in actions:

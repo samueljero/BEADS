@@ -89,6 +89,7 @@ class HostController:
             if "basic" in cmd['cmd']:
                 time.sleep(self.conf['topo_discovery'])
                 results.append(self._ping_test())
+                #time.sleep(120)
                 results.append(self._iperf_test())
                 running = False
             elif "wait" in cmd['cmd']:
