@@ -35,7 +35,8 @@
 #define ACTION_ID_CDIVERT		8
 #define ACTION_ID_PKT_TYPES		9
 #define ACTION_ID_INJECT		10
-#define ACTION_ID_MAX			10
+#define ACTION_ID_CDROP			11
+#define ACTION_ID_MAX			11
 
 #define MOD_SET 1
 #define MOD_ADD 2
@@ -44,6 +45,7 @@
 #define PARAMS_TYPE_ERR			0
 #define PARAMS_TYPE_LIE			1
 #define PARAMS_TYPE_DIVERT		2
+#define PARAMS_TYPE_DROP		3
 
 #define INJECT_TYPE_ERR			0
 #define INJECT_TYPE_REP			1

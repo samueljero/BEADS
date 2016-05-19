@@ -40,6 +40,7 @@ using namespace std;
 #define ACTION_ALIAS_DIVERT		"DIVERT"
 #define ACTION_ALIAS_CLIE		"CLIE"
 #define ACTION_ALIAS_CDIVERT	"CDIVERT"
+#define ACTION_ALIAS_CDROP		"CDROP"
 #define ACTION_ALIAS_PKT_TYPES	"PKT_TYPES"
 #define ACTION_ALIAS_INJECT		"INJECT"
 
@@ -243,6 +244,51 @@ bool Attacker::loadmap(int cid, uint64_t dpid, int ofp_ver, int msg_type, int ac
 				removeCommand(it5, it4, it3, it2, it1);
 				ret = false;
 				goto out;
+			}
+			break;
+		case ACTION_ID_CDROP:
+			ma.type = PARAMS_TYPE_DROP;
+			targ = args_find(args, "p");
+			if (targ && targ->type == ARG_VALUE_TYPE_INT) {
+				ma.percent = targ->value.i;
+				if (targ->value.i == 0) {
+					removeCommand(it5, it4, it3, it2, it1);
+				}
+			} else {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no p tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			targ = args_find(args, "mfield");
+			if (!targ) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no mfield tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			if (targ->type == ARG_VALUE_TYPE_INT) {
+				ma.matchfield.push_back(targ->value.i);
+			} else {
+				ma.matchfield = normalize_field(targ->value.s);
+			}
+			targ = args_find(args, "mval");
+			if (!targ || targ->type != ARG_VALUE_TYPE_INT) {
+				dbgprintf(0, "Adding Command: failed with bad arguments (no mval tag)\n");
+				removeCommand(it5, it4, it3, it2, it1);
+				ret = false;
+				goto out;
+			}
+			ma.matchvalue = targ->value.i;
+			if (it5->second == -3) {
+				/* New action set */
+				it5->second = nxt_param;
+				mod_params[nxt_param] = std::vector<modAttack>();
+				mod_params[nxt_param].push_back(ma);
+				nxt_param++;
+			} else {
+				/* Existing action set */
+				mod_params[it5->second].push_back(ma);
 			}
 			break;
 		case ACTION_ID_DELAY:
@@ -628,6 +674,7 @@ int Attacker::normalize_action_type(char *s)
 	if (!strcmp(ACTION_ALIAS_DIVERT, s)) return ACTION_ID_DIVERT;
 	if (!strcmp(ACTION_ALIAS_CLIE, s)) return ACTION_ID_CLIE;
 	if (!strcmp(ACTION_ALIAS_CDIVERT, s)) return ACTION_ID_CDIVERT;
+	if (!strcmp(ACTION_ALIAS_CDROP, s)) return ACTION_ID_CDROP;
 	if (!strcmp(ACTION_ALIAS_PKT_TYPES, s)) return ACTION_ID_PKT_TYPES;
 	if (!strcmp(ACTION_ALIAS_INJECT, s)) return ACTION_ID_INJECT;
 	return ACTION_ID_ERR;
@@ -822,6 +869,24 @@ pkt_info Attacker::applyActions(pkt_info pk, aamap_t::iterator it4)
 			of_object_delete(pk.ofo);
 			pk.ofo = NULL;
 			goto out;
+		}
+	}
+	it5 = it4->second.find(ACTION_ID_CDROP);
+	if (it5 != it4->second.end()) {
+		param = it5->second;
+		mod_acts = mod_params[param];
+		for (unsigned int x = 0; x < mod_acts.size(); x++) {
+			if (mod_acts[x].type == PARAMS_TYPE_DROP) {
+				if (!isFieldValue(pk.ofo,mod_acts[x].matchfield, mod_acts[x].matchvalue)) {
+					continue;
+				}
+				if (rand() % 100 < mod_acts[x].percent) {
+					dbgprintf(1, "Dropping packet (CDROP)!\n");
+					of_object_delete(pk.ofo);
+					pk.ofo = NULL;
+					goto out;
+				}
+			}
 		}
 	}
 

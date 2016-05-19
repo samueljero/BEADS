@@ -31,7 +31,7 @@ class FixedTree( Topo ):
             node = self.addSwitch( 's%s' % self.switchNum, dpid = self.makeDPID(self.switchNum) ,failMode=fm)
             self.switchNum += 1
             for _ in range( fanout ):
-                child = self.addTree( depth - 1, fanout, failMode)
+                child = self.addTree( depth - 1, fanout, fm)
                 self.addLink( node, child )
         else:
             node = self.addHost( 'h%s' % self.hostNum, mac = self.makeMAC(self.hostNum))

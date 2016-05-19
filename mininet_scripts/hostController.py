@@ -92,6 +92,13 @@ class HostController:
                 #time.sleep(120)
                 results.append(self._iperf_test())
                 running = False
+            elif "hijack" in cmd['cmd']:
+                time.sleep(self.conf['topo_discovery'])
+                results.append(self._ping_test())
+                time.sleep(50)
+                results.append(self._iperf_test())
+                results.append(self._magic_test(1,3,1))
+                running = False
             elif "wait" in cmd['cmd']:
                 time.sleep(self.conf['topo_discovery'])
             elif "ping-test" in cmd['cmd']:
