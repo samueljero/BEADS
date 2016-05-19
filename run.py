@@ -250,8 +250,20 @@ def infinite_loop(tester):
 	i = 0
 	while True:
 		print "Test " + str(i) + "   " +  str(datetime.today())
-                now = str(time.time()+30)
+                #Do Nothing
 		res = tester.doTest({'topo':'/root/test1.py','switch':["*,*,*,*,*,CLEAR,*"],'host':[{'cmd':'basic'}]})
+
+
+                #Break Network Quarantine
+		#res = tester.doTest({'topo':'/root/test1.py','switch':[{'action':'{controllers[0]},2,*,of_packet_in,3,LIE,act==&val=0','time':20}],'host':None,'controller':[{'action':'kill','time':25}],'priority':100})
+                #DeniableDoS
+		#res = tester.doTest({'topo':'/root/test1.py','switch':['{controllers[0]},1,*,of_features_reply,11.3.1,LIE,act==&val=65533'],'host':[{'cmd':'attack','action':{'module':'arp','command':'inject','type':'who-has','ids':[None,None,None,None,None,'10.0.0.42'],'freq':0.5,'num':100,'start':time.time()+30},'mal':2},{'cmd':'basic'}],'controller':None,'priority':100})
+		#res = tester.doTest({'topo':'/root/test1.py','switch':['{controllers[0]},1,*,of_features_reply,11.3.1,LIE,act==&val=65533'],'host':None,'controller':None,'priority':100})
+                #WebServer Impersonation
+		#res = tester.doTest({'topo':'/root/test1.py','switch':[{'action':'{controllers[0]},3,*,of_packet_in,*,CDROP,p=100&mfield=12&mval=2','time':40}],'host':[{'cmd':'attack','action':{'module':'arp','command':'inject','type':'is-at','ids':[None,'vict-mac','vict-mac','vict-ip',None,None],'freq':0.1,'num':200,'start':str(time.time()+45)},'mal':1,'vict':3},{'cmd':'hijack'}],'controller':None,'priority':100})
+		#res = tester.doTest({'topo':'/root/test1.py','switch':None,'host':[{'cmd':'attack','action':{'module':'arp','command':'inject','type':'is-at','ids':[None,'vict-mac','vict-mac','vict-ip',None,None],'freq':0.1,'num':200,'start':str(time.time()+45)},'mal':1,'vict':3},{'cmd':'hijack'}],'controller':None,'priority':100})
+
+
 		print "Test Result: " + str(res[0])
 		print "******"
 		i += 1

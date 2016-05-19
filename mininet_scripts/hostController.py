@@ -96,8 +96,11 @@ class HostController:
                 time.sleep(self.conf['topo_discovery'])
                 results.append(self._ping_test())
                 time.sleep(50)
+                results.append(self._magic_test(1,3,1))
+                results.append(self._http_test(1,3))
                 results.append(self._iperf_test())
                 results.append(self._magic_test(1,3,1))
+                results.append(self._http_test(1,3))
                 running = False
             elif "wait" in cmd['cmd']:
                 time.sleep(self.conf['topo_discovery'])
@@ -256,7 +259,7 @@ class HostController:
             cmd = {'module':'http','command':'start-good-server'}
             if h == self.mininet.hosts[mal]:
                 #Malicious Host
-                cmd = {'module':'http','command':'start-mal-server'}
+                cmd = {'module':'http','command':'start-mal-server', 'mac':self.mininet.hosts[vict].MAC(),'ip':self.mininet.hosts[vict].IP()}
             h.write(repr(cmd)+"\n")
             out = self._read_eval(h)
             if out == None:

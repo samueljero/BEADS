@@ -191,6 +191,8 @@ class Iperf(Module):
 # {'module':'http',
 #    'command':'',
 #    'dst':'10.0.1.1',
+#    'ip':,
+#    'mac':,
 # }
 # Commands:
 #  'start-good-server',
@@ -199,6 +201,7 @@ class Iperf(Module):
 #  'stop-server',
 #
 # 'dst' is only needed for 'start-client'
+# 'ip' and 'mac' are only needed for 'start-mal-server'
 class HttpTest(Module):
     class handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 	def log_message(self, format, *args):
@@ -244,7 +247,9 @@ class HttpTest(Module):
         if "start-good-server" in cmd['command']:
             return self._start_good_server()
         elif "start-mal-server" in cmd['command']:
-            return self._start_mal_server()
+	    if not 'mac' in cmd or not 'ip' in cmd:
+		return False,"No MAC or IP"
+            return self._start_mal_server(cmd['ip'],cmd['mac'])
         elif "start-client" in cmd['command']:
             return self._start_client(cmd)
         elif "stop-server" in cmd['command']:
@@ -264,12 +269,16 @@ class HttpTest(Module):
         self._server.start()
         return True, "Server Started"
 
-    def _start_mal_server(self):
+    def _start_mal_server(self,vict_ip,vict_mac):
         if self._server is not None:
             self._stop_server()
 
         self.saved_cwd = os.getcwd()
         os.chdir(self.bad_path)
+
+	os.system("ifconfig " + str(self.iface) + " down > /dev/null")
+	os.system("ifconfig " + str(self.iface) + " hw ether " + str(vict_mac) + " > /dev/null")
+	os.system("ifconfig " + str(self.iface) + " " + str(vict_ip) + " up > /dev/null")
 
         self._server = HttpTest.HttpServerThread(self.port)
         self._server.daemon = True
@@ -299,6 +308,10 @@ class HttpTest(Module):
     def _stop_server(self):
         if self._server == None:
             return True, "Server Not Running"
+
+	os.system("ifconfig " + str(self.iface) + " down > /dev/null")
+	os.system("ifconfig " + str(self.iface) + " hw ether " + str(self.eth) + " > /dev/null")
+	os.system("ifconfig " + str(self.iface) + " " + str(self.ip) + " up > /dev/null")
 
         if self.saved_cwd is not None:
             os.chdir(self.saved_cwd)
