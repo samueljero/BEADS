@@ -41,6 +41,13 @@ case $CONTROLLER_ID in
         KILL_CMD="pkill ryu-manager"
         STOP_TIMEOUT_SEC=5
         ;;
+	floodlight)
+		START_CMD="/root/floodlight/floodlight.sh"
+        PID_CMD="pgrep java"
+        STOP_CMD="pkill java"
+        KILL_CMD="pkill java"
+        STOP_TIMEOUT_SEC=5
+		;;
     *)
         echo "Controller \"$CONTROLLER_ID\" not yet supported."
         exit 1
