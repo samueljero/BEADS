@@ -11,6 +11,7 @@ from types import NoneType
 
 def main(args):
         reason_count = {}
+	old = False
 
 	#Parse Args
 	argp = argparse.ArgumentParser(description='Testing Results Viewer')
@@ -44,15 +45,22 @@ def main(args):
 			continue
                 
                 records.append(record)
+		if (len(record) == 5):
+			old = True
                 i+=1
 
-        records.sort(key = lambda e: e[4])
+	if old:
+	        records.sort(key = lambda e: e[4])
+	else:
+		records.sort(key = lambda e: e[3])
 
         
         #Output
         for r in records:
-            print "%s: %s" % (r[4],r[3])
-
+	    if old:
+	            print "%s: %s" % (r[4],r[3])
+	    else:
+	            print "%s: %s" % (r[3],r[2])
 	return 0
 
 

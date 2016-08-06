@@ -4,7 +4,8 @@ import sys
 
 def main(d):
     f = open(d+"checkpoint.ck","r")
-    fl = f.readline()
+    fl = f.readlines()
+    fl = "\n".join(fl)
     ck = eval(fl)
     ck.keys()
     len(ck['failed_lst'])
@@ -23,9 +24,16 @@ def main(d):
     for s in retried:
 	found = False
 	for l in lines:
-	    if s[1][0] in str(l[3]):
-	    	found = True
-	    	break
+	    if len(l) == 5:
+		#Old style
+		if s[1][0] in str(l[3]):
+			found = True
+	    		break
+	    else:
+		#New Style
+		if s['switch'][0] in str(l[2]):
+			found = True
+			break
 	if not found:
 	    partial.append(s)
 

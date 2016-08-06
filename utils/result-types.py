@@ -43,11 +43,20 @@ def main(args):
 			i += 1
 			continue
                 
-                result = record[0]
-                check_time = record[1]
-                script = record[2]
-                strat = record[3]
-                reason = record[4]
+		if (len(record) == 4):
+			result = record[0]
+        	        check_time = record[1]
+        	        strat = record[2]
+        	        reason = record[3]
+		elif (len(record) == 5):
+			#old format
+	                result = record[0]
+        	        check_time = record[1]
+        	        script = record[2]
+        	        strat = record[3]
+        	        reason = record[4]
+		else:
+			continue
 
                 if ":" in reason:
                     reason = reason.split(":")[0]
