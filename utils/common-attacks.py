@@ -8,6 +8,13 @@ import re
 import argparse
 from types import NoneType
 
+system_home = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
+coord_path = os.path.abspath(os.path.join(system_home, 'coordinator'))
+sys.path.insert(1,coord_path)
+import strategies
+
+fancy_output = False
+
 
 def load_results(f):
     results = []
@@ -27,7 +34,12 @@ def load_results(f):
             continue
         try:
             record = eval(flines[i])
-            results.append(record[3])
+	    if len(record) == 5:
+		    #Old style
+	            results.append(record[3])
+	    else:
+		    #New style
+		    results.append(str(record[2]['switch']))
         except Exception as e:
             print e
             i += 1
@@ -62,7 +74,12 @@ def main(args):
         
         #Output
         for r in common:
-            print r
+	    if fancy_output:
+		s = eval(r)
+		s = s[0]
+	    	print strategies.StrategyGenerator.pretty_print_switch_strat(s)
+	    else:
+	        print r
         print len(common)
 
 	return 0
