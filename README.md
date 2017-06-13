@@ -7,7 +7,7 @@ Details described in:
 
 Samuel Jero, Xiangyu Bu, Cristina Nita-Rotaru, Hamed Okhravi, Richard Skowyra, and Sonia Fahmy. BEADS: A Framework for Attack Discovery in OpenFlow-based SDN Systems, 20th International Symposium on Research in Attacks, Intrusions, and Defenses (RAID), 2017.
 
-###Preqs
+### Preqs
 * Python 2.7
 * Qemu (Tested with 1.7.0 / 2.3.0)
 * Limited sudo access. In particular, the ability to run the following commands:
@@ -29,7 +29,7 @@ Samuel Jero, Xiangyu Bu, Cristina Nita-Rotaru, Hamed Okhravi, Richard Skowyra, a
 		/usr/local/sbin/restart-dhcpd
 		/bin/ifconfig tap*
 
-###Usage
+### Usage
 * Configure Network:
 
 		./scripts/network_setup.py start 1 <max>
@@ -62,4 +62,5 @@ Samuel Jero, Xiangyu Bu, Cristina Nita-Rotaru, Hamed Okhravi, Richard Skowyra, a
 		./run.py -c localhost -i 0
 
 
-Samuel Jero <sjero@purdue.edu>
+Samuel Jero  
+<sjero@purdue.edu>
