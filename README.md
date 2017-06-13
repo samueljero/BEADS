@@ -3,27 +3,31 @@ BEADS
 
 A framework to automatically generate test scenarios and find attacks in SDN systems, with real, unmodified controller implementations and real software switches.
 
-###Preqs
-	* Python 2.7
-	* Qemu (Tested with 1.7.0 / 2.3.0)
-	* Limited sudo access. In particular, the ability to run the following commands:
+Details described in:
 
-			/usr/bin/tunctl -u [a-z]* -t tap*
-			/usr/bin/tunctl -d tap*
-			/bin/ifconfig tap* hw ether 00:00:00:*:*:*
-			/bin/ifconfig tap* up
-			/bin/ifconfig tap* 0.0.0.0 up
-			/bin/ifconfig tap* 10.0.*.* netmask 255.255.*.* up
-			/bin/ifconfig tap* down
-			/bin/ifconfig br* up
-			/bin/ifconfig br* 10.0.*.* netmask 255.255.*.* up
-			/bin/ifconfig br* down
-			/sbin/brctl addbr br*
-			/sbin/brctl delbr br*
-			/sbin/brctl addif br* tap*
-			/sbin/brctl delif br* tap*
-			/usr/local/sbin/restart-dhcpd
-			/bin/ifconfig tap*
+Samuel Jero, Xiangyu Bu, Cristina Nita-Rotaru, Hamed Okhravi, Richard Skowyra, and Sonia Fahmy. BEADS: A Framework for Attack Discovery in OpenFlow-based SDN Systems, 20th International Symposium on Research in Attacks, Intrusions, and Defenses (RAID), 2017.
+
+###Preqs
+* Python 2.7
+* Qemu (Tested with 1.7.0 / 2.3.0)
+* Limited sudo access. In particular, the ability to run the following commands:
+
+		/usr/bin/tunctl -u [a-z]* -t tap*
+		/usr/bin/tunctl -d tap*
+		/bin/ifconfig tap* hw ether 00:00:00:*:*:*
+		/bin/ifconfig tap* up
+		/bin/ifconfig tap* 0.0.0.0 up
+		/bin/ifconfig tap* 10.0.*.* netmask 255.255.*.* up
+		/bin/ifconfig tap* down
+		/bin/ifconfig br* up
+		/bin/ifconfig br* 10.0.*.* netmask 255.255.*.* up
+		/bin/ifconfig br* down
+		/sbin/brctl addbr br*
+		/sbin/brctl delbr br*
+		/sbin/brctl addif br* tap*
+		/sbin/brctl delif br* tap*
+		/usr/local/sbin/restart-dhcpd
+		/bin/ifconfig tap*
 
 ###Usage
 * Configure Network:
