@@ -47,7 +47,8 @@ In order to build and run BEADS, the following are required:
 
 * Download the VMs:
 
-		wget http://cs.purdue.edu/~sjero/beads_vms.tar.gz
+		wget http://www.cs.purdue.edu/~sjero/beads_vms.tar.gz
+		(or http://sjero.net/ds2/beads_vms.tar.gz)
 		tar xf beads_vms.tar.gz
 
 * Setup the VMs:
